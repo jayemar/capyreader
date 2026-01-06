@@ -542,7 +542,8 @@ fun ArticleScreen(
                             currentFeed = currentFeed,
                             feeds = allFeeds,
                             savedSearches = savedSearches,
-                            folders = allFolders
+                            folders = allFolders,
+                            unreadCount = unreadCount
                         )
                     },
                     snackbarHost = {
