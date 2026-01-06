@@ -6,6 +6,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -47,6 +50,7 @@ import com.capyreader.app.common.Media
 import com.capyreader.app.common.Saver
 import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
+import com.capyreader.app.preferences.ArticleListVerticalSwipe
 import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener
@@ -113,12 +117,24 @@ fun ArticleScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle("")
     val searchState by viewModel.searchState.collectAsStateWithLifecycle(SearchState.INACTIVE)
     val nextFilter by viewModel.nextFilter.collectAsStateWithLifecycle(initialValue = null)
+    val listSwipeBottom by viewModel.listSwipeBottomPreference.collectAsStateWithLifecycle(
+        initialValue = ArticleListVerticalSwipe.NEXT_FEED
+    )
     val afterReadAll by viewModel.afterReadAll.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val refreshInterval by appPreferences
         .refreshInterval
         .collectChangesWithDefault(appPreferences.refreshInterval.get())
 
+    val canSwipeUp = when (listSwipeBottom) {
+        ArticleListVerticalSwipe.DISABLED -> false
+        ArticleListVerticalSwipe.NEXT_FEED -> nextFilter != null
+        ArticleListVerticalSwipe.REFRESH_ARTICLES -> true
+    }
+    val swipeUpIcon = when (listSwipeBottom) {
+        ArticleListVerticalSwipe.REFRESH_ARTICLES -> Icons.Rounded.Refresh
+        else -> Icons.Rounded.KeyboardArrowDown
+    }
     val canSwipeToNextFeed = nextFilter != null
     val context = LocalContext.current
 
@@ -576,9 +592,14 @@ fun ArticleScreen(
                         ) {
                             PullToNextFeedBox(
                                 modifier = Modifier.fillMaxSize(),
-                                enabled = canSwipeToNextFeed,
+                                enabled = canSwipeUp,
+                                icon = swipeUpIcon,
                                 onRequestNext = {
-                                    requestNextFeed()
+                                    when (listSwipeBottom) {
+                                        ArticleListVerticalSwipe.NEXT_FEED -> requestNextFeed()
+                                        ArticleListVerticalSwipe.REFRESH_ARTICLES -> refreshAll()
+                                        ArticleListVerticalSwipe.DISABLED -> {}
+                                    }
                                 },
                             ) {
                                 key(filter, articles.itemCount) {

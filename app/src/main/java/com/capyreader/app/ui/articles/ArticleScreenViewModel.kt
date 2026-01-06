@@ -39,6 +39,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -61,6 +62,9 @@ class ArticleScreenViewModel(
 
     private val listSwipeBottom =
         appPreferences.articleListOptions.swipeBottom.stateIn(viewModelScope)
+
+    val listSwipeBottomPreference: StateFlow<ArticleListVerticalSwipe>
+        get() = listSwipeBottom
 
     private val _searchQuery = MutableStateFlow("")
 
@@ -141,7 +145,7 @@ class ArticleScreenViewModel(
             folders,
             filter
         ) { swipeBottom, savedSearches, feeds, folders, filter ->
-            if (swipeBottom == ArticleListVerticalSwipe.DISABLED) {
+            if (swipeBottom != ArticleListVerticalSwipe.NEXT_FEED) {
                 return@combine null
             }
 

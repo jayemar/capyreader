@@ -257,6 +257,7 @@
     <string name="settings_options_reader_show_bottom_toolbar">Dangos gweithredoedd ar y bar offer gwaelod</string>
     <string name="article_list_swipe_disabled">Wedi\'i analluogi</string>
     <string name="article_list_swipe_next_feed">Mynd i\'r ffrwd nesaf</string>
+    <string name="article_list_swipe_refresh_articles">Adnewyddu erthyglau</string>
     <string name="settings_gestures_enable_horizontal_pagination_subtitle">Llusgo i\'r chwith neu\'r dde i lywio erthyglau</string>
     <string name="after_read_all_behavior_label">Pan fydd popeth wedi\'i ddarllen</string>
     <string name="after_read_all_behavior_default">Rhagosodiad</string>

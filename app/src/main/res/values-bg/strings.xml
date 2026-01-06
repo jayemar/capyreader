@@ -243,6 +243,7 @@
     <string name="feed_nav_drawer_refresh_all">Обновяване на всички</string>
     <string name="settings_gestures_list_swipe_up">Плъзнете нагоре</string>
     <string name="article_list_swipe_next_feed">Отиди на следваща емисия</string>
+    <string name="article_list_swipe_refresh_articles">Обновяване на статии</string>
     <string name="article_list_swipe_disabled">Деактивирано</string>
     <string name="media_save">Запази</string>
     <string name="media_save_failure">Неуспешно запазване на изображение</string>

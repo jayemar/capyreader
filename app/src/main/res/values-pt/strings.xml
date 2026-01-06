@@ -45,6 +45,7 @@
     <string name="article_list_row_swipe_disabled">Desativado</string>
     <string name="article_list_row_swipe_toggle_read">Marcar Lido</string>
     <string name="article_list_swipe_next_feed">Ir para o próximo feed</string>
+    <string name="article_list_swipe_refresh_articles">Atualizar artigos</string>
     <string name="article_list_swipe_disabled">Desativado</string>
     <string name="settings_gestures_enable_horizontal_pagination_subtitle">Deslizar para a esquerda ou para a direita para navegar entre artigos</string>
     <string name="full_content_error_generic">Falha ao analisar artigo</string>

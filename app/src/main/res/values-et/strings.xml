@@ -239,6 +239,7 @@
     <string name="notification_mark_as_read_action">Märgi loetuks</string>
     <string name="settings_gestures_list_swipe_up">Viibates üles</string>
     <string name="article_list_swipe_next_feed">Mine järgmise uudisvoo juurde</string>
+    <string name="article_list_swipe_refresh_articles">Uuenda artikleid</string>
     <string name="article_list_swipe_disabled">Ära tee midagi</string>
     <string name="media_save">Salvesta</string>
     <string name="media_save_success">Pilt on salvestatud</string>

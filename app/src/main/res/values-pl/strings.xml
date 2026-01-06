@@ -222,6 +222,7 @@
     <string name="settings_gestures_list_swipe_up">Przesunięcie w górę</string>
     <string name="article_vertical_open_article_in_browser">Otwórz artykuł w przeglądarce</string>
     <string name="article_list_swipe_next_feed">Następny kanał</string>
+    <string name="article_list_swipe_refresh_articles">Odśwież artykuły</string>
     <string name="article_list_swipe_disabled">Wyłączone</string>
     <string name="feed_nav_drawer_refresh_all">Odśwież wszystkie</string>
     <string name="media_share">Udostępnij</string>

@@ -197,6 +197,7 @@
     <string name="article_list_row_swipe_toggle_read">Olvasott/Olvasatlan váltás</string>
     <string name="article_list_row_swipe_toggle_starred">Csillagozott/Nem csillagozott váltás</string>
     <string name="article_list_swipe_next_feed">Ugrás a következő hírfolyamra</string>
+    <string name="article_list_swipe_refresh_articles">Cikkek frissítése</string>
     <string name="article_list_swipe_disabled">Letiltva</string>
     <string name="article_list_sort_title">Cikkek rendezése</string>
     <string name="article_list_sort_newest_first">Legújabbak elöl</string>

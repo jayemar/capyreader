@@ -205,6 +205,7 @@
     <string name="article_list_row_swipe_toggle_read">Comută starea de citire</string>
     <string name="article_list_row_swipe_toggle_starred">Comută starea de marcare</string>
     <string name="article_list_swipe_next_feed">Mergi la următorul flux</string>
+    <string name="article_list_swipe_refresh_articles">Reîmprospătează articolele</string>
     <string name="article_list_swipe_disabled">Dezactivat</string>
     <string name="crash_log_export_item_title">Distribuie log-urile de eroare</string>
     <string name="edit_feed_tag_section">Adaugă sau alege etichete</string>

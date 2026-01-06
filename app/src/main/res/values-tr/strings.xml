@@ -215,6 +215,7 @@
     <string name="settings_donate_button">Bağış Yap</string>
     <string name="settings_gestures_list_swipe_up">Yukarı Kaydır</string>
     <string name="article_list_swipe_next_feed">Sıradaki akışa git</string>
+    <string name="article_list_swipe_refresh_articles">Makaleleri yenile</string>
     <string name="article_list_swipe_disabled">Devre dışı bırakıldı</string>
     <string name="end_of_feed_text">Her şeyden haberdarsınız!</string>
     <string name="media_save_success">Görsel kaydedildi</string>

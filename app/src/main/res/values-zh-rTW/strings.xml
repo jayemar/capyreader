@@ -247,6 +247,7 @@
     <string name="media_save_success">圖片已儲存</string>
     <string name="media_save">儲存</string>
     <string name="article_list_swipe_next_feed">轉到下個訂閱源</string>
+    <string name="article_list_swipe_refresh_articles">重新整理文章</string>
     <string name="media_share">分享</string>
     <string name="image_preview_menu_option_medium">中</string>
     <string name="blocked_keywords_supporting_text">移除標題或內容中與關鍵字相符的文章</string>

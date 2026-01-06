@@ -193,6 +193,7 @@
     <string name="article_list_row_swipe_toggle_read">既読/未読を切り替え</string>
     <string name="article_list_row_swipe_toggle_starred">スター状態を切り替え</string>
     <string name="article_list_swipe_next_feed">次のフィードに行く</string>
+    <string name="article_list_swipe_refresh_articles">記事を更新</string>
     <string name="article_list_swipe_disabled">無効</string>
     <string name="article_list_sort_newest_first">新しい順</string>
     <string name="article_list_sort_oldest_first">古い順</string>

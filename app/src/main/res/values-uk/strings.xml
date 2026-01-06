@@ -203,6 +203,7 @@
     <string name="article_list_row_swipe_toggle_read">Перемкнути прочитаність</string>
     <string name="article_list_row_swipe_toggle_starred">Перемкнути вподобання</string>
     <string name="article_list_swipe_next_feed">Наступна стрічка</string>
+    <string name="article_list_swipe_refresh_articles">Оновити статті</string>
     <string name="article_list_swipe_disabled">Вимкнено</string>
     <string name="article_list_sort_title">Порядок статей</string>
     <string name="article_list_sort_newest_first">Спершу новіші</string>

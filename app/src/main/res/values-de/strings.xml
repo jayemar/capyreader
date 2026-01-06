@@ -246,6 +246,7 @@
     <string name="notification_mark_as_read_action">Als gelesen markieren</string>
     <string name="image_preview_menu_option_medium">Mittel</string>
     <string name="article_list_swipe_next_feed">Gehe zum nächsten Feed</string>
+    <string name="article_list_swipe_refresh_articles">Artikel aktualisieren</string>
     <string name="media_save_failure">Bild speichern fehlgeschlagen</string>
     <string name="media_share_failure">Bild teilen fehlgeschlagen</string>
     <string name="feed_nav_drawer_refresh_all">Alle aktualisieren</string>

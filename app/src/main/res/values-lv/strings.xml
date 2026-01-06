@@ -171,6 +171,7 @@
     <string name="article_list_row_swipe_toggle_starred">Pārslēgt rakstu kā atzīmētu vai neatzīmētu</string>
     <string name="article_list_row_swipe_toggle_read">Pārslēgt rakstu kā lasītu vai nelasītu</string>
     <string name="article_list_swipe_next_feed">Doties uz nākamo ziņu plūsmu</string>
+    <string name="article_list_swipe_refresh_articles">Atsvaidzināt rakstus</string>
     <string name="article_list_sort_title">Rakstu kārtošanas secība</string>
     <string name="article_list_sort_newest_first">Jaunākos augšgalā</string>
     <string name="article_list_sort_oldest_first">Vecākos augšgalā</string>

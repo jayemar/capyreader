@@ -245,6 +245,7 @@
     <string name="settings_gestures_enable_horizontal_pagination_subtitle">Смахните влево или вправо, чтобы пролистывать статьи</string>
     <string name="settings_gestures_list_swipe_up">Проведите пальцем вверх</string>
     <string name="article_list_swipe_next_feed">Перейти к следующей ленте</string>
+    <string name="article_list_swipe_refresh_articles">Обновить статьи</string>
     <string name="article_list_swipe_disabled">Отключено</string>
     <string name="media_save">Сохранить</string>
     <string name="media_save_success">Изображение сохранено</string>

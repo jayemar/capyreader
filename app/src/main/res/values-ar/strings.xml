@@ -249,6 +249,7 @@
     <string name="image_preview_menu_option_medium">متوسطة</string>
     <string name="settings_gestures_list_swipe_up">السحب لأعلى</string>
     <string name="article_list_swipe_next_feed">إنتقل إلى الموجز التالي</string>
+    <string name="article_list_swipe_refresh_articles">تحديث المقالات</string>
     <string name="article_list_swipe_disabled">تعطيل</string>
     <string name="notification_mark_as_read_action">وضع علامة كمقروءة</string>
     <string name="settings_options_reader_pin_top_toolbar">تثبيت الشريط العلوي</string>

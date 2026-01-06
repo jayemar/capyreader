@@ -234,6 +234,7 @@
     <string name="image_preview_menu_option_medium">Medio</string>
     <string name="settings_gestures_list_swipe_up">Deslizar hacia arriba</string>
     <string name="article_list_swipe_next_feed">Ir al próximo feed</string>
+    <string name="article_list_swipe_refresh_articles">Actualizar artículos</string>
     <string name="article_list_swipe_disabled">Deshabilitado</string>
     <string name="settings_gestures_enable_horizontal_pagination_title">Habilitar desplazamiento horizontal</string>
     <string name="notification_mark_as_read_action">Marcar como leído</string>

@@ -193,6 +193,7 @@
     <string name="article_list_row_swipe_toggle_read">מתג סמן כנקרא</string>
     <string name="article_list_row_swipe_toggle_starred">מתג כוכבית</string>
     <string name="article_list_swipe_next_feed">עבור לפיד הבא</string>
+    <string name="article_list_swipe_refresh_articles">רענן מאמרים</string>
     <string name="article_list_swipe_disabled">מכובה</string>
     <string name="article_list_sort_title">מיין מאמרים</string>
     <string name="article_list_sort_newest_first">חדשים יותר קודם</string>

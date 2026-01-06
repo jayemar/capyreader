@@ -207,6 +207,7 @@
     <string name="article_list_row_swipe_toggle_read">Gelezen in-/uitschakelen</string>
     <string name="article_list_row_swipe_toggle_starred">Favoriet in-/uitschakelen</string>
     <string name="article_list_swipe_next_feed">Ga naar volgende feed</string>
+    <string name="article_list_swipe_refresh_articles">Artikelen vernieuwen</string>
     <string name="article_list_swipe_disabled">Uitgeschakeld</string>
     <string name="article_list_sort_title">Artikel sortering</string>
     <string name="article_list_sort_newest_first">Nieuwste eerst</string>

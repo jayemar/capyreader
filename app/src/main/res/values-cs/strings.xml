@@ -240,6 +240,7 @@
     <string name="image_preview_menu_option_medium">Střední</string>
     <string name="settings_gestures_list_swipe_up">Přejetím nahoru</string>
     <string name="article_list_swipe_next_feed">Přejít na další kanál</string>
+    <string name="article_list_swipe_refresh_articles">Aktualizovat články</string>
     <string name="article_list_swipe_disabled">Vypnuto</string>
     <string name="media_save_success">Obrázek uložen</string>
     <string name="media_share_failure">Sdílení obrázku selhalo</string>

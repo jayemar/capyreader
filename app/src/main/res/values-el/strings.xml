@@ -197,6 +197,7 @@
     <string name="settings_notifications_select_all">Επιλογή Όλων</string>
     <string name="article_list_row_swipe_toggle_starred">Εναλλαγή αγαπημένου</string>
     <string name="article_list_swipe_next_feed">Μετάβαση στην επόμενη ροή</string>
+    <string name="article_list_swipe_refresh_articles">Ανανέωση άρθρων</string>
     <string name="article_list_swipe_disabled">Ανενεργό</string>
     <string name="article_list_sort_title">Ταξινόμηση άρθρων</string>
     <string name="article_list_sort_newest_first">Νεότερα Πρώτα</string>

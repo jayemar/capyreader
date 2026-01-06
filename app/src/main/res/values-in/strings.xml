@@ -248,6 +248,7 @@
     <string name="settings_options_reader_show_bottom_toolbar">Tampilkan Tindakan di Bilah Alat Bawah</string>
     <string name="settings_gestures_list_swipe_up">Usap ke Atas</string>
     <string name="article_list_swipe_next_feed">Ke umpan selanjutnya</string>
+    <string name="article_list_swipe_refresh_articles">Segarkan artikel</string>
     <string name="media_save">Simpan</string>
     <string name="media_save_success">Gambar disimpan</string>
     <string name="feed_nav_drawer_refresh_all">Segarkan semua</string>

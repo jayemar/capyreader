@@ -5,6 +5,7 @@ import androidx.compose.material.icons.rounded.KeyboardArrowDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import com.capyreader.app.ui.components.pullrefresh.SwipeRefresh
@@ -13,6 +14,7 @@ import com.capyreader.app.ui.components.pullrefresh.SwipeRefresh
 fun PullToNextFeedBox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    icon: ImageVector = Icons.Rounded.KeyboardArrowDown,
     onRequestNext: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -27,7 +29,7 @@ fun PullToNextFeedBox(
         swipeEnabled = enabled,
         onTriggerThreshold = { triggerThreshold() },
         indicatorAlignment = Alignment.BottomCenter,
-        icon = Icons.Rounded.KeyboardArrowDown,
+        icon = icon,
         modifier = modifier,
     ) {
         content()

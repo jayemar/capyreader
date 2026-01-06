@@ -239,6 +239,7 @@
     <string name="notification_mark_as_read_action">Marcar como lido</string>
     <string name="media_share_failure">Fallo ao compartir a imaxe</string>
     <string name="article_list_swipe_next_feed">Ir á seguinte canle</string>
+    <string name="article_list_swipe_refresh_articles">Actualizar artigos</string>
     <string name="media_share">Compartir</string>
     <string name="image_preview_menu_option_medium">Medio</string>
     <string name="blocked_keywords_remove_keyword">Retirar palabra clave</string>
