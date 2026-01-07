@@ -30,6 +30,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import com.capyreader.app.ui.articles.feeds.AngleRefreshState
+import com.capyreader.app.ui.articles.feeds.rememberRefreshButtonState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -239,12 +241,14 @@ fun SwipeRefresh(
     indicatorAlignment: Alignment = Alignment.TopCenter,
     indicatorPadding: PaddingValues = PaddingValues(0.dp),
     icon: ImageVector = Icons.Rounded.KeyboardArrowUp,
-    indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp) -> Unit = { s, trigger ->
+    refreshState: AngleRefreshState = AngleRefreshState.STOPPED,
+    indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp, iconRotation: Float) -> Unit = { s, trigger, rotation ->
         SwipeRefreshIndicator(
             state = s,
             refreshTriggerDistance = trigger,
             icon = icon,
-            clockwise = (indicatorAlignment as BiasAlignment).verticalBias != 1f
+            clockwise = (indicatorAlignment as BiasAlignment).verticalBias != 1f,
+            iconRotation = rotation
         )
     },
     clipIndicatorToPadding: Boolean = true,
@@ -252,6 +256,14 @@ fun SwipeRefresh(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
+    val buttonState = rememberRefreshButtonState(refreshState)
+
+    LaunchedEffect(refreshState) {
+        state.isRefreshing = when (refreshState) {
+            AngleRefreshState.STOPPED -> false
+            AngleRefreshState.RUNNING, AngleRefreshState.SETTLING -> true
+        }
+    }
 
     // Our LaunchedEffect, which animates the indicator to its resting position
     LaunchedEffect(state.isSwipeInProgress) {
@@ -302,7 +314,7 @@ fun SwipeRefresh(
                 .let { if (clipIndicatorToPadding) it.clipToBounds() else it }
         ) {
             Box(Modifier.align(indicatorAlignment)) {
-                indicator(state, refreshTriggerDistance)
+                indicator(state, refreshTriggerDistance, buttonState.iconRotation)
             }
         }
     }

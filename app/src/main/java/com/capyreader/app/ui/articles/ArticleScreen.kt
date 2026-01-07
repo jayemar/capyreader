@@ -200,6 +200,13 @@ fun ArticleScreen(
         }
         var refreshAllState by remember { mutableStateOf(AngleRefreshState.STOPPED) }
 
+        LaunchedEffect(refreshAllState) {
+            if (refreshAllState == AngleRefreshState.SETTLING) {
+                delay(1100)
+                refreshAllState = AngleRefreshState.STOPPED
+            }
+        }
+
         val (isUpdatePasswordDialogOpen, setUpdatePasswordDialogOpen) = rememberSaveable {
             mutableStateOf(false)
         }
@@ -594,6 +601,7 @@ fun ArticleScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 enabled = canSwipeUp,
                                 icon = swipeUpIcon,
+                                refreshState = refreshAllState,
                                 onRequestNext = {
                                     when (listSwipeBottom) {
                                         ArticleListVerticalSwipe.NEXT_FEED -> requestNextFeed()

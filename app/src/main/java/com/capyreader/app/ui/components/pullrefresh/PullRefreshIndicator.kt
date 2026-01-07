@@ -97,6 +97,7 @@ fun SwipeRefreshIndicator(
     refreshingOffset: Dp = 16.dp,
     largeIndication: Boolean = false,
     elevation: Dp = 0.dp,
+    iconRotation: Float = 0f,
 ) {
     val sizes = if (largeIndication) LargeSizes else DefaultSizes
 
@@ -177,6 +178,9 @@ fun SwipeRefreshIndicator(
                 imageVector = icon,
                 contentDescription = null,
                 tint = contentColor,
+                modifier = Modifier.graphicsLayer {
+                    rotationZ = iconRotation
+                }
             )
         }
     }
