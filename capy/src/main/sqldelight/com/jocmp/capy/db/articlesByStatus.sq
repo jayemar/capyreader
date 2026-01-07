@@ -50,15 +50,23 @@ AND (articles.title LIKE '%' || :query || '%' OR articles.summary  LIKE '%' || :
 AND (
     :afterArticleID IS NULL
     OR CASE WHEN :newestFirst
-        THEN articles.published_at >= (SELECT published_at FROM articles WHERE id = :afterArticleID)
-        ELSE articles.published_at <= (SELECT published_at FROM articles WHERE id = :afterArticleID)
+        THEN (articles.published_at > (SELECT published_at FROM articles WHERE id = :afterArticleID)
+              OR (articles.published_at = (SELECT published_at FROM articles WHERE id = :afterArticleID)
+                  AND articles.id > :afterArticleID))
+        ELSE (articles.published_at < (SELECT published_at FROM articles WHERE id = :afterArticleID)
+              OR (articles.published_at = (SELECT published_at FROM articles WHERE id = :afterArticleID)
+                  AND articles.id < :afterArticleID))
     END
 )
 AND (
     :beforeArticleID IS NULL
     OR CASE WHEN :newestFirst
-        THEN articles.published_at <= (SELECT published_at FROM articles WHERE id = :beforeArticleID)
-        ELSE articles.published_at >= (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+        THEN (articles.published_at < (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+              OR (articles.published_at = (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+                  AND articles.id < :beforeArticleID))
+        ELSE (articles.published_at > (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+              OR (articles.published_at = (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+                  AND articles.id > :beforeArticleID))
     END
 )
 GROUP BY articles.id;
