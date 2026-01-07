@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import com.capyreader.app.ui.articles.feeds.AngleRefreshState
 import com.capyreader.app.ui.components.pullrefresh.SwipeRefresh
 
 @Composable
@@ -15,6 +16,7 @@ fun PullToNextFeedBox(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: ImageVector = Icons.Rounded.KeyboardArrowDown,
+    refreshState: AngleRefreshState = AngleRefreshState.STOPPED,
     onRequestNext: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -30,6 +32,7 @@ fun PullToNextFeedBox(
         onTriggerThreshold = { triggerThreshold() },
         indicatorAlignment = Alignment.BottomCenter,
         icon = icon,
+        refreshState = refreshState,
         modifier = modifier,
     ) {
         content()
