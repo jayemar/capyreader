@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
@@ -170,19 +173,27 @@ fun SwipeRefreshIndicator(
             modifier = Modifier.size(sizes.size),
             contentAlignment = Alignment.Center
         ) {
-            if (state.isRefreshing) {
+            val progress = (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
+
+            // Show indeterminate spinner when refreshing or when we've reached the trigger point
+            if (state.isRefreshing || (!state.isSwipeInProgress && progress >= 1f)) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     color = contentColor,
                     strokeWidth = 2.dp
                 )
             } else {
-                val progress = (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
-                CircularProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier.size(20.dp),
-                    color = contentColor,
-                    strokeWidth = 2.dp
+                // Show circular arrow icon during the pull
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .graphicsLayer {
+                            // Rotate the icon as you pull (360 degrees at 100% progress)
+                            rotationZ = progress * 360f
+                        }
                 )
             }
         }
