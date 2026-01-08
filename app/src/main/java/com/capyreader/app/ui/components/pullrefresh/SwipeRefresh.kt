@@ -20,6 +20,7 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -304,6 +305,10 @@ fun SwipeRefresh(
             Modifier
                 .padding(indicatorPadding)
                 .matchParentSize()
+                .graphicsLayer {
+                    // Don't clip the indicator as it animates off-screen
+                    clip = false
+                }
         ) {
             Box(Modifier.align(indicatorAlignment)) {
                 indicator(state, refreshTriggerDistance)
