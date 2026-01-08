@@ -251,6 +251,7 @@ fun SwipeRefresh(
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
 
     val refreshTriggerPx = with(LocalDensity.current) { refreshTriggerDistance.toPx() }
+    val isBottomIndicator = (indicatorAlignment as BiasAlignment).verticalBias == 1f
 
     LaunchedEffect(refreshState) {
         state.isRefreshing = when (refreshState) {
@@ -268,7 +269,13 @@ fun SwipeRefresh(
             AngleRefreshState.STOPPED -> {
                 // When refresh completes, animate indicator away
                 if (!state.isSwipeInProgress) {
-                    state.animateOffsetTo(0f)
+                    if (isBottomIndicator) {
+                        // For bottom indicator, animate down off screen (negative offset)
+                        state.animateOffsetTo(-refreshTriggerPx)
+                    } else {
+                        // For top indicator, animate up off screen (0)
+                        state.animateOffsetTo(0f)
+                    }
                 }
             }
         }
@@ -277,8 +284,12 @@ fun SwipeRefresh(
     // Our LaunchedEffect, which animates the indicator to its resting position
     LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
         if (!state.isSwipeInProgress && !state.isRefreshing) {
-            // If there's not a swipe in progress and we're not refreshing, rest the indicator at 0f
-            state.animateOffsetTo(0f)
+            // If there's not a swipe in progress and we're not refreshing, rest the indicator off screen
+            if (isBottomIndicator) {
+                state.animateOffsetTo(-refreshTriggerPx)
+            } else {
+                state.animateOffsetTo(0f)
+            }
         }
     }
 

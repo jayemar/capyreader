@@ -13,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.capyreader.app.ui.components.rememberUpdatedSlingshot
+import kotlin.math.absoluteValue
 
 /**
  * A class to encapsulate details of different indicator sizes.
@@ -92,12 +94,12 @@ fun SwipeRefreshIndicator(
     clockwise: Boolean = true,
     fade: Boolean = true,
     scale: Boolean = false,
-    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
     contentColor: Color = contentColorFor(backgroundColor),
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     refreshingOffset: Dp = 16.dp,
     largeIndication: Boolean = false,
-    elevation: Dp = 6.dp,
+    elevation: Dp = 1.dp,
 ) {
     val sizes = if (largeIndication) LargeSizes else DefaultSizes
 
@@ -134,8 +136,9 @@ fun SwipeRefreshIndicator(
         }
     }
 
-    val alpha = if (fade) {
-        (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
+    val alpha = if (fade && state.isSwipeInProgress) {
+        // Only fade during pull, not during or after refresh
+        (state.indicatorOffset.absoluteValue / indicatorRefreshTrigger).coerceIn(0f, 1f)
     } else {
         1f
     }
