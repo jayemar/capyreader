@@ -24,4 +24,5 @@ private fun translationKey(format: CopyLinkFormat) =
     when (format) {
         CopyLinkFormat.PLAIN_URL -> R.string.settings_copy_link_format_plain_url
         CopyLinkFormat.MARKDOWN -> R.string.settings_copy_link_format_markdown
+        CopyLinkFormat.WIKI_LINK -> R.string.settings_copy_link_format_wiki_link
     }
