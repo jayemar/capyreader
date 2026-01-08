@@ -32,6 +32,13 @@ fun buildCopyToClipboard(
                     url
                 }
             }
+            CopyLinkFormat.WIKI_LINK -> {
+                if (!title.isNullOrBlank()) {
+                    formatWikiLink(title, url)
+                } else {
+                    url
+                }
+            }
         }
         clipboardManager.setText(AnnotatedString(textToCopy))
     }
@@ -40,4 +47,8 @@ fun buildCopyToClipboard(
 private fun formatMarkdownLink(title: String, url: String): String {
     val escapedTitle = title.replace("[", "\\[").replace("]", "\\]")
     return "[$escapedTitle]($url)"
+}
+
+private fun formatWikiLink(title: String, url: String): String {
+    return "[$url $title]"
 }

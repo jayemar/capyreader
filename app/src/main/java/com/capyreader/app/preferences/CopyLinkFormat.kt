@@ -2,7 +2,8 @@ package com.capyreader.app.preferences
 
 enum class CopyLinkFormat {
     PLAIN_URL,
-    MARKDOWN;
+    MARKDOWN,
+    WIKI_LINK;
 
     companion object {
         val default = PLAIN_URL

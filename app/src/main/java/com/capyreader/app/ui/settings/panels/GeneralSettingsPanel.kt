@@ -191,20 +191,12 @@ fun GeneralSettingsPanelView(
         }
 
         FormSection(title = stringResource(R.string.settings_section_browser)) {
-            Column {
-                RowItem {
-                    TextSwitch(
-                        checked = canOpenLinksInternally,
-                        onCheckedChange = updateOpenLinksInternally,
-                        title = stringResource(R.string.settings_option_in_app_browser)
-                    )
-                }
-                RowItem {
-                    CopyLinkFormatSelect(
-                        selected = copyLinkFormat,
-                        update = updateCopyLinkFormat
-                    )
-                }
+            RowItem {
+                TextSwitch(
+                    checked = canOpenLinksInternally,
+                    onCheckedChange = updateOpenLinksInternally,
+                    title = stringResource(R.string.settings_option_in_app_browser)
+                )
             }
         }
 
@@ -217,6 +209,13 @@ fun GeneralSettingsPanelView(
                     subtitle = stringResource(R.string.settings_option_full_content_subtitle)
                 )
             }
+        }
+
+        FormSection(title = stringResource(R.string.settings_section_share)) {
+            CopyLinkFormatSelect(
+                selected = copyLinkFormat,
+                update = updateCopyLinkFormat
+            )
         }
 
         FormSection(

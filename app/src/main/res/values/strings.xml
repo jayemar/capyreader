@@ -214,6 +214,7 @@
     <string name="opml_exporter_success">Export complete</string>
     <string name="opml_exporter_failure">Export failed</string>
     <string name="settings_reader_title">Reader</string>
+    <string name="settings_section_share">Share</string>
     <string name="settings_options_reader_pin_top_toolbar">Pin Top Toolbar</string>
     <string name="settings_options_reader_show_bottom_toolbar">Show Actions on Bottom Toolbar</string>
     <string name="article_bottom_bar_next_article">Go to next article</string>
@@ -265,6 +266,7 @@
     <string name="settings_copy_link_format">Copy link format</string>
     <string name="settings_copy_link_format_plain_url">Plain URL</string>
     <string name="settings_copy_link_format_markdown">Markdown</string>
+    <string name="settings_copy_link_format_wiki_link">Wiki link</string>
     <string name="settings_section_categories">Categories</string>
     <string name="settings_option_show_today_filter">Today</string>
     <string name="reader_image_visibility_show_on_wifi">Only show images on Wi-Fi</string>
