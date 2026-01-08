@@ -265,21 +265,11 @@ fun SwipeRefresh(
                 }
             }
             AngleRefreshState.STOPPED -> {
-                // When refresh completes, PullRefreshIndicator handles the hide animation
-                // Just reset the indicator offset to 0 so it's ready for next pull
+                // When refresh completes, reset indicator offset to 0
                 if (!state.isSwipeInProgress) {
                     state.animateOffsetTo(0f)
                 }
             }
-        }
-    }
-
-    // Our LaunchedEffect, which animates the indicator to its resting position
-    LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
-        if (!state.isSwipeInProgress && !state.isRefreshing) {
-            // If there's not a swipe in progress and we're not refreshing, reset indicator offset
-            // PullRefreshIndicator handles the visual hide animation
-            state.animateOffsetTo(0f)
         }
     }
 

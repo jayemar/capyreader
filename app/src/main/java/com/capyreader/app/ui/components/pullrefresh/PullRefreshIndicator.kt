@@ -114,16 +114,14 @@ fun SwipeRefreshIndicator(
         height = indicatorHeight,
     )
 
-    var offset by remember { mutableStateOf(0f) }
+    var offset by remember { mutableStateOf(if (clockwise) 0f else -indicatorHeight.toFloat()) }
 
     // If the user is currently swiping, we use the 'slingshot' offset directly
     if (state.isSwipeInProgress) {
         offset = slingshot.offset.toFloat()
-    }
-
-    LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
-        // If there's no swipe currently in progress, animate to the correct resting position
-        if (!state.isSwipeInProgress) {
+    } else {
+        // When not swiping, animate to the appropriate position
+        LaunchedEffect(state.isRefreshing) {
             val targetValue = when {
                 state.isRefreshing -> indicatorHeight + refreshingOffsetPx
                 clockwise -> 0f  // Top indicator: hide at top (offset 0)
