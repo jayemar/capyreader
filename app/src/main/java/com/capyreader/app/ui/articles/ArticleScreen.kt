@@ -198,25 +198,11 @@ fun ArticleScreen(
         val (isRefreshInitialized, setRefreshInitialized) = rememberSaveable {
             mutableStateOf(skipInitialRefresh)
         }
-        var refreshAllState by remember { mutableStateOf(AngleRefreshState.STOPPED) }
-
-        // Sync refreshAllState with the actual refresh operation status
-        LaunchedEffect(viewModel.refreshingAll) {
-            if (viewModel.refreshingAll) {
-                // Refresh started - show spinner
-                refreshAllState = AngleRefreshState.RUNNING
-            } else if (refreshAllState == AngleRefreshState.RUNNING) {
-                // Refresh completed - transition to settling animation
-                refreshAllState = AngleRefreshState.SETTLING
-            }
-        }
-
-        LaunchedEffect(refreshAllState) {
-            if (refreshAllState == AngleRefreshState.SETTLING) {
-                delay(1100)
-                refreshAllState = AngleRefreshState.STOPPED
-            }
-        }
+        var isPullToRefreshing by remember { mutableStateOf(false) }
+        var isPullUpRefreshing by remember { mutableStateOf(false) }
+        var isRefreshingAll by remember { mutableStateOf(false) }
+        val refreshAllState = if (isRefreshingAll) AngleRefreshState.RUNNING else AngleRefreshState.STOPPED
+        val pullUpRefreshState = if (isPullUpRefreshing) AngleRefreshState.RUNNING else AngleRefreshState.STOPPED
 
         val (isUpdatePasswordDialogOpen, setUpdatePasswordDialogOpen) = rememberSaveable {
             mutableStateOf(false)
@@ -224,7 +210,6 @@ fun ArticleScreen(
         val coroutineScope = rememberCoroutineScope()
         val scaffoldNavigator = rememberArticleScaffoldNavigator()
         val showMultipleColumns = scaffoldNavigator.scaffoldDirective.maxHorizontalPartitions > 1
-        var isPullToRefreshing by remember { mutableStateOf(false) }
         val addFeedSuccessMessage = stringResource(R.string.add_feed_success)
         val currentFeed by viewModel.currentFeed.collectAsStateWithLifecycle(null)
         val scrollBehavior = pinnedScrollBehavior()
@@ -320,11 +305,14 @@ fun ArticleScreen(
                 scrollToTop()
             }
 
-            if (viewModel.refreshingAll) {
+            if (isRefreshingAll) {
                 return
             }
 
+            isRefreshingAll = true
+
             viewModel.refreshAll {
+                isRefreshingAll = false
                 refreshPagination()
 
                 if (!isRefreshInitialized) {
@@ -338,6 +326,15 @@ fun ArticleScreen(
 
             viewModel.refresh(filter) {
                 isPullToRefreshing = false
+                refreshPagination()
+            }
+        }
+
+        fun refreshPullUp() {
+            isPullUpRefreshing = true
+
+            viewModel.refresh(filter) {
+                isPullUpRefreshing = false
                 refreshPagination()
             }
         }
@@ -600,11 +597,11 @@ fun ArticleScreen(
                                 modifier = Modifier.fillMaxSize(),
                                 enabled = canSwipeUp,
                                 icon = swipeUpIcon,
-                                refreshState = refreshAllState,
+                                refreshState = pullUpRefreshState,
                                 onRequestNext = {
                                     when (listSwipeBottom) {
                                         ArticleListVerticalSwipe.NEXT_FEED -> requestNextFeed()
-                                        ArticleListVerticalSwipe.REFRESH_ARTICLES -> refreshAll()
+                                        ArticleListVerticalSwipe.REFRESH_ARTICLES -> refreshPullUp()
                                         ArticleListVerticalSwipe.DISABLED -> {}
                                     }
                                 },
