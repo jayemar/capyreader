@@ -235,16 +235,7 @@ fun ArticleScreen(
             }
         }
 
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .drop(if (enableMarkReadOnScroll) 0 else 1)
-                .distinctUntilChanged()
-                .collect {
-                    listState.scrollToItem(0)
-                    resetScrollBehaviorOffset()
-                }
-        }
-
+        // Scroll to top when filter changes (user expects to see new results from the top)
         LaunchedEffect(listState) {
             snapshotFlow { filter }
                 .distinctUntilChanged()
