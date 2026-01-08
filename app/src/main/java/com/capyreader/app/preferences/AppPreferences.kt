@@ -71,6 +71,8 @@ class AppPreferences(context: Context) {
     val enableStickyFullContent: Preference<Boolean>
         get() = preferenceStore.getBoolean("enable_sticky_full_content", false)
 
+    val copyLinkFormat: Preference<CopyLinkFormat>
+        get() = preferenceStore.getEnum("copy_link_format", CopyLinkFormat.default)
 
     val layout: Preference<LayoutPreference>
         get() = preferenceStore.getEnum("layout_preference", LayoutPreference.RESPONSIVE)

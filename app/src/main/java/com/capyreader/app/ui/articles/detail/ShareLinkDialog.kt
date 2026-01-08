@@ -26,16 +26,21 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.capyreader.app.R
 import com.capyreader.app.common.shareLink
+import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.ui.components.DialogCard
 import com.capyreader.app.ui.components.ShareLink
 import com.capyreader.app.ui.components.buildCopyToClipboard
 import com.capyreader.app.ui.theme.CapyTheme
+import org.koin.compose.koinInject
 
 @Composable
 fun ShareLinkDialog(
     onClose: () -> Unit,
     link: ShareLink,
 ) {
+    val appPreferences = koinInject<AppPreferences>()
+    val format = appPreferences.copyLinkFormat.get()
+
     val listItemColors =
         ListItemDefaults.colors(containerColor = CardDefaults.cardColors().containerColor)
 
@@ -45,7 +50,11 @@ fun ShareLinkDialog(
         onClose()
     }
 
-    val copy = buildCopyToClipboard(link.url)
+    val copy = buildCopyToClipboard(
+        url = link.url,
+        title = link.text,
+        format = format
+    )
 
     val copyLink = {
         copy()
