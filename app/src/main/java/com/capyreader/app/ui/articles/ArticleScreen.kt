@@ -131,10 +131,6 @@ fun ArticleScreen(
         ArticleListVerticalSwipe.NEXT_FEED -> nextFilter != null
         ArticleListVerticalSwipe.REFRESH_ARTICLES -> true
     }
-    val swipeUpIcon = when (listSwipeBottom) {
-        ArticleListVerticalSwipe.REFRESH_ARTICLES -> Icons.Rounded.Refresh
-        else -> Icons.Rounded.KeyboardArrowDown
-    }
     val canSwipeToNextFeed = nextFilter != null
     val context = LocalContext.current
 
@@ -604,7 +600,6 @@ fun ArticleScreen(
                             PullToNextFeedBox(
                                 modifier = Modifier.fillMaxSize(),
                                 enabled = canSwipeUp,
-                                icon = swipeUpIcon,
                                 refreshState = pullUpRefreshState,
                                 onRequestNext = {
                                     when (listSwipeBottom) {

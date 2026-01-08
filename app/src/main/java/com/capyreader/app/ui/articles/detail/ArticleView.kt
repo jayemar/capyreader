@@ -292,35 +292,16 @@ fun ArticlePullRefresh(
     SwipeRefresh(
         onRefresh = { onSwipe(topSwipe) },
         swipeEnabled = enableTopSwipe,
-        icon = swipeIcon(
-            topSwipe,
-            relatedArticleIcon = Icons.Rounded.KeyboardArrowUp
-        ),
         onTriggerThreshold = { triggerThreshold() }
     ) {
         SwipeRefresh(
             onRefresh = { onSwipe(bottomSwipe) },
             swipeEnabled = enableBottomSwipe,
-            icon = swipeIcon(
-                bottomSwipe,
-                relatedArticleIcon = Icons.Rounded.KeyboardArrowDown
-            ),
             onTriggerThreshold = { triggerThreshold() },
             indicatorAlignment = Alignment.BottomCenter,
         ) {
             content()
         }
-    }
-}
-
-fun swipeIcon(
-    swipe: ArticleVerticalSwipe,
-    relatedArticleIcon: ImageVector
-): ImageVector {
-    return when (swipe) {
-        LOAD_FULL_CONTENT -> Icons.AutoMirrored.Rounded.Article
-        OPEN_ARTICLE_IN_BROWSER -> Icons.AutoMirrored.Rounded.OpenInNew
-        else -> relatedArticleIcon
     }
 }
 

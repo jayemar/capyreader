@@ -6,8 +6,6 @@ import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -22,7 +20,6 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -31,7 +28,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import com.capyreader.app.ui.articles.feeds.AngleRefreshState
-import com.capyreader.app.ui.articles.feeds.rememberRefreshButtonState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -240,15 +236,12 @@ fun SwipeRefresh(
     refreshTriggerDistance: Dp = 80.dp,
     indicatorAlignment: Alignment = Alignment.TopCenter,
     indicatorPadding: PaddingValues = PaddingValues(0.dp),
-    icon: ImageVector = Icons.Rounded.KeyboardArrowUp,
     refreshState: AngleRefreshState = AngleRefreshState.STOPPED,
-    indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp, iconRotation: Float) -> Unit = { s, trigger, rotation ->
+    indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp) -> Unit = { s, trigger ->
         SwipeRefreshIndicator(
             state = s,
             refreshTriggerDistance = trigger,
-            icon = icon,
-            clockwise = (indicatorAlignment as BiasAlignment).verticalBias != 1f,
-            iconRotation = rotation
+            clockwise = (indicatorAlignment as BiasAlignment).verticalBias != 1f
         )
     },
     clipIndicatorToPadding: Boolean = true,
@@ -256,7 +249,6 @@ fun SwipeRefresh(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
-    val buttonState = rememberRefreshButtonState(refreshState)
 
     val refreshTriggerPx = with(LocalDensity.current) { refreshTriggerDistance.toPx() }
 
@@ -329,7 +321,7 @@ fun SwipeRefresh(
                 .let { if (clipIndicatorToPadding) it.clipToBounds() else it }
         ) {
             Box(Modifier.align(indicatorAlignment)) {
-                indicator(state, refreshTriggerDistance, buttonState.iconRotation)
+                indicator(state, refreshTriggerDistance)
             }
         }
     }
