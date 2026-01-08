@@ -91,12 +91,12 @@ fun SwipeRefreshIndicator(
     icon: ImageVector,
     fade: Boolean = true,
     scale: Boolean = false,
-    backgroundColor: Color = MaterialTheme.colorScheme.secondaryContainer,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = contentColorFor(backgroundColor),
     shape: Shape = MaterialTheme.shapes.small.copy(CornerSize(percent = 50)),
     refreshingOffset: Dp = 16.dp,
     largeIndication: Boolean = false,
-    elevation: Dp = 0.dp,
+    elevation: Dp = 6.dp,
     iconRotation: Float = 0f,
 ) {
     val sizes = if (largeIndication) LargeSizes else DefaultSizes
@@ -134,9 +134,16 @@ fun SwipeRefreshIndicator(
         }
     }
 
+    val alpha = if (fade) {
+        (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
+    } else {
+        1f
+    }
+
     Surface(
         modifier = modifier
             .size(size = sizes.size)
+            .alpha(alpha)
             .graphicsLayer {
                 // Translate the indicator according to the slingshot and the Position of the Swipe
                 // to refresh.
@@ -162,16 +169,8 @@ fun SwipeRefreshIndicator(
         color = backgroundColor,
         shadowElevation = elevation
     ) {
-        val alpha = if (fade) {
-            (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
-        } else {
-            1f
-        }
-
         Box(
-            modifier = Modifier
-                .size(20.dp)
-                .alpha(alpha),
+            modifier = Modifier.size(20.dp),
             contentAlignment = Alignment.Center
         ) {
             Icon(
