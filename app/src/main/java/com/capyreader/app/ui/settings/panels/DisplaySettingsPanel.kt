@@ -29,6 +29,7 @@ import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
+import com.capyreader.app.ui.articles.SummaryMaxLines
 import com.capyreader.app.ui.collectChangesWithCurrent
 import com.capyreader.app.ui.components.FormSection
 import com.capyreader.app.ui.components.TextSwitch
@@ -70,12 +71,16 @@ fun DisplaySettingsPanel(
             showFeedIcons = viewModel.showFeedIcons,
             showFeedName = viewModel.showFeedName,
             shortenTitles = viewModel.shortenTitles,
+            shortenSummaries = viewModel.shortenSummaries,
+            summaryMaxLines = viewModel.summaryMaxLines,
             updateImagePreview = viewModel::updateImagePreview,
             updateSummary = viewModel::updateSummary,
             updateFeedName = viewModel::updateFeedName,
             updateFeedIcons = viewModel::updateFeedIcons,
             updateFontScale = viewModel::updateFontScale,
             updateShortenTitles = viewModel::updateShortenTitles,
+            updateShortenSummaries = viewModel::updateShortenSummaries,
+            updateSummaryMaxLines = viewModel::updateSummaryMaxLines,
         )
     )
 }
@@ -238,12 +243,16 @@ private fun DisplaySettingsPanelViewPreview() {
                     showFeedIcons = true,
                     showFeedName = false,
                     shortenTitles = true,
+                    shortenSummaries = true,
+                    summaryMaxLines = SummaryMaxLines.default,
                     updateImagePreview = {},
                     updateSummary = {},
                     updateFeedName = {},
                     updateFeedIcons = {},
                     updateFontScale = {},
                     updateShortenTitles = {},
+                    updateShortenSummaries = {},
+                    updateSummaryMaxLines = {},
                 ),
                 updatePinArticleBars = {},
                 pinArticleBars = false,

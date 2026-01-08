@@ -7,6 +7,7 @@ import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
+import com.capyreader.app.ui.articles.SummaryMaxLines
 import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.articles.FontOption
 import com.jocmp.capy.articles.FontSize
@@ -163,6 +164,12 @@ class AppPreferences(context: Context) {
 
         val shortenTitles: Preference<Boolean>
             get() = preferenceStore.getBoolean("article_display_shorten_titles", true)
+
+        val shortenSummaries: Preference<Boolean>
+            get() = preferenceStore.getBoolean("article_display_shorten_summaries", true)
+
+        val summaryMaxLines: Preference<SummaryMaxLines>
+            get() = preferenceStore.getEnum("article_display_summary_max_lines", SummaryMaxLines.default)
 
         val fontScale: Preference<ArticleListFontScale>
             get() = preferenceStore.getEnum(
