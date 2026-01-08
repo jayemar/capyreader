@@ -128,7 +128,7 @@ fun SwipeRefreshIndicator(
                 initialValue = offset,
                 targetValue = when {
                     state.isRefreshing -> indicatorHeight + refreshingOffsetPx
-                    else -> 0f
+                    else -> 0f  // Hide indicator (translates off screen via graphicsLayer)
                 }
             ) { value, _ ->
                 offset = value

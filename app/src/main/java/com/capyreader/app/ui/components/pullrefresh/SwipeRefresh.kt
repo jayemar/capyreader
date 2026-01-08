@@ -117,12 +117,9 @@ private class SwipeRefreshNestedScrollConnection(
         !enabled -> Offset.Zero
         // If we're refreshing, return zero
         state.isRefreshing -> Offset.Zero
-        // If the user is swiping and there's y remaining, handle it
+        // For top indicator: handle upward drag (collapsing the indicator)
         scrollFromTop && source == NestedScrollSource.Drag && available.y < 0f -> onScroll(available)
-        !scrollFromTop && source == NestedScrollSource.Drag && available.y > 0f -> onScroll(
-            available
-        )
-
+        // For bottom indicator: don't intercept in pre-scroll, let the list handle it first
         else -> Offset.Zero
     }
 
@@ -135,8 +132,9 @@ private class SwipeRefreshNestedScrollConnection(
         !enabled -> Offset.Zero
         // If we're refreshing, return zero
         state.isRefreshing -> Offset.Zero
-        // If the user is swiping and there's y remaining, handle it
+        // For top indicator: handle downward drag when at top (pull-down-to-refresh)
         scrollFromTop && source == NestedScrollSource.Drag && available.y > 0f -> onScroll(available)
+        // For bottom indicator: handle upward drag when at bottom (pull-up-to-refresh)
         !scrollFromTop && source == NestedScrollSource.Drag && available.y < 0f -> onScroll(
             available
         )
@@ -267,15 +265,10 @@ fun SwipeRefresh(
                 }
             }
             AngleRefreshState.STOPPED -> {
-                // When refresh completes, animate indicator away
+                // When refresh completes, PullRefreshIndicator handles the hide animation
+                // Just reset the indicator offset to 0 so it's ready for next pull
                 if (!state.isSwipeInProgress) {
-                    if (isBottomIndicator) {
-                        // For bottom indicator, animate down off screen (negative offset)
-                        state.animateOffsetTo(-refreshTriggerPx)
-                    } else {
-                        // For top indicator, animate up off screen (0)
-                        state.animateOffsetTo(0f)
-                    }
+                    state.animateOffsetTo(0f)
                 }
             }
         }
@@ -284,12 +277,9 @@ fun SwipeRefresh(
     // Our LaunchedEffect, which animates the indicator to its resting position
     LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
         if (!state.isSwipeInProgress && !state.isRefreshing) {
-            // If there's not a swipe in progress and we're not refreshing, rest the indicator off screen
-            if (isBottomIndicator) {
-                state.animateOffsetTo(-refreshTriggerPx)
-            } else {
-                state.animateOffsetTo(0f)
-            }
+            // If there's not a swipe in progress and we're not refreshing, reset indicator offset
+            // PullRefreshIndicator handles the visual hide animation
+            state.animateOffsetTo(0f)
         }
     }
 
