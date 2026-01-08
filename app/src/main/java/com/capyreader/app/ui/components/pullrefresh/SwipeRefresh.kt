@@ -312,14 +312,8 @@ fun SwipeRefresh(
 
         Box(
             Modifier
-                // If we're not clipping to the padding, we use clipToBounds() before the padding()
-                // modifier.
-                .let { if (!clipIndicatorToPadding) it.clipToBounds() else it }
                 .padding(indicatorPadding)
                 .matchParentSize()
-                // Else, if we're are clipping to the padding, we use clipToBounds() after
-                // the padding() modifier.
-                .let { if (clipIndicatorToPadding) it.clipToBounds() else it }
         ) {
             Box(Modifier.align(indicatorAlignment)) {
                 indicator(state, refreshTriggerDistance)

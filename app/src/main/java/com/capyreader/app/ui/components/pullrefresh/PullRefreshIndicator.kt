@@ -136,11 +136,14 @@ fun SwipeRefreshIndicator(
         }
     }
 
-    val alpha = if (fade && state.isSwipeInProgress) {
-        // Only fade during pull, not during or after refresh
-        (state.indicatorOffset.absoluteValue / indicatorRefreshTrigger).coerceIn(0f, 1f)
-    } else {
-        1f
+    val alpha = when {
+        // During pull: fade in based on progress
+        fade && state.isSwipeInProgress ->
+            (state.indicatorOffset.absoluteValue / indicatorRefreshTrigger).coerceIn(0f, 1f)
+        // During/after refresh: fully visible
+        state.isRefreshing -> 1f
+        // Hidden state: fade out when offset is near 0
+        else -> (offset / indicatorHeight.toFloat()).coerceIn(0f, 1f)
     }
 
     Surface(
