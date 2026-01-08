@@ -45,6 +45,7 @@ import com.capyreader.app.R
 import com.capyreader.app.common.RowItem
 import com.capyreader.app.notifications.Notifications
 import com.capyreader.app.preferences.AfterReadAllBehavior
+import com.capyreader.app.preferences.CopyLinkFormat
 import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.ui.CrashReporting
 import com.capyreader.app.ui.components.FormSection
@@ -100,6 +101,8 @@ fun GeneralSettingsPanel(
             enableStickyFullContent = viewModel.enableStickyFullContent,
             markReadOnScroll = viewModel.markReadOnScroll,
             updateMarkReadOnScroll = viewModel::updateMarkReadOnScroll,
+            copyLinkFormat = viewModel.copyLinkFormat,
+            updateCopyLinkFormat = viewModel::updateCopyLinkFormat,
         )
     }
 }
@@ -125,6 +128,8 @@ fun GeneralSettingsPanelView(
     confirmMarkAllRead: Boolean,
     markReadOnScroll: Boolean,
     updateMarkReadOnScroll: (enable: Boolean) -> Unit,
+    copyLinkFormat: CopyLinkFormat,
+    updateCopyLinkFormat: (CopyLinkFormat) -> Unit,
 ) {
     val (isClearArticlesDialogOpen, setClearArticlesDialogOpen) = remember { mutableStateOf(false) }
 
@@ -171,12 +176,20 @@ fun GeneralSettingsPanelView(
         }
 
         FormSection(title = stringResource(R.string.settings_section_browser)) {
-            RowItem {
-                TextSwitch(
-                    checked = canOpenLinksInternally,
-                    onCheckedChange = updateOpenLinksInternally,
-                    title = stringResource(R.string.settings_option_in_app_browser)
-                )
+            Column {
+                RowItem {
+                    TextSwitch(
+                        checked = canOpenLinksInternally,
+                        onCheckedChange = updateOpenLinksInternally,
+                        title = stringResource(R.string.settings_option_in_app_browser)
+                    )
+                }
+                RowItem {
+                    CopyLinkFormatSelect(
+                        selected = copyLinkFormat,
+                        update = updateCopyLinkFormat
+                    )
+                }
             }
         }
 
@@ -370,6 +383,8 @@ private fun GeneralSettingsPanelPreview() {
                 updateAfterReadAll = {},
                 markReadOnScroll = false,
                 updateMarkReadOnScroll = {},
+                copyLinkFormat = CopyLinkFormat.default,
+                updateCopyLinkFormat = {}
             )
         }
     }

@@ -75,6 +75,9 @@ class AppPreferences(context: Context) {
     val paneExpansionIndex: Preference<Int>
         get() = preferenceStore.getInt("pane_expansion_index", DefaultPaneExpansionIndex)
 
+    val copyLinkFormat: Preference<CopyLinkFormat>
+        get() = preferenceStore.getEnum("copy_link_format", CopyLinkFormat.default)
+
     fun pinFeedGroup(type: FeedGroup): Preference<Boolean> {
         return preferenceStore.getBoolean("feed_group_${type.toString().lowercase()}", true)
     }
