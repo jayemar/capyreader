@@ -124,12 +124,14 @@ fun SwipeRefreshIndicator(
     LaunchedEffect(state.isSwipeInProgress, state.isRefreshing) {
         // If there's no swipe currently in progress, animate to the correct resting position
         if (!state.isSwipeInProgress) {
+            val targetValue = when {
+                state.isRefreshing -> indicatorHeight + refreshingOffsetPx
+                clockwise -> 0f  // Top indicator: hide at top (offset 0)
+                else -> -indicatorHeight.toFloat()  // Bottom indicator: hide below screen (negative offset)
+            }
             animate(
                 initialValue = offset,
-                targetValue = when {
-                    state.isRefreshing -> indicatorHeight + refreshingOffsetPx
-                    else -> 0f  // Hide indicator (translates off screen via graphicsLayer)
-                }
+                targetValue = targetValue
             ) { value, _ ->
                 offset = value
             }
@@ -142,8 +144,16 @@ fun SwipeRefreshIndicator(
             (state.indicatorOffset.absoluteValue / indicatorRefreshTrigger).coerceIn(0f, 1f)
         // During/after refresh: fully visible
         state.isRefreshing -> 1f
-        // Hidden state: fade out when offset is near 0
-        else -> (offset / indicatorHeight.toFloat()).coerceIn(0f, 1f)
+        // Hidden state: fade out based on offset
+        else -> {
+            if (clockwise) {
+                // Top indicator: fade out as offset approaches 0
+                (offset / indicatorHeight.toFloat()).coerceIn(0f, 1f)
+            } else {
+                // Bottom indicator: fade out as offset approaches negative
+                ((offset + indicatorHeight.toFloat()) / indicatorHeight.toFloat()).coerceIn(0f, 1f)
+            }
+        }
     }
 
     Surface(
