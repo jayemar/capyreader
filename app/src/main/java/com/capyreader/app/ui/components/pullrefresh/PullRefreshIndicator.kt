@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
@@ -23,7 +23,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -88,7 +87,6 @@ fun SwipeRefreshIndicator(
     refreshTriggerDistance: Dp,
     modifier: Modifier = Modifier,
     clockwise: Boolean = true,
-    icon: ImageVector,
     fade: Boolean = true,
     scale: Boolean = false,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
@@ -97,7 +95,6 @@ fun SwipeRefreshIndicator(
     refreshingOffset: Dp = 16.dp,
     largeIndication: Boolean = false,
     elevation: Dp = 6.dp,
-    iconRotation: Float = 0f,
 ) {
     val sizes = if (largeIndication) LargeSizes else DefaultSizes
 
@@ -170,17 +167,24 @@ fun SwipeRefreshIndicator(
         shadowElevation = elevation
     ) {
         Box(
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(sizes.size),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = contentColor,
-                modifier = Modifier.graphicsLayer {
-                    rotationZ = iconRotation
-                }
-            )
+            if (state.isRefreshing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
+            } else {
+                val progress = (state.indicatorOffset / indicatorRefreshTrigger).coerceIn(0f, 1f)
+                CircularProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.size(20.dp),
+                    color = contentColor,
+                    strokeWidth = 2.dp
+                )
+            }
         }
     }
 }
