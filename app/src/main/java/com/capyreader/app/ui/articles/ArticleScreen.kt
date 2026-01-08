@@ -200,6 +200,17 @@ fun ArticleScreen(
         }
         var refreshAllState by remember { mutableStateOf(AngleRefreshState.STOPPED) }
 
+        // Sync refreshAllState with the actual refresh operation status
+        LaunchedEffect(viewModel.refreshingAll) {
+            if (viewModel.refreshingAll) {
+                // Refresh started - show spinner
+                refreshAllState = AngleRefreshState.RUNNING
+            } else if (refreshAllState == AngleRefreshState.RUNNING) {
+                // Refresh completed - transition to settling animation
+                refreshAllState = AngleRefreshState.SETTLING
+            }
+        }
+
         LaunchedEffect(refreshAllState) {
             if (refreshAllState == AngleRefreshState.SETTLING) {
                 delay(1100)
@@ -309,15 +320,11 @@ fun ArticleScreen(
                 scrollToTop()
             }
 
-            if (refreshAllState == AngleRefreshState.RUNNING) {
+            if (viewModel.refreshingAll) {
                 return
             }
 
-
-            refreshAllState = AngleRefreshState.RUNNING
-
             viewModel.refreshAll {
-                refreshAllState = AngleRefreshState.SETTLING
                 refreshPagination()
 
                 if (!isRefreshInitialized) {
