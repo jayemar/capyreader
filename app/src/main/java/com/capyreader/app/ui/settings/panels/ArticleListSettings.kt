@@ -13,6 +13,7 @@ import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.common.RowItem
 import com.capyreader.app.ui.articles.ArticleListFontScale
+import com.capyreader.app.ui.articles.SummaryMaxLines
 import com.capyreader.app.ui.components.FormSection
 import com.capyreader.app.ui.components.LabelStyle
 import com.capyreader.app.ui.components.TextSwitch
@@ -26,6 +27,8 @@ data class ArticleListOptions(
     val showFeedName: Boolean,
     val showSummary: Boolean,
     val shortenTitles: Boolean,
+    val shortenSummaries: Boolean,
+    val summaryMaxLines: SummaryMaxLines,
     val fontScale: ArticleListFontScale,
     val updateFeedIcons: (show: Boolean) -> Unit,
     val updateFeedName: (show: Boolean) -> Unit,
@@ -33,6 +36,8 @@ data class ArticleListOptions(
     val updateSummary: (show: Boolean) -> Unit,
     val updateFontScale: (scale: ArticleListFontScale) -> Unit,
     val updateShortenTitles: (show: Boolean) -> Unit,
+    val updateShortenSummaries: (show: Boolean) -> Unit,
+    val updateSummaryMaxLines: (maxLines: SummaryMaxLines) -> Unit,
 )
 
 @Composable
@@ -63,7 +68,17 @@ fun ArticleListSettings(
                 checked = options.shortenTitles,
                 title = stringResource(R.string.settings_article_list_shorten_titles)
             )
+            TextSwitch(
+                onCheckedChange = options.updateShortenSummaries,
+                checked = options.shortenSummaries,
+                title = stringResource(R.string.settings_article_list_shorten_summaries)
+            )
         }
+
+        SummaryMaxLinesSelect(
+            selected = options.summaryMaxLines,
+            update = options.updateSummaryMaxLines
+        )
 
         PreferenceSelect(
             selected = options.imagePreview,
@@ -106,12 +121,16 @@ private fun ArticleListSettingsPreview() {
             fontScale = ArticleListFontScale.LARGE,
             showFeedName = false,
             shortenTitles = true,
+            shortenSummaries = true,
+            summaryMaxLines = SummaryMaxLines.default,
             updateImagePreview = {},
             updateSummary = {},
             updateFeedName = {},
             updateFeedIcons = {},
             updateFontScale = {},
             updateShortenTitles = {},
+            updateShortenSummaries = {},
+            updateSummaryMaxLines = {},
         )
     )
 }
