@@ -85,6 +85,8 @@ data class ArticleRowOptions(
     val shortenTitles: Boolean = true,
     val accentColors: Boolean = false,
     val dim: Boolean = true,
+    val shortenSummaries: Boolean = true,
+    val summaryMaxLines: SummaryMaxLines = SummaryMaxLines.default,
 )
 
 @Composable
@@ -201,7 +203,7 @@ fun ArticleRow(
                         if (article.summary.isNotBlank() && options.showSummary) {
                             Text(
                                 text = article.summary,
-                                maxLines = 2,
+                                maxLines = if (options.shortenSummaries) options.summaryMaxLines.lines else Int.MAX_VALUE,
                                 overflow = TextOverflow.Ellipsis,
                                 fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,
                             )
