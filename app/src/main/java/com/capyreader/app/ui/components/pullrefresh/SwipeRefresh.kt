@@ -20,7 +20,6 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -28,7 +27,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.capyreader.app.ui.articles.feeds.AngleRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -306,11 +304,7 @@ fun SwipeRefresh(
             Modifier
                 .padding(indicatorPadding)
                 .matchParentSize()
-                .zIndex(10f)
-                .graphicsLayer {
-                    // Don't clip the indicator as it animates off-screen
-                    clip = false
-                }
+                .clipToBounds()
         ) {
             Box(Modifier.align(indicatorAlignment)) {
                 indicator(state, refreshTriggerDistance)
