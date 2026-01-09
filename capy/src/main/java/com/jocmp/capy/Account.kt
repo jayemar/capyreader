@@ -51,11 +51,11 @@ data class Account(
     val source: Source = Source.LOCAL,
     val faviconFetcher: FaviconFetcher,
     private val clientCertManager: ClientCertManager,
-    private val localHttpClient: OkHttpClient = LocalOkHttpClient.forAccount(path = cacheDirectory),
+    val httpClient: OkHttpClient = LocalOkHttpClient.forAccount(path = cacheDirectory),
     val delegate: AccountDelegate = when (source) {
         Source.LOCAL -> LocalAccountDelegate(
             database = database,
-            httpClient = localHttpClient,
+            httpClient = httpClient,
             faviconFetcher = faviconFetcher,
             preferences = preferences,
         )
@@ -86,7 +86,7 @@ data class Account(
     private val taggingRecords = TaggingRecords(database)
     private val savedSearchRecords = SavedSearchRecords(database)
 
-    private val articleContent = ArticleContent(localHttpClient)
+    private val articleContent = ArticleContent(httpClient)
 
     val taggedFeeds = feedRecords.taggedFeeds().map {
         it.sortedByTitle()
