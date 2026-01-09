@@ -6,6 +6,7 @@ import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
+import com.jocmp.capy.persistence.forUnreadCounts
 import com.jocmp.capy.persistence.listMapper
 import com.jocmp.capy.persistence.toStatusPair
 import java.time.OffsetDateTime
@@ -64,6 +65,22 @@ class ByArticleStatus(private val database: Database) {
         since: OffsetDateTime? = null
     ): Query<Long> {
         val (read, starred) = status.toStatusPair
+
+        return database.articlesByStatusQueries.countAll(
+            read = read,
+            starred = starred,
+            query = query,
+            lastReadAt = mapLastRead(read, since),
+            publishedSince = null
+        )
+    }
+
+    fun countUnread(
+        status: ArticleStatus,
+        query: String? = null,
+        since: OffsetDateTime? = null
+    ): Query<Long> {
+        val (read, starred) = status.forUnreadCounts
 
         return database.articlesByStatusQueries.countAll(
             read = read,

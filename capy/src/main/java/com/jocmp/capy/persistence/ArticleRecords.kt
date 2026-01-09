@@ -244,13 +244,13 @@ internal class ArticleRecords internal constructor(
         val since = null
 
         val count = when (filter) {
-            is ArticleFilter.Articles -> byStatus.count(
+            is ArticleFilter.Articles -> byStatus.countUnread(
                 status = filter.articleStatus,
                 query = query,
                 since = null
             )
 
-            is ArticleFilter.Feeds -> byFeed.count(
+            is ArticleFilter.Feeds -> byFeed.countUnread(
                 feedIDs = listOf(filter.feedID),
                 status = filter.feedStatus,
                 query = query,
@@ -258,7 +258,7 @@ internal class ArticleRecords internal constructor(
                 priority = FeedPriority.FEED,
             )
 
-            is ArticleFilter.Folders -> byFeed.count(
+            is ArticleFilter.Folders -> byFeed.countUnread(
                 feedIDs = folderFeedIDs(filter),
                 status = filter.status,
                 query = query,
@@ -266,14 +266,14 @@ internal class ArticleRecords internal constructor(
                 priority = FeedPriority.CATEGORY,
             )
 
-            is ArticleFilter.SavedSearches -> bySavedSearch.count(
+            is ArticleFilter.SavedSearches -> bySavedSearch.countUnread(
                 savedSearchID = filter.savedSearchID,
                 status = filter.status,
                 query = query,
                 since = since,
             )
 
-            is ArticleFilter.Today -> byToday.count(
+            is ArticleFilter.Today -> byToday.countUnread(
                 status = filter.status,
                 query = query,
                 since = null
