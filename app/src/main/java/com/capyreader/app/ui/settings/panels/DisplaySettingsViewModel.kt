@@ -43,6 +43,8 @@ class DisplaySettingsViewModel(
 
     private val _summaryMaxLines = mutableStateOf(appPreferences.articleListOptions.summaryMaxLines.get())
 
+    private val _showUnreadCount = mutableStateOf(appPreferences.articleListOptions.showUnreadCount.get())
+
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
         private set
 
@@ -68,6 +70,9 @@ class DisplaySettingsViewModel(
 
     val summaryMaxLines: SummaryMaxLines
         get() = _summaryMaxLines.value
+
+    val showUnreadCount: Boolean
+        get() = _showUnreadCount.value
 
     val pinArticleBars = appPreferences.readerOptions.pinTopToolbar
 
@@ -166,5 +171,11 @@ class DisplaySettingsViewModel(
         appPreferences.articleListOptions.summaryMaxLines.set(maxLines)
 
         _summaryMaxLines.value = maxLines
+    }
+
+    fun updateShowUnreadCount(show: Boolean) {
+        appPreferences.articleListOptions.showUnreadCount.set(show)
+
+        _showUnreadCount.value = show
     }
 }

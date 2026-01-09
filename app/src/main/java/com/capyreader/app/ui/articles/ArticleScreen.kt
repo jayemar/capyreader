@@ -147,6 +147,11 @@ fun ArticleScreen(
         .markReadButtonPosition
         .collectChangesWithCurrent()
 
+    val showUnreadCount by appPreferences
+        .articleListOptions
+        .showUnreadCount
+        .collectChangesWithCurrent()
+
     val articles = viewModel.articles.collectAsLazyPagingItems()
 
     val onMarkAllRead = { range: MarkRead ->
@@ -542,7 +547,8 @@ fun ArticleScreen(
                             feeds = allFeeds,
                             savedSearches = savedSearches,
                             folders = allFolders,
-                            unreadCount = unreadCount
+                            unreadCount = unreadCount,
+                            showUnreadCount = showUnreadCount
                         )
                     },
                     snackbarHost = {

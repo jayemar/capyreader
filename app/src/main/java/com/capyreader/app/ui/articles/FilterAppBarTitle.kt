@@ -29,6 +29,7 @@ fun FilterAppBarTitle(
     allFolders: List<Folder>,
     allSavedSearches: List<SavedSearch>,
     unreadCount: Long,
+    showUnreadCount: Boolean,
     onRequestJumpToTop: () -> Unit
 ) {
     val text = when (filter) {
@@ -47,7 +48,7 @@ fun FilterAppBarTitle(
         is ArticleFilter.Today -> stringResource(R.string.filter_today)
     }.orEmpty()
 
-    val displayText = if (unreadCount > 0) {
+    val displayText = if (showUnreadCount && unreadCount > 0) {
         "$text ($unreadCount)"
     } else {
         text
@@ -84,6 +85,7 @@ fun FilterAppBarTitlePreview() {
                 allFolders = emptyList(),
                 allSavedSearches = emptyList(),
                 unreadCount = 42,
+                showUnreadCount = true,
                 onRequestJumpToTop = {}
             )
         })

@@ -73,6 +73,7 @@ fun DisplaySettingsPanel(
             shortenTitles = viewModel.shortenTitles,
             shortenSummaries = viewModel.shortenSummaries,
             summaryMaxLines = viewModel.summaryMaxLines,
+            showUnreadCount = viewModel.showUnreadCount,
             updateImagePreview = viewModel::updateImagePreview,
             updateSummary = viewModel::updateSummary,
             updateFeedName = viewModel::updateFeedName,
@@ -81,6 +82,7 @@ fun DisplaySettingsPanel(
             updateShortenTitles = viewModel::updateShortenTitles,
             updateShortenSummaries = viewModel::updateShortenSummaries,
             updateSummaryMaxLines = viewModel::updateSummaryMaxLines,
+            updateShowUnreadCount = viewModel::updateShowUnreadCount,
         )
     )
 }
@@ -245,6 +247,7 @@ private fun DisplaySettingsPanelViewPreview() {
                     shortenTitles = true,
                     shortenSummaries = true,
                     summaryMaxLines = SummaryMaxLines.default,
+                    showUnreadCount = false,
                     updateImagePreview = {},
                     updateSummary = {},
                     updateFeedName = {},
@@ -253,6 +256,7 @@ private fun DisplaySettingsPanelViewPreview() {
                     updateShortenTitles = {},
                     updateShortenSummaries = {},
                     updateSummaryMaxLines = {},
+                    updateShowUnreadCount = {},
                 ),
                 updatePinArticleBars = {},
                 pinArticleBars = false,

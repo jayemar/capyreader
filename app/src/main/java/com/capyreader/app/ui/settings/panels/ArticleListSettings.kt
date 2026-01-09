@@ -29,6 +29,7 @@ data class ArticleListOptions(
     val shortenTitles: Boolean,
     val shortenSummaries: Boolean,
     val summaryMaxLines: SummaryMaxLines,
+    val showUnreadCount: Boolean,
     val fontScale: ArticleListFontScale,
     val updateFeedIcons: (show: Boolean) -> Unit,
     val updateFeedName: (show: Boolean) -> Unit,
@@ -38,6 +39,7 @@ data class ArticleListOptions(
     val updateShortenTitles: (show: Boolean) -> Unit,
     val updateShortenSummaries: (show: Boolean) -> Unit,
     val updateSummaryMaxLines: (maxLines: SummaryMaxLines) -> Unit,
+    val updateShowUnreadCount: (show: Boolean) -> Unit,
 )
 
 @Composable
@@ -72,6 +74,11 @@ fun ArticleListSettings(
                 onCheckedChange = options.updateShortenSummaries,
                 checked = options.shortenSummaries,
                 title = stringResource(R.string.settings_article_list_shorten_summaries)
+            )
+            TextSwitch(
+                onCheckedChange = options.updateShowUnreadCount,
+                checked = options.showUnreadCount,
+                title = stringResource(R.string.settings_article_list_show_unread_count)
             )
         }
 
@@ -123,6 +130,7 @@ private fun ArticleListSettingsPreview() {
             shortenTitles = true,
             shortenSummaries = true,
             summaryMaxLines = SummaryMaxLines.default,
+            showUnreadCount = false,
             updateImagePreview = {},
             updateSummary = {},
             updateFeedName = {},
@@ -131,6 +139,7 @@ private fun ArticleListSettingsPreview() {
             updateShortenTitles = {},
             updateShortenSummaries = {},
             updateSummaryMaxLines = {},
+            updateShowUnreadCount = {},
         )
     )
 }
