@@ -35,6 +35,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -525,7 +526,11 @@ fun ArticleScreen(
 
                                 return Offset.Zero
                             }
-                        }),
+                        })
+                        .graphicsLayer {
+                            // Don't clip refresh indicators that animate beyond bounds
+                            clip = false
+                        },
                     topBar = {
                         ArticleListTopBar(
                             onRequestJumpToTop = {
@@ -595,7 +600,12 @@ fun ArticleScreen(
                             onRefresh = {
                                 refreshFeeds()
                             },
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer {
+                                    // Don't clip bottom refresh indicator
+                                    clip = false
+                                }
                         ) {
                             PullToNextFeedBox(
                                 modifier = Modifier.fillMaxSize(),
