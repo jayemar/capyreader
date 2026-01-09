@@ -199,5 +199,8 @@ class AppPreferences(context: Context) {
                 "after_read_all_behavior",
                 AfterReadAllBehavior.default
             )
+
+        val showUnreadCount: Preference<Boolean>
+            get() = preferenceStore.getBoolean("article_list_show_unread_count", false)
     }
 }

@@ -57,6 +57,7 @@ fun ArticleListTopBar(
     savedSearches: List<SavedSearch>,
     folders: List<Folder>,
     unreadCount: Long,
+    showUnreadCount: Boolean,
 ) {
     val enableSearch = search.isActive
     val layout = rememberLayoutPreference()
@@ -116,6 +117,7 @@ fun ArticleListTopBar(
                     allFolders = folders,
                     allSavedSearches = savedSearches,
                     unreadCount = unreadCount,
+                    showUnreadCount = showUnreadCount,
                     onRequestJumpToTop = onRequestJumpToTop
                 )
             }
@@ -173,6 +175,7 @@ private fun FeedListTopBarPreview() {
         feeds = listOf(),
         savedSearches = emptyList(),
         folders = emptyList(),
-        unreadCount = 42
+        unreadCount = 42,
+        showUnreadCount = true
     )
 }
