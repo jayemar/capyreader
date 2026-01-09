@@ -54,7 +54,7 @@ fun WebView(
 class AccompanistWebViewClient(
     private val assetLoader: WebViewAssetLoader,
     private val onOpenLink: (url: Uri) -> Unit,
-    private val httpClient: OkHttpClient = OkHttpClient(),
+    private val httpClient: OkHttpClient,
 ) : WebViewClient(),
     KoinComponent {
     lateinit var state: WebViewState
@@ -76,11 +76,69 @@ class AccompanistWebViewClient(
         val origin = request.requestHeaders["Origin"]
         val isCorsRequest = origin == "null" && url.startsWith("http")
 
-        if (!isCorsRequest) {
-            return null
+        if (isCorsRequest) {
+            return proxyCorsRequest(request)
         }
 
-        return proxyCorsRequest(request)
+        // Intercept image requests to apply authentication
+        if (isImageRequest(request)) {
+            return loadAuthenticatedImage(request)
+        }
+
+        return null
+    }
+
+    private fun isImageRequest(request: WebResourceRequest): Boolean {
+        val url = request.url.toString()
+        val accept = request.requestHeaders["Accept"] ?: ""
+
+        // Check if Accept header indicates an image request
+        if (accept.contains("image/")) {
+            return true
+        }
+
+        // Check common image extensions
+        val imageExtensions = listOf(".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico")
+        return imageExtensions.any { url.lowercase().contains(it) }
+    }
+
+    private fun loadAuthenticatedImage(request: WebResourceRequest): WebResourceResponse? {
+        return try {
+            val okRequest = Request.Builder()
+                .url(request.url.toString())
+                .apply {
+                    request.requestHeaders.forEach { (key, value) ->
+                        header(key, value)
+                    }
+                }
+                .build()
+
+            val response = httpClient.newCall(okRequest).execute()
+
+            if (!response.isSuccessful) {
+                CapyLog.error("webview_image_load_failed", Exception("HTTP ${response.code} for ${request.url}"))
+                return null
+            }
+
+            val contentType = response.header("Content-Type") ?: "application/octet-stream"
+            val mimeType = contentType.substringBefore(";").trim()
+            val charset = contentType
+                .substringAfter("charset=", "UTF-8")
+                .substringBefore(";")
+                .trim()
+
+            WebResourceResponse(
+                mimeType,
+                charset,
+                response.code,
+                response.message.ifEmpty { "OK" },
+                response.headers.toMultimap().mapValues { it.value.firstOrNull() ?: "" },
+                response.body.byteStream()
+            )
+        } catch (e: Exception) {
+            CapyLog.error("webview_image_intercept", e)
+            null
+        }
     }
 
     /** Avoids CORS issues when loading additional pages from Mercury.js */
@@ -205,6 +263,7 @@ class WebViewState(
 @Composable
 fun rememberWebViewState(
     renderer: ArticleRenderer = koinInject(),
+    httpClient: OkHttpClient = koinInject<com.jocmp.capy.Account>().httpClient,
     onNavigateToMedia: (media: Media) -> Unit,
     onRequestLinkDialog: (link: ShareLink) -> Unit,
     onRequestImageDialog: (imageUrl: String) -> Unit = {},
@@ -234,6 +293,7 @@ fun rememberWebViewState(
                 .addPathHandler("/res/", ResourcesPathHandler(context))
                 .build(),
             onOpenLink = onOpenLink,
+            httpClient = httpClient,
         )
     }
 
