@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
 fun ArticleListScaffold(
@@ -18,10 +17,6 @@ fun ArticleListScaffold(
     Box(
         Modifier
             .fillMaxSize()
-            .graphicsLayer {
-                // Don't clip refresh indicators that animate beyond bounds
-                clip = false
-            }
     ) {
         if (showOnboarding) {
             Box(Modifier.padding(padding)) {
