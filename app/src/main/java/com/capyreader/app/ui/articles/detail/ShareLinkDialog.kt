@@ -46,7 +46,7 @@ fun ShareLinkDialog(
 
     val context = LocalContext.current
     val shareLink = {
-        context.shareLink(url = link.url, title = link.text)
+        context.shareLink(url = link.url, title = link.text, format = format)
         onClose()
     }
 

@@ -23,24 +23,28 @@ fun buildCopyToClipboard(
     val clipboardManager = LocalClipboardManager.current
 
     return {
-        val textToCopy = when (format) {
-            CopyLinkFormat.PLAIN_URL -> url
-            CopyLinkFormat.MARKDOWN -> {
-                if (!title.isNullOrBlank()) {
-                    formatMarkdownLink(title, url)
-                } else {
-                    url
-                }
-            }
-            CopyLinkFormat.WIKI_LINK -> {
-                if (!title.isNullOrBlank()) {
-                    formatWikiLink(title, url)
-                } else {
-                    url
-                }
+        val textToCopy = formatLink(url, title, format)
+        clipboardManager.setText(AnnotatedString(textToCopy))
+    }
+}
+
+fun formatLink(url: String, title: String?, format: CopyLinkFormat): String {
+    return when (format) {
+        CopyLinkFormat.PLAIN_URL -> url
+        CopyLinkFormat.MARKDOWN -> {
+            if (!title.isNullOrBlank()) {
+                formatMarkdownLink(title, url)
+            } else {
+                url
             }
         }
-        clipboardManager.setText(AnnotatedString(textToCopy))
+        CopyLinkFormat.WIKI_LINK -> {
+            if (!title.isNullOrBlank()) {
+                formatWikiLink(title, url)
+            } else {
+                url
+            }
+        }
     }
 }
 

@@ -133,11 +133,13 @@ private fun CopyLinkMenuItem(onDismissRequest: () -> Unit, article: Article) {
 @Composable
 private fun ShareLinkMenuItem(onDismissRequest: () -> Unit, article: Article) {
     val url = article.url?.toString() ?: return
+    val appPreferences = koinInject<AppPreferences>()
+    val format = appPreferences.copyLinkFormat.get()
 
     val context = LocalContext.current
 
     val shareLink = {
-        context.shareLink(url = url, article.title)
+        context.shareLink(url = url, title = article.title, format = format)
     }
 
     DropdownMenuItem(
