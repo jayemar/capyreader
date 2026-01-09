@@ -24,12 +24,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.capyreader.app.R
 import com.capyreader.app.common.shareArticle
+import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.ui.articles.FullContentLoadingIcon
 import com.capyreader.app.ui.articles.LocalLabelsActions
 import com.capyreader.app.ui.components.ToolbarTooltip
 import com.jocmp.capy.Article
 import com.jocmp.capy.Article.FullContentState.LOADED
 import com.jocmp.capy.Article.FullContentState.LOADING
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +43,8 @@ fun ArticleActions(
 ) {
     val context = LocalContext.current
     val labelsActions = LocalLabelsActions.current
+    val appPreferences = koinInject<AppPreferences>()
+    val format = appPreferences.copyLinkFormat.get()
     val (isStyleSheetOpen, setStyleSheetOpen) = rememberSaveable { mutableStateOf(false) }
 
     ToolbarTooltip(
@@ -114,7 +118,7 @@ fun ArticleActions(
         message = stringResource(R.string.article_share)
     ) {
         IconButton(
-            onClick = { context.shareArticle(article = article) },
+            onClick = { context.shareArticle(article = article, format = format) },
         ) {
             Icon(
                 Icons.Rounded.Share,
