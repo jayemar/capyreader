@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import java.util.Properties
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 plugins {
@@ -34,7 +35,7 @@ android {
         versionCode = 1184
         versionName = "2026.01.1184-dev"
 
-        val buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        val buildTime = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " UTC"
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
