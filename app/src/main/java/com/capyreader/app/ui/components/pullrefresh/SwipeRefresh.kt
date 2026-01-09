@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.capyreader.app.ui.articles.feeds.AngleRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -305,6 +306,7 @@ fun SwipeRefresh(
             Modifier
                 .padding(indicatorPadding)
                 .matchParentSize()
+                .zIndex(10f)
                 .graphicsLayer {
                     // Don't clip the indicator as it animates off-screen
                     clip = false
