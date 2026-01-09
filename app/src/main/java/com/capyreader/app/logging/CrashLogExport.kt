@@ -51,6 +51,7 @@ class CrashLogExport(private val context: Context) {
     private fun buildDebugInfo(): String {
         return """
             App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.FLAVOR}, ${BuildConfig.VERSION_CODE})
+            Build time: ${BuildConfig.BUILD_TIME}
             Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT}; build ${Build.DISPLAY})
             Device brand: ${Build.BRAND}
             Device manufacturer: ${Build.MANUFACTURER}

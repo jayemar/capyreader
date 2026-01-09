@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.capyreader.app.BuildConfig.VERSION_NAME
+import com.capyreader.app.BuildConfig.BUILD_TIME
 import com.capyreader.app.R
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.components.FormSection
@@ -40,8 +41,9 @@ import com.capyreader.app.ui.theme.CapyTheme
 fun AboutSettingsPanel() {
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
+    val versionText = "Capy Reader $VERSION_NAME (built $BUILD_TIME)"
     val copyVersionToClipboard = {
-        clipboardManager.setText(AnnotatedString("Capy Reader $VERSION_NAME"))
+        clipboardManager.setText(AnnotatedString(versionText))
     }
 
     val linkOpener = LocalLinkOpener.current
@@ -84,7 +86,7 @@ fun AboutSettingsPanel() {
                     }
             ) {
                 Text(
-                    text = VERSION_NAME,
+                    text = versionText,
                     modifier = Modifier
                         .padding(16.dp)
                 )

@@ -1,5 +1,7 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import java.util.Properties
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 plugins {
     id("com.android.application")
@@ -31,6 +33,9 @@ android {
         targetSdk = 36
         versionCode = 1184
         versionName = "2026.01.1184-dev"
+
+        val buildTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+        buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
