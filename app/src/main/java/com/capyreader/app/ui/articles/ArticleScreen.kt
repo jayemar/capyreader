@@ -236,9 +236,10 @@ fun ArticleScreen(
         }
 
         // Scroll to top when filter changes (user expects to see new results from the top)
-        LaunchedEffect(listState) {
+        LaunchedEffect(Unit) {
             snapshotFlow { filter }
                 .distinctUntilChanged()
+                .drop(1)  // Skip first emission to prevent scroll reset on rotation
                 .collect {
                     delay(200)
                     listState.scrollToItem(0)
@@ -572,7 +573,7 @@ fun ArticleScreen(
                                     requestNextFeed()
                                 },
                             ) {
-                                key(filter, articles.itemCount) {
+                                key(filter) {
                                     ArticleList(
                                         articles = articles,
                                         selectedArticleKey = article?.id,
