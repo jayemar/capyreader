@@ -269,7 +269,7 @@ data class Account(
         query: String?,
     ): Flow<Long> {
         return articleRecords.countUnread(
-            filter = filter.withStatus(UNREAD),
+            filter = filter,
             query = query,
         )
     }
