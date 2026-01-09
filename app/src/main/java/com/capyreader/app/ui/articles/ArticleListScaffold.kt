@@ -13,21 +13,22 @@ fun ArticleListScaffold(
     padding: PaddingValues,
     showOnboarding: Boolean,
     onboarding: @Composable () -> Unit,
-    articles: @Composable () -> Unit,
+    articles: @Composable (PaddingValues) -> Unit,
 ) {
     Box(
         Modifier
             .fillMaxSize()
-            .padding(padding)
             .graphicsLayer {
                 // Don't clip refresh indicators that animate beyond bounds
                 clip = false
             }
     ) {
         if (showOnboarding) {
-            onboarding()
+            Box(Modifier.padding(padding)) {
+                onboarding()
+            }
         } else {
-            articles()
+            articles(padding)
         }
     }
 }

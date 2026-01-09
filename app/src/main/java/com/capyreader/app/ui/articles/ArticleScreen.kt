@@ -15,7 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -209,7 +209,7 @@ fun ArticleScreen(
         val showMultipleColumns = scaffoldNavigator.scaffoldDirective.maxHorizontalPartitions > 1
         val addFeedSuccessMessage = stringResource(R.string.add_feed_success)
         val currentFeed by viewModel.currentFeed.collectAsStateWithLifecycle(null)
-        val scrollBehavior = pinnedScrollBehavior()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         var media by rememberSaveable(saver = Media.Saver) { mutableStateOf(null) }
         val audioController: AudioPlayerController = koinInject()
         val audioEnclosure by audioController.currentAudio.collectAsState()
@@ -594,7 +594,7 @@ fun ArticleScreen(
                                 )
                             }
                         },
-                    ) {
+                        articles = { contentPadding ->
                         PullToRefreshBox(
                             isRefreshing = isPullToRefreshing,
                             onRefresh = {
@@ -626,6 +626,7 @@ fun ArticleScreen(
                                         listState = listState,
                                         enableMarkReadOnScroll = enableMarkReadOnScroll,
                                         refreshingAll = viewModel.refreshingAll,
+                                        contentPadding = contentPadding,
                                         onMarkAllRead = { range ->
                                             onMarkAllRead(range)
                                         },
@@ -637,6 +638,7 @@ fun ArticleScreen(
                             }
                         }
                     }
+                )
                 }
             },
             detailPane = {
