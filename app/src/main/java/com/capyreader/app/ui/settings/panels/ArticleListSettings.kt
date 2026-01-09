@@ -75,17 +75,20 @@ fun ArticleListSettings(
                 checked = options.shortenSummaries,
                 title = stringResource(R.string.settings_article_list_shorten_summaries)
             )
-            TextSwitch(
-                onCheckedChange = options.updateShowUnreadCount,
-                checked = options.showUnreadCount,
-                title = stringResource(R.string.settings_article_list_show_unread_count)
-            )
         }
 
         SummaryMaxLinesSelect(
             selected = options.summaryMaxLines,
             update = options.updateSummaryMaxLines
         )
+
+        RowItem {
+            TextSwitch(
+                onCheckedChange = options.updateShowUnreadCount,
+                checked = options.showUnreadCount,
+                title = stringResource(R.string.settings_article_list_show_unread_count)
+            )
+        }
 
         PreferenceSelect(
             selected = options.imagePreview,

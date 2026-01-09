@@ -156,7 +156,7 @@
     <string name="settings_article_list_summary_max_lines_four">4 lines</string>
     <string name="settings_article_list_summary_max_lines_five">5 lines</string>
     <string name="settings_article_list_summary_max_lines_unlimited">Unlimited</string>
-    <string name="settings_article_list_show_unread_count">Show unread count</string>
+    <string name="settings_article_list_show_unread_count">Unread count</string>
     <string name="settings_section_version">Version</string>
     <string name="settings_option_copy_version">Copy version</string>
     <string name="settings_option_full_content_title">Sticky Full Content</string>
