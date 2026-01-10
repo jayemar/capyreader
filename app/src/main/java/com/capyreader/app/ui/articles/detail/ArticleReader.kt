@@ -32,6 +32,7 @@ import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.articles.ColumnScrollbar
 import com.capyreader.app.ui.articles.media.ImageSaver
+import com.capyreader.app.ui.components.ShareLink
 import com.capyreader.app.ui.components.WebView
 import com.capyreader.app.ui.components.WebViewState
 import com.capyreader.app.ui.components.rememberSaveableShareLink
@@ -108,7 +109,13 @@ fun ArticleReader(
     val webViewState = rememberWebViewState(
         key = article.id,
         onNavigateToMedia = onSelectMedia,
-        onRequestLinkDialog = { setShareLink(it) },
+        onRequestLinkDialog = { link ->
+            if (link.url == article.url?.toString()) {
+                setShareLink(ShareLink(url = link.url, text = article.title))
+            } else {
+                setShareLink(link)
+            }
+        },
         onRequestImageDialog = { setImageUrl(it) },
         onOpenLink = { linkOpener.open(it) },
         onOpenAudioPlayer = onSelectAudio,
