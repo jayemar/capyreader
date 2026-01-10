@@ -264,6 +264,8 @@ fun ArticleScreen(
                     delay(200)
                     listState.scrollToItem(0)
                     resetScrollBehaviorOffset()
+                    delay(600) // Wait for 500ms debounce in MarkReadOnScroll to pass
+                    viewModel.clearFilterTransition()
                 }
         }
 
@@ -616,6 +618,7 @@ fun ArticleScreen(
                                         enableMarkReadOnScroll = enableMarkReadOnScroll,
                                         refreshingAll = viewModel.refreshingAll,
                                         contentPadding = contentPadding,
+                                        isFilterTransitioning = viewModel.isFilterTransitioning,
                                         onMarkAllRead = { range ->
                                             onMarkAllRead(range)
                                         },

@@ -47,6 +47,7 @@ fun ArticleList(
     listState: LazyListState,
     onMarkAllRead: (range: MarkRead) -> Unit = {},
     refreshingAll: Boolean,
+    isFilterTransitioning: Boolean = false,
     enableMarkReadOnScroll: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -100,7 +101,7 @@ fun ArticleList(
     }
 
     MarkReadOnScroll(
-        enabled = enableMarkReadOnScroll && !refreshingAll,
+        enabled = enableMarkReadOnScroll && !refreshingAll && !isFilterTransitioning,
         articles = articles,
         listState
     ) { range ->
