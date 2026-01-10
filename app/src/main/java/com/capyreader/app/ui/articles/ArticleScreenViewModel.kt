@@ -71,6 +71,9 @@ class ArticleScreenViewModel(
     var refreshingAll by mutableStateOf(false)
         private set
 
+    var isFilterTransitioning by mutableStateOf(false)
+        private set
+
     val articlesSince = MutableStateFlow<OffsetDateTime>(OffsetDateTime.now())
 
     private var _showUnauthorizedMessage by mutableStateOf(UnauthorizedMessageState.HIDE)
@@ -528,11 +531,16 @@ class ArticleScreenViewModel(
     }
 
     private fun updateFilter(filter: ArticleFilter) {
+        isFilterTransitioning = true
         appPreferences.filter.set(filter)
 
         clearArticle()
 
         updateArticlesSince()
+    }
+
+    fun clearFilterTransition() {
+        isFilterTransitioning = false
     }
 
     private fun updateArticlesSince() {

@@ -46,6 +46,7 @@ fun ArticleList(
     listState: LazyListState,
     onMarkAllRead: (range: MarkRead) -> Unit = {},
     refreshingAll: Boolean,
+    isFilterTransitioning: Boolean = false,
     enableMarkReadOnScroll: Boolean = false,
 ) {
     val articleOptions = rememberArticleOptions()
@@ -97,7 +98,7 @@ fun ArticleList(
     }
 
     MarkReadOnScroll(
-        enabled = enableMarkReadOnScroll && !refreshingAll,
+        enabled = enableMarkReadOnScroll && !refreshingAll && !isFilterTransitioning,
         articles = articles,
         listState
     ) { range ->
