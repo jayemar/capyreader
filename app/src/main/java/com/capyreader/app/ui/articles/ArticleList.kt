@@ -178,6 +178,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
     val imagePreview by appPreferences.articleListOptions.imagePreview.stateIn(scope)
         .collectAsState()
     val fontScale by appPreferences.articleListOptions.fontScale.stateIn(scope).collectAsState()
+    val fontFamily by appPreferences.articleListOptions.fontFamily.stateIn(scope).collectAsState()
     val shortenTitles by appPreferences.articleListOptions.shortenTitles.stateIn(scope)
         .collectAsState()
 
@@ -187,6 +188,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         showFeedName = showFeedName,
         imagePreview = imagePreview,
         fontScale = fontScale,
+        fontFamily = fontFamily,
         shortenTitles = shortenTitles,
     )
 }

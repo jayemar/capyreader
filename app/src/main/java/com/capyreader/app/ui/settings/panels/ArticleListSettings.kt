@@ -13,10 +13,12 @@ import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.common.RowItem
 import com.capyreader.app.ui.articles.ArticleListFontScale
+import com.capyreader.app.ui.articles.translationKey
 import com.capyreader.app.ui.components.FormSection
 import com.capyreader.app.ui.components.LabelStyle
 import com.capyreader.app.ui.components.TextSwitch
 import com.capyreader.app.ui.settings.PreferenceSelect
+import com.jocmp.capy.articles.FontOption
 import kotlin.math.roundToInt
 
 @Immutable
@@ -27,12 +29,14 @@ data class ArticleListOptions(
     val showSummary: Boolean,
     val shortenTitles: Boolean,
     val fontScale: ArticleListFontScale,
+    val fontFamily: FontOption,
     val updateFeedIcons: (show: Boolean) -> Unit,
     val updateFeedName: (show: Boolean) -> Unit,
     val updateImagePreview: (preview: ImagePreview) -> Unit,
     val updateSummary: (show: Boolean) -> Unit,
     val updateFontScale: (scale: ArticleListFontScale) -> Unit,
     val updateShortenTitles: (show: Boolean) -> Unit,
+    val updateFontFamily: (font: FontOption) -> Unit,
 )
 
 @Composable
@@ -76,6 +80,16 @@ fun ArticleListSettings(
             }
         )
 
+        PreferenceSelect(
+            selected = options.fontFamily,
+            update = options.updateFontFamily,
+            options = FontOption.entries,
+            label = R.string.article_list_font_family_label,
+            optionText = {
+                stringResource(it.translationKey)
+            }
+        )
+
         FormSection(
             modifier = Modifier.padding(top = 16.dp),
             title = stringResource(R.string.article_font_scale_label),
@@ -104,6 +118,7 @@ private fun ArticleListSettingsPreview() {
             showSummary = true,
             showFeedIcons = true,
             fontScale = ArticleListFontScale.LARGE,
+            fontFamily = FontOption.SYSTEM_DEFAULT,
             showFeedName = false,
             shortenTitles = true,
             updateImagePreview = {},
@@ -112,6 +127,7 @@ private fun ArticleListSettingsPreview() {
             updateFeedIcons = {},
             updateFontScale = {},
             updateShortenTitles = {},
+            updateFontFamily = {},
         )
     )
 }

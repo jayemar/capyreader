@@ -60,6 +60,7 @@ import com.capyreader.app.ui.theme.CapyTheme
 import com.capyreader.app.ui.theme.LocalAppTheme
 import com.jocmp.capy.Article
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.FontOption
 import com.jocmp.capy.articles.relativeTime
 import java.net.URL
 import java.time.LocalDateTime
@@ -73,6 +74,7 @@ data class ArticleRowOptions(
     val imagePreview: ImagePreview = ImagePreview.default,
     val fontScale: ArticleListFontScale = ArticleListFontScale.MEDIUM,
     val shortenTitles: Boolean = true,
+    val fontFamily: FontOption = FontOption.SYSTEM_DEFAULT,
 )
 
 @Composable
@@ -311,8 +313,13 @@ fun findFeedNameColor(read: Boolean): Color {
 
 @Composable
 fun StyleProviders(options: ArticleRowOptions, content: @Composable () -> Unit) {
+    val fontFamily = fontOptionToFontFamily(options.fontFamily)
+
     CompositionLocalProvider(
-        LocalTextStyle provides LocalTextStyle.current.copy(textDirection = TextDirection.Content),
+        LocalTextStyle provides LocalTextStyle.current.copy(
+            textDirection = TextDirection.Content,
+            fontFamily = fontFamily ?: androidx.compose.ui.text.font.FontFamily.Default
+        ),
         LocalDensity provides Density(
             LocalDensity.current.density,
             options.fontScale.withLocaleDensity()

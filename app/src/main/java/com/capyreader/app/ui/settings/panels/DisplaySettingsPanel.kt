@@ -29,6 +29,7 @@ import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
+import com.jocmp.capy.articles.FontOption
 import com.capyreader.app.ui.collectChangesWithCurrent
 import com.capyreader.app.ui.components.FormSection
 import com.capyreader.app.ui.components.TextSwitch
@@ -67,6 +68,7 @@ fun DisplaySettingsPanel(
             imagePreview = viewModel.imagePreview,
             showSummary = viewModel.showSummary,
             fontScale = viewModel.fontScale,
+            fontFamily = viewModel.fontFamily,
             showFeedIcons = viewModel.showFeedIcons,
             showFeedName = viewModel.showFeedName,
             shortenTitles = viewModel.shortenTitles,
@@ -76,6 +78,7 @@ fun DisplaySettingsPanel(
             updateFeedIcons = viewModel::updateFeedIcons,
             updateFontScale = viewModel::updateFontScale,
             updateShortenTitles = viewModel::updateShortenTitles,
+            updateFontFamily = viewModel::updateFontFamily,
         )
     )
 }
@@ -235,6 +238,7 @@ private fun DisplaySettingsPanelViewPreview() {
                     imagePreview = ImagePreview.default,
                     showSummary = true,
                     fontScale = ArticleListFontScale.MEDIUM,
+                    fontFamily = FontOption.SYSTEM_DEFAULT,
                     showFeedIcons = true,
                     showFeedName = false,
                     shortenTitles = true,
@@ -244,6 +248,7 @@ private fun DisplaySettingsPanelViewPreview() {
                     updateFeedIcons = {},
                     updateFontScale = {},
                     updateShortenTitles = {},
+                    updateFontFamily = {},
                 ),
                 updatePinArticleBars = {},
                 pinArticleBars = false,

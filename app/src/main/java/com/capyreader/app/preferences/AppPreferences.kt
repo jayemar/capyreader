@@ -170,6 +170,12 @@ class AppPreferences(context: Context) {
                 ArticleListFontScale.default
             )
 
+        val fontFamily: Preference<FontOption>
+            get() = preferenceStore.getEnum(
+                "article_list_font_family",
+                FontOption.SYSTEM_DEFAULT
+            )
+
         val markReadButtonPosition: Preference<MarkReadPosition>
             get() = preferenceStore.getEnum(
                 "article_list_mark_read_position",

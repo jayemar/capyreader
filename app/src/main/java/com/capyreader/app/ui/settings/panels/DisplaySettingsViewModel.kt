@@ -13,6 +13,7 @@ import com.capyreader.app.preferences.AppTheme
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
 import com.jocmp.capy.Account
+import com.jocmp.capy.articles.FontOption
 
 class DisplaySettingsViewModel(
     val account: Account,
@@ -39,6 +40,9 @@ class DisplaySettingsViewModel(
     private val _shortenTitles = mutableStateOf(appPreferences.articleListOptions.shortenTitles.get())
 
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
+        private set
+
+    var fontFamily by mutableStateOf(appPreferences.articleListOptions.fontFamily.get())
         private set
 
     var enableBottomBarActions = appPreferences.readerOptions.bottomBarActions
@@ -97,6 +101,12 @@ class DisplaySettingsViewModel(
         appPreferences.articleListOptions.fontScale.set(fontScale)
 
         this.fontScale = fontScale
+    }
+
+    fun updateFontFamily(fontFamily: FontOption) {
+        appPreferences.articleListOptions.fontFamily.set(fontFamily)
+
+        this.fontFamily = fontFamily
     }
 
     fun updateImagePreview(imagePreview: ImagePreview) {
