@@ -20,9 +20,11 @@ import androidx.paging.compose.LazyPagingItems
  * <https://github.com/ReadYouApp/ReadYou/blob/8be88771745dc891cdd1d9229ad668e86dd9532e/app/src/main/java/me/ash/reader/ui/ext/LazyListStateExt.kt#L17-L18>
  */
 @Composable
-fun <T : Any> LazyPagingItems<T>.rememberLazyListState(): LazyListState {
+fun <T : Any> LazyPagingItems<T>.rememberLazyListState(
+    key: Any? = null
+): LazyListState {
     // Use rememberSaveable to preserve scroll position across configuration changes
-    val savedState = rememberSaveable(saver = LazyListState.Saver) {
+    val savedState = rememberSaveable(key = key?.toString(), saver = LazyListState.Saver) {
         LazyListState(0, 0)
     }
 

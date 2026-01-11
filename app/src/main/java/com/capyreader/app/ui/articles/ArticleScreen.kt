@@ -208,7 +208,7 @@ fun ArticleScreen(
             scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
 
-        val listState = articles.rememberLazyListState()
+        val listState = articles.rememberLazyListState(key = filter)
 
         fun scrollToArticle(index: Int) {
             coroutineScope.launch {
