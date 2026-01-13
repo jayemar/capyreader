@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -245,6 +246,31 @@ fun ArticleScreen(
                     listState.scrollToItem(0)
                     resetScrollBehaviorOffset()
                 }
+        }
+
+        // Save scroll position before search, restore when search closes
+        var savedScrollIndex by rememberSaveable { mutableIntStateOf(0) }
+        var savedScrollOffset by rememberSaveable { mutableIntStateOf(0) }
+
+        // When search becomes active, save position and scroll to top
+        // When search closes, restore the saved position
+        LaunchedEffect(searchState) {
+            if (searchState == SearchState.ACTIVE) {
+                savedScrollIndex = listState.firstVisibleItemIndex
+                savedScrollOffset = listState.firstVisibleItemScrollOffset
+                listState.scrollToItem(0)
+            } else if (searchState == SearchState.INACTIVE && savedScrollIndex > 0) {
+                listState.scrollToItem(savedScrollIndex, savedScrollOffset)
+                savedScrollIndex = 0
+                savedScrollOffset = 0
+            }
+        }
+
+        // Scroll to top when search query changes (while searching)
+        LaunchedEffect(searchQuery) {
+            if (searchState == SearchState.ACTIVE && searchQuery.isNotEmpty()) {
+                listState.scrollToItem(0)
+            }
         }
 
         suspend fun openNextStatus(action: suspend () -> Unit) {
