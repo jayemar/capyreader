@@ -41,6 +41,7 @@ import com.capyreader.app.ui.theme.CapyTheme
 fun ShareImageDialog(
     onClose: () -> Unit,
     imageUrl: String,
+    imageTitle: String? = null,
     onSave: () -> Unit,
     onShare: () -> Unit,
 ) {
@@ -74,6 +75,14 @@ fun ShareImageDialog(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+                if (!imageTitle.isNullOrBlank()) {
+                    Text(
+                        imageTitle,
+                        fontSize = 14.sp,
+                        color = colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                 }
                 HorizontalDivider()
@@ -124,6 +133,7 @@ private fun ShareImageDialogPreview() {
         ShareImageDialog(
             onClose = {},
             imageUrl = "https://asteriastudio.com/images/photo.jpg",
+            imageTitle = "This is example hover text that would appear on an xkcd comic",
             onSave = {},
             onShare = {},
         )

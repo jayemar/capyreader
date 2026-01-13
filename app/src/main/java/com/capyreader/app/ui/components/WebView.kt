@@ -266,7 +266,7 @@ fun rememberWebViewState(
     httpClient: OkHttpClient = koinInject<com.jocmp.capy.Account>().httpClient,
     onNavigateToMedia: (media: Media) -> Unit,
     onRequestLinkDialog: (link: ShareLink) -> Unit,
-    onRequestImageDialog: (imageUrl: String) -> Unit = {},
+    onRequestImageDialog: (imageUrl: String, title: String?) -> Unit = { _, _ -> },
     onOpenLink: (url: Uri) -> Unit,
     onOpenAudioPlayer: (audio: AudioEnclosure) -> Unit = {},
     onPauseAudio: () -> Unit = {},
