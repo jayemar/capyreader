@@ -26,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -228,7 +229,7 @@ fun ArticleScreen(
             scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
         }
 
-        val listState = articles.rememberLazyListState()
+        val listState = articles.rememberLazyListState(key = filter)
 
         fun scrollToArticle(index: Int) {
             coroutineScope.launch {
@@ -267,6 +268,31 @@ fun ArticleScreen(
                     delay(600) // Wait for 500ms debounce in MarkReadOnScroll to pass
                     viewModel.clearFilterTransition()
                 }
+        }
+
+        // Save scroll position before search, restore when search closes
+        var savedScrollIndex by rememberSaveable { mutableIntStateOf(0) }
+        var savedScrollOffset by rememberSaveable { mutableIntStateOf(0) }
+
+        // When search becomes active, save position and scroll to top
+        // When search closes, restore the saved position
+        LaunchedEffect(searchState) {
+            if (searchState == SearchState.ACTIVE) {
+                savedScrollIndex = listState.firstVisibleItemIndex
+                savedScrollOffset = listState.firstVisibleItemScrollOffset
+                listState.scrollToItem(0)
+            } else if (searchState == SearchState.INACTIVE && savedScrollIndex > 0) {
+                listState.scrollToItem(savedScrollIndex, savedScrollOffset)
+                savedScrollIndex = 0
+                savedScrollOffset = 0
+            }
+        }
+
+        // Scroll to top when search query changes (while searching)
+        LaunchedEffect(searchQuery) {
+            if (searchState == SearchState.ACTIVE && searchQuery.isNotEmpty()) {
+                listState.scrollToItem(0)
+            }
         }
 
         suspend fun openNextStatus(action: suspend () -> Unit) {
@@ -616,7 +642,7 @@ fun ArticleScreen(
                                         selectedArticleKey = article?.id,
                                         listState = listState,
                                         enableMarkReadOnScroll = enableMarkReadOnScroll,
-                                        refreshingAll = viewModel.refreshingAll,
+                                        refreshing = viewModel.refreshingAll || isPullToRefreshing,
                                         contentPadding = contentPadding,
                                         isFilterTransitioning = viewModel.isFilterTransitioning,
                                         onMarkAllRead = { range ->
