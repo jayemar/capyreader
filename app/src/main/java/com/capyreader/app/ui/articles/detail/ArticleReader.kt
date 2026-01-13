@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -69,7 +68,7 @@ fun ArticleReader(
     val shareFailureMessage = stringResource(R.string.media_share_failure)
 
     // Find in page state
-    var showFindBar by rememberSaveable { mutableStateOf(false) }
+    val findInPage = LocalFindInPage.current
     var findQuery by rememberSaveable { mutableStateOf("") }
     var activeMatch by remember { mutableIntStateOf(0) }
     var totalMatches by remember { mutableIntStateOf(0) }
@@ -138,7 +137,7 @@ fun ArticleReader(
 
     // Clear find when article changes
     LaunchedEffect(article.id) {
-        if (showFindBar) {
+        if (findInPage.isVisible) {
             findQuery = ""
             activeMatch = 0
             totalMatches = 0
@@ -153,62 +152,46 @@ fun ArticleReader(
     val showImages = rememberImageVisibility()
     val improveTalkback by rememberTalkbackPreference()
 
-    val findInPageState = remember(showFindBar) {
-        FindInPageState(
-            isVisible = showFindBar,
-            show = { showFindBar = true },
-            hide = {
-                showFindBar = false
-                findQuery = ""
-                activeMatch = 0
-                totalMatches = 0
-                webViewState.clearFind()
-            }
-        )
-    }
-
-    CompositionLocalProvider(LocalFindInPage provides findInPageState) {
-        Box(Modifier.fillMaxSize()) {
-            if (improveTalkback) {
-                Column(
-                    Modifier.fillMaxSize()
-                ) {
-                    WebView(
-                        modifier = Modifier.fillMaxSize(),
-                        state = webViewState,
-                        article = article,
-                        showImages = showImages,
-                    )
-                }
-            } else {
-                ScrollableWebView(webViewState, article, showImages)
-            }
-
-            if (showFindBar) {
-                FindInPageBar(
-                    query = findQuery,
-                    onQueryChange = { query ->
-                        findQuery = query
-                        if (query.isNotEmpty()) {
-                            webViewState.findInPage(query)
-                        } else {
-                            webViewState.clearFind()
-                        }
-                    },
-                    onFindNext = { webViewState.findNext(true) },
-                    onFindPrevious = { webViewState.findNext(false) },
-                    onClose = {
-                        showFindBar = false
-                        findQuery = ""
-                        activeMatch = 0
-                        totalMatches = 0
-                        webViewState.clearFind()
-                    },
-                    activeMatch = activeMatch,
-                    totalMatches = totalMatches,
-                    modifier = Modifier.align(Alignment.TopCenter)
+    Box(Modifier.fillMaxSize()) {
+        if (improveTalkback) {
+            Column(
+                Modifier.fillMaxSize()
+            ) {
+                WebView(
+                    modifier = Modifier.fillMaxSize(),
+                    state = webViewState,
+                    article = article,
+                    showImages = showImages,
                 )
             }
+        } else {
+            ScrollableWebView(webViewState, article, showImages)
+        }
+
+        if (findInPage.isVisible) {
+            FindInPageBar(
+                query = findQuery,
+                onQueryChange = { query ->
+                    findQuery = query
+                    if (query.isNotEmpty()) {
+                        webViewState.findInPage(query)
+                    } else {
+                        webViewState.clearFind()
+                    }
+                },
+                onFindNext = { webViewState.findNext(true) },
+                onFindPrevious = { webViewState.findNext(false) },
+                onClose = {
+                    findInPage.hide()
+                    findQuery = ""
+                    activeMatch = 0
+                    totalMatches = 0
+                    webViewState.clearFind()
+                },
+                activeMatch = activeMatch,
+                totalMatches = totalMatches,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 
