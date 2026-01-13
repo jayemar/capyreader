@@ -190,6 +190,11 @@ class AccompanistWebViewClient(
     }
 }
 
+data class FindInPageResult(
+    val activeMatch: Int = 0,
+    val totalMatches: Int = 0,
+)
+
 @Stable
 class WebViewState(
     private val renderer: ArticleRenderer,
@@ -202,8 +207,20 @@ class WebViewState(
     private var currentAudioUrl: String? = null
     private var isAudioPlaying: Boolean = false
 
+    var onFindResultChanged: ((FindInPageResult) -> Unit)? = null
+
     init {
         loadEmpty()
+        webView.setFindListener { activeMatchOrdinal, numberOfMatches, isDoneCounting ->
+            if (isDoneCounting) {
+                onFindResultChanged?.invoke(
+                    FindInPageResult(
+                        activeMatch = if (numberOfMatches > 0) activeMatchOrdinal + 1 else 0,
+                        totalMatches = numberOfMatches
+                    )
+                )
+            }
+        }
     }
 
     fun loadHtml(article: Article, showImages: Boolean) {
@@ -254,6 +271,19 @@ class WebViewState(
 
     fun resetAudioPlayState() {
         updateAudioPlayState(null, false)
+    }
+
+    fun findInPage(query: String) {
+        webView.findAllAsync(query)
+    }
+
+    fun findNext(forward: Boolean = true) {
+        webView.findNext(forward)
+    }
+
+    fun clearFind() {
+        webView.clearMatches()
+        onFindResultChanged?.invoke(FindInPageResult())
     }
 
     private fun loadEmpty() = webView.loadUrl("about:blank")

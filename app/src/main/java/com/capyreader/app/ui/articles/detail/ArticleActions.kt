@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.FormatSize
 import androidx.compose.material.icons.rounded.Circle
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.StarOutline
@@ -45,6 +46,7 @@ fun ArticleActions(
     val labelsActions = LocalLabelsActions.current
     val appPreferences = koinInject<AppPreferences>()
     val format = appPreferences.copyLinkFormat.get()
+    val findInPage = LocalFindInPage.current
     val (isStyleSheetOpen, setStyleSheetOpen) = rememberSaveable { mutableStateOf(false) }
 
     ToolbarTooltip(
@@ -111,6 +113,18 @@ fun ArticleActions(
             Icon(
                 Icons.Outlined.FormatSize,
                 stringResource(R.string.article_style_options)
+            )
+        }
+    }
+    ToolbarTooltip(
+        message = stringResource(R.string.find_in_page)
+    ) {
+        IconButton(
+            onClick = { findInPage.show() },
+        ) {
+            Icon(
+                Icons.Rounded.Search,
+                contentDescription = stringResource(R.string.find_in_page)
             )
         }
     }
