@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 class WebViewInterface(
     private val navigateToMedia: (media: Media) -> Unit,
     private val onRequestLinkDialog: (link: ShareLink) -> Unit,
-    private val onRequestImageDialog: (imageUrl: String) -> Unit = {},
+    private val onRequestImageDialog: (imageUrl: String, title: String?) -> Unit = { _, _ -> },
     private val onOpenAudioPlayer: (audio: AudioEnclosure) -> Unit = {},
     private val onPauseAudio: () -> Unit = {},
 ) {
@@ -38,9 +38,9 @@ class WebViewInterface(
     }
 
     @JavascriptInterface
-    fun showImageDialog(imageUrl: String) {
+    fun showImageDialog(imageUrl: String, title: String? = null) {
         optionalURL(imageUrl)?.let {
-            onRequestImageDialog(it.toString())
+            onRequestImageDialog(it.toString(), title?.ifBlank { null })
         }
     }
 

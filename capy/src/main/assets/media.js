@@ -31,7 +31,7 @@ function addImageClickListeners() {
 
     longPress(img, (e) => {
       e.preventDefault();
-      Android.showImageDialog(img.src);
+      Android.showImageDialog(img.src, img.title || null);
     });
   });
 }

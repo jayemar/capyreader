@@ -55,6 +55,7 @@ fun ArticleReader(
 ) {
     val (shareLink, setShareLink) = rememberSaveableShareLink()
     val (shareImageUrl, setImageUrl) = rememberSaveable { mutableStateOf<String?>(null) }
+    val (shareImageTitle, setImageTitle) = rememberSaveable { mutableStateOf<String?>(null) }
     val linkOpener = LocalLinkOpener.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -87,6 +88,7 @@ fun ArticleReader(
         }
 
         setImageUrl(null)
+        setImageTitle(null)
     }
 
     fun shareImage(imageUrl: String) {
@@ -103,13 +105,17 @@ fun ArticleReader(
         }
 
         setImageUrl(null)
+        setImageTitle(null)
     }
 
     val webViewState = rememberWebViewState(
         key = article.id,
         onNavigateToMedia = onSelectMedia,
         onRequestLinkDialog = { setShareLink(it) },
-        onRequestImageDialog = { setImageUrl(it) },
+        onRequestImageDialog = { url, title ->
+            setImageUrl(url)
+            setImageTitle(title)
+        },
         onOpenLink = { linkOpener.open(it) },
         onOpenAudioPlayer = onSelectAudio,
         onPauseAudio = onPauseAudio,
@@ -154,8 +160,10 @@ fun ArticleReader(
         ShareImageDialog(
             onClose = {
                 setImageUrl(null)
+                setImageTitle(null)
             },
             imageUrl = shareImageUrl,
+            imageTitle = shareImageTitle,
             onSave = { saveImage(shareImageUrl) },
             onShare = { shareImage(shareImageUrl) },
         )
