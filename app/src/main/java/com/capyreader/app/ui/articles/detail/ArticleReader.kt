@@ -1,21 +1,25 @@
 package com.capyreader.app.ui.articles.detail
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +36,7 @@ import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.articles.ColumnScrollbar
 import com.capyreader.app.ui.articles.media.ImageSaver
+import com.capyreader.app.ui.components.FindInPageBar
 import com.capyreader.app.ui.components.WebView
 import com.capyreader.app.ui.components.WebViewState
 import com.capyreader.app.ui.components.rememberSaveableShareLink
@@ -62,6 +67,12 @@ fun ArticleReader(
     val successMessage = stringResource(R.string.media_save_success)
     val failureMessage = stringResource(R.string.media_save_failure)
     val shareFailureMessage = stringResource(R.string.media_share_failure)
+
+    // Find in page state
+    var showFindBar by rememberSaveable { mutableStateOf(false) }
+    var findQuery by rememberSaveable { mutableStateOf("") }
+    var activeMatch by remember { mutableIntStateOf(0) }
+    var totalMatches by remember { mutableIntStateOf(0) }
 
     fun showSnackbar(message: String) {
         scope.launchUI {
@@ -117,6 +128,24 @@ fun ArticleReader(
         isAudioPlaying = isAudioPlaying,
     )
 
+    // Set up find result listener
+    LaunchedEffect(webViewState) {
+        webViewState.onFindResultChanged = { result ->
+            activeMatch = result.activeMatch
+            totalMatches = result.totalMatches
+        }
+    }
+
+    // Clear find when article changes
+    LaunchedEffect(article.id) {
+        if (showFindBar) {
+            findQuery = ""
+            activeMatch = 0
+            totalMatches = 0
+            webViewState.clearFind()
+        }
+    }
+
     LaunchedEffect(currentAudioUrl, isAudioPlaying) {
         webViewState.updateAudioPlayState(currentAudioUrl, isAudioPlaying)
     }
@@ -124,19 +153,63 @@ fun ArticleReader(
     val showImages = rememberImageVisibility()
     val improveTalkback by rememberTalkbackPreference()
 
-    if (improveTalkback) {
-        Column(
-            Modifier.fillMaxSize()
-        ) {
-            WebView(
-                modifier = Modifier.fillMaxSize(),
-                state = webViewState,
-                article = article,
-                showImages = showImages,
-            )
+    val findInPageState = remember(showFindBar) {
+        FindInPageState(
+            isVisible = showFindBar,
+            show = { showFindBar = true },
+            hide = {
+                showFindBar = false
+                findQuery = ""
+                activeMatch = 0
+                totalMatches = 0
+                webViewState.clearFind()
+            }
+        )
+    }
+
+    CompositionLocalProvider(LocalFindInPage provides findInPageState) {
+        Box(Modifier.fillMaxSize()) {
+            if (improveTalkback) {
+                Column(
+                    Modifier.fillMaxSize()
+                ) {
+                    WebView(
+                        modifier = Modifier.fillMaxSize(),
+                        state = webViewState,
+                        article = article,
+                        showImages = showImages,
+                    )
+                }
+            } else {
+                ScrollableWebView(webViewState, article, showImages)
+            }
+
+            if (showFindBar) {
+                FindInPageBar(
+                    query = findQuery,
+                    onQueryChange = { query ->
+                        findQuery = query
+                        if (query.isNotEmpty()) {
+                            webViewState.findInPage(query)
+                        } else {
+                            webViewState.clearFind()
+                        }
+                    },
+                    onFindNext = { webViewState.findNext(true) },
+                    onFindPrevious = { webViewState.findNext(false) },
+                    onClose = {
+                        showFindBar = false
+                        findQuery = ""
+                        activeMatch = 0
+                        totalMatches = 0
+                        webViewState.clearFind()
+                    },
+                    activeMatch = activeMatch,
+                    totalMatches = totalMatches,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
-    } else {
-        ScrollableWebView(webViewState, article, showImages)
     }
 
     ArticleStyleListener(webView = webViewState.webView)
