@@ -605,7 +605,7 @@ fun ArticleScreen(
                                         selectedArticleKey = article?.id,
                                         listState = listState,
                                         enableMarkReadOnScroll = enableMarkReadOnScroll,
-                                        refreshingAll = viewModel.refreshingAll,
+                                        refreshing = viewModel.refreshingAll || isPullToRefreshing,
                                         onMarkAllRead = { range ->
                                             onMarkAllRead(range)
                                         },
