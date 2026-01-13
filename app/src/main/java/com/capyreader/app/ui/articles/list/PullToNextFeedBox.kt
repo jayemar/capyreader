@@ -5,6 +5,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
 import com.capyreader.app.ui.articles.feeds.AngleRefreshState
 import com.capyreader.app.ui.components.pullrefresh.SwipeRefresh
 
@@ -28,6 +29,7 @@ fun PullToNextFeedBox(
         onTriggerThreshold = { triggerThreshold() },
         indicatorAlignment = Alignment.BottomCenter,
         refreshState = refreshState,
+        refreshTriggerDistance = 48.dp,
         modifier = modifier,
     ) {
         content()
