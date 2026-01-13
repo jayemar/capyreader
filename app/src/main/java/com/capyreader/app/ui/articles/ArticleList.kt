@@ -21,8 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Dp
@@ -53,18 +51,12 @@ fun ArticleList(
 ) {
     val articleOptions = rememberArticleOptions()
     val currentTime = rememberCurrentTime()
-    val localDensity = LocalDensity.current
-    var listHeight by remember { mutableStateOf(0.dp) }
 
     LazyScrollbar(state = listState) {
         LazyColumn(
             state = listState,
             contentPadding = contentPadding,
-            modifier = Modifier
-                .fillMaxSize()
-                .onGloballyPositioned { coordinates ->
-                    listHeight = with(localDensity) { coordinates.size.height.toDp() }
-                }
+            modifier = Modifier.fillMaxSize()
         ) {
             items(count = articles.itemCount, key = articles.itemKey { it.id }) { index ->
                 val item = articles[index]
@@ -90,7 +82,7 @@ fun ArticleList(
 
             if (enableMarkReadOnScroll && articles.itemCount > 0) {
                 item {
-                    FeedOverScrollBox(height = listHeight)
+                    FeedOverScrollBox(height = 300.dp)
                 }
             } else {
                 item {
