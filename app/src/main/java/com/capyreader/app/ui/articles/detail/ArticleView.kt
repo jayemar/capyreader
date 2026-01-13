@@ -30,8 +30,11 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -127,6 +130,16 @@ fun ArticleView(
     val bottomScrollBehavior = exitAlwaysScrollBehavior()
     val enableBottomBar by rememberBottomBarPreference()
 
+    // Find in page state - needs to be here so ArticleActions can access it
+    var showFindBar by rememberSaveable { mutableStateOf(false) }
+    val findInPageState = remember(showFindBar) {
+        FindInPageState(
+            isVisible = showFindBar,
+            show = { showFindBar = true },
+            hide = { showFindBar = false }
+        )
+    }
+
     LaunchedEffect(article.id) {
         topToolbarPreference.scrollBehavior.state.heightOffset = 0f
         topToolbarPreference.scrollBehavior.state.contentOffset = 0f
@@ -134,70 +147,72 @@ fun ArticleView(
         bottomScrollBehavior.state.contentOffset = 0f
     }
 
-    ArticleViewScaffold(
-        bottomScrollBehavior = bottomScrollBehavior,
-        enableBottomBar = enableBottomBar,
-        topToolbarPreference = topToolbarPreference,
-        topBar = {
-            ArticleTopBar(
-                scrollBehavior = topToolbarPreference.scrollBehavior,
-                onClose = onBackPressed,
-                actions = {
-                    if (!enableBottomBar) {
-                        ArticleActions(
-                            article = article,
-                            onToggleExtractContent = onToggleFullContent,
-                            onToggleRead = onToggleRead,
-                            onToggleStar = onToggleStar,
-                        )
+    CompositionLocalProvider(LocalFindInPage provides findInPageState) {
+        ArticleViewScaffold(
+            bottomScrollBehavior = bottomScrollBehavior,
+            enableBottomBar = enableBottomBar,
+            topToolbarPreference = topToolbarPreference,
+            topBar = {
+                ArticleTopBar(
+                    scrollBehavior = topToolbarPreference.scrollBehavior,
+                    onClose = onBackPressed,
+                    actions = {
+                        if (!enableBottomBar) {
+                            ArticleActions(
+                                article = article,
+                                onToggleExtractContent = onToggleFullContent,
+                                onToggleRead = onToggleRead,
+                                onToggleStar = onToggleStar,
+                            )
+                        }
                     }
-                }
-            )
-        },
-        bottomBar = {
-            FlexibleBottomAppBar(
-                expandedHeight = 56.dp,
-                scrollBehavior = bottomScrollBehavior,
-            ) {
-                ArticleActions(
-                    article = article,
-                    onToggleExtractContent = onToggleFullContent,
-                    onToggleRead = onToggleRead,
-                    onToggleStar = onToggleStar,
                 )
-            }
-        },
-        reader = {
-            ArticlePullRefresh(
-                onSwipe = onSwipe,
-                hasPreviousArticle = hasPrevious,
-                hasNextArticle = hasNext
-            ) {
-                HorizontalReaderPager(
-                    enabled = enableHorizontalPager,
-                    enablePrevious = hasPrevious,
-                    enableNext = hasNext,
-                    onSelectPrevious = {
-                        selectPrevious()
-                    },
-                    onSelectNext = {
-                        selectNext()
-                    },
+            },
+            bottomBar = {
+                FlexibleBottomAppBar(
+                    expandedHeight = 56.dp,
+                    scrollBehavior = bottomScrollBehavior,
                 ) {
-                    ArticleTransition(article = article) { targetArticle ->
-                        ArticleReader(
-                            article = targetArticle,
-                            onSelectMedia = onSelectMedia,
-                            onSelectAudio = onSelectAudio,
-                            onPauseAudio = onPauseAudio,
-                            currentAudioUrl = currentAudioUrl,
-                            isAudioPlaying = isAudioPlaying,
-                        )
+                    ArticleActions(
+                        article = article,
+                        onToggleExtractContent = onToggleFullContent,
+                        onToggleRead = onToggleRead,
+                        onToggleStar = onToggleStar,
+                    )
+                }
+            },
+            reader = {
+                ArticlePullRefresh(
+                    onSwipe = onSwipe,
+                    hasPreviousArticle = hasPrevious,
+                    hasNextArticle = hasNext
+                ) {
+                    HorizontalReaderPager(
+                        enabled = enableHorizontalPager,
+                        enablePrevious = hasPrevious,
+                        enableNext = hasNext,
+                        onSelectPrevious = {
+                            selectPrevious()
+                        },
+                        onSelectNext = {
+                            selectNext()
+                        },
+                    ) {
+                        ArticleTransition(article = article) { targetArticle ->
+                            ArticleReader(
+                                article = targetArticle,
+                                onSelectMedia = onSelectMedia,
+                                onSelectAudio = onSelectAudio,
+                                onPauseAudio = onPauseAudio,
+                                currentAudioUrl = currentAudioUrl,
+                                isAudioPlaying = isAudioPlaying,
+                            )
+                        }
                     }
                 }
-            }
-        },
-    )
+            },
+        )
+    }
 
     LaunchedEffect(index) {
         if (index > -1) {
