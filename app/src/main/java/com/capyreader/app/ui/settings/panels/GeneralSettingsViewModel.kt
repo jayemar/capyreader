@@ -24,6 +24,9 @@ class GeneralSettingsViewModel(
 ) : ViewModel() {
     val source = account.source
 
+    var refreshOnStart by mutableStateOf(appPreferences.refreshOnStart.get())
+        private set
+
     var refreshInterval by mutableStateOf(refreshScheduler.refreshInterval)
         private set
 
@@ -52,6 +55,12 @@ class GeneralSettingsViewModel(
         .preferences
         .filterKeywords
         .stateIn(viewModelScope)
+
+    fun updateRefreshOnStart(enable: Boolean) {
+        appPreferences.refreshOnStart.set(enable)
+
+        refreshOnStart = enable
+    }
 
     fun updateRefreshInterval(interval: RefreshInterval) {
         refreshScheduler.update(interval)
