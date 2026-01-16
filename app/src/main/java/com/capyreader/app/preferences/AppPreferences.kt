@@ -50,6 +50,9 @@ class AppPreferences(context: Context) {
     val refreshInterval: Preference<RefreshInterval>
         get() = preferenceStore.getEnum("refresh_interval", RefreshInterval.default)
 
+    val refreshOnStart: Preference<Boolean>
+        get() = preferenceStore.getBoolean("refresh_on_start", true)
+
     val articleID: Preference<String>
         get() = preferenceStore.getString("article_id")
 
