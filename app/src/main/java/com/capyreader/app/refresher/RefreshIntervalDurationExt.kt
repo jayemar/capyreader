@@ -10,6 +10,5 @@ val RefreshInterval.toTime: Pair<Long, TimeUnit>?
         EVERY_HOUR -> Pair(1, TimeUnit.HOURS)
         EVERY_12_HOURS -> Pair(12, TimeUnit.HOURS)
         EVERY_DAY -> Pair(24, TimeUnit.HOURS)
-        ON_START -> null
         MANUALLY_ONLY -> null
     }

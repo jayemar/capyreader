@@ -52,7 +52,6 @@ import com.capyreader.app.common.Saver
 import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.preferences.ArticleListVerticalSwipe
-import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.LocalMarkAllReadButtonPosition
@@ -123,9 +122,7 @@ fun ArticleScreen(
     )
     val afterReadAll by viewModel.afterReadAll.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val refreshInterval by appPreferences
-        .refreshInterval
-        .collectChangesWithDefault(appPreferences.refreshInterval.get())
+    val refreshOnStart by appPreferences.refreshOnStart.collectChangesWithDefault()
 
     val canSwipeUp = when (listSwipeBottom) {
         ArticleListVerticalSwipe.DISABLED -> false
@@ -195,7 +192,7 @@ fun ArticleScreen(
     ) {
         val openNextFeedOnReadAll = afterReadAll == AfterReadAllBehavior.OPEN_NEXT_FEED
 
-        val skipInitialRefresh = refreshInterval != RefreshInterval.ON_START
+        val skipInitialRefresh = !refreshOnStart
 
         val (isRefreshInitialized, setRefreshInitialized) = rememberSaveable {
             mutableStateOf(skipInitialRefresh)
