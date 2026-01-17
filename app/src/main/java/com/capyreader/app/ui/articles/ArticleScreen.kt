@@ -360,7 +360,7 @@ fun ArticleScreen(
         fun refreshPullUp() {
             isPullUpRefreshing = true
 
-            viewModel.refresh(filter) {
+            viewModel.refreshAndMarkRead(filter) {
                 isPullUpRefreshing = false
                 refreshPagination()
             }
