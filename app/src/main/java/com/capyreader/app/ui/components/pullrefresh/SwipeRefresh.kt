@@ -166,6 +166,7 @@ private class SwipeRefreshNestedScrollConnection(
         // If we're dragging, not currently refreshing and scrolled
         // past the trigger point, refresh!
         if (!state.isRefreshing && state.indicatorOffset >= refreshTrigger) {
+            state.isRefreshing = true  // Set immediately before callback to prevent race condition
             onRefresh()
         }
 
