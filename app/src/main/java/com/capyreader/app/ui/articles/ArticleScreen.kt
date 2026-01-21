@@ -328,13 +328,15 @@ fun ArticleScreen(
         }
 
         fun refreshAll() {
-            if (enableMarkReadOnScroll) {
-                scrollToTop()
-            }
-
             if (isRefreshingAll) {
                 return
             }
+
+            // Capture scroll position before refresh
+            val preRefreshIndex = listState.firstVisibleItemIndex
+            val preRefreshOffset = listState.firstVisibleItemScrollOffset
+            val preRefreshCount = articles.itemCount
+            val preRefreshArticleID = articles[preRefreshIndex]?.id
 
             isRefreshingAll = true
 
@@ -345,15 +347,63 @@ fun ArticleScreen(
                 if (!isRefreshInitialized) {
                     setRefreshInitialized(true)
                 }
+
+                // Adjust scroll position after refresh
+                if (preRefreshIndex > 0 && preRefreshArticleID != null) {
+                    coroutineScope.launch {
+                        delay(100)  // Allow Paging library to process the refresh
+
+                        // Find the previously visible article's new index
+                        var newIndex = -1
+                        for (i in 0 until articles.itemCount) {
+                            if (articles[i]?.id == preRefreshArticleID) {
+                                newIndex = i
+                                break
+                            }
+                        }
+
+                        // If found, scroll to maintain position
+                        if (newIndex >= 0) {
+                            listState.scrollToItem(newIndex, preRefreshOffset)
+                        }
+                    }
+                }
             }
         }
 
         fun refreshFeeds() {
             isPullToRefreshing = true
 
+            // Capture scroll position before refresh
+            val preRefreshIndex = listState.firstVisibleItemIndex
+            val preRefreshOffset = listState.firstVisibleItemScrollOffset
+            val preRefreshCount = articles.itemCount
+            val preRefreshArticleID = articles[preRefreshIndex]?.id
+
             viewModel.refresh(filter) {
                 isPullToRefreshing = false
                 refreshPagination()
+
+                // Adjust scroll position after refresh
+                if (preRefreshIndex > 0 && preRefreshArticleID != null) {
+                    coroutineScope.launch {
+                        delay(100)  // Allow Paging library to process the refresh
+
+                        // Find the previously visible article's new index
+                        var newIndex = -1
+                        for (i in 0 until articles.itemCount) {
+                            if (articles[i]?.id == preRefreshArticleID) {
+                                newIndex = i
+                                break
+                            }
+                        }
+
+                        // If found, scroll to maintain position
+                        if (newIndex >= 0) {
+                            listState.scrollToItem(newIndex, preRefreshOffset)
+                        }
+                    }
+                }
             }
         }
 
