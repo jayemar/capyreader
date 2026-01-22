@@ -336,7 +336,11 @@ fun ArticleScreen(
             val preRefreshIndex = listState.firstVisibleItemIndex
             val preRefreshOffset = listState.firstVisibleItemScrollOffset
             val preRefreshCount = articles.itemCount
-            val preRefreshArticleID = articles[preRefreshIndex]?.id
+            val preRefreshArticleID = if (preRefreshIndex >= 0 && preRefreshIndex < articles.itemCount) {
+                articles[preRefreshIndex]?.id
+            } else {
+                null
+            }
 
             isRefreshingAll = true
 
@@ -378,7 +382,11 @@ fun ArticleScreen(
             val preRefreshIndex = listState.firstVisibleItemIndex
             val preRefreshOffset = listState.firstVisibleItemScrollOffset
             val preRefreshCount = articles.itemCount
-            val preRefreshArticleID = articles[preRefreshIndex]?.id
+            val preRefreshArticleID = if (preRefreshIndex >= 0 && preRefreshIndex < articles.itemCount) {
+                articles[preRefreshIndex]?.id
+            } else {
+                null
+            }
 
             viewModel.refresh(filter) {
                 isPullToRefreshing = false
