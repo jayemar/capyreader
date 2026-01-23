@@ -589,6 +589,81 @@ class ArticleRecordsTest {
 
         assertEquals(expected = 2, actual = count)
     }
+
+    @Test
+    fun findLastReadArticleID_returnsLastReadArticle() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create multiple read articles with different lastReadAt timestamps
+        val oldArticle = articleFixture.create(
+            id = "old-article",
+            title = "Old Article",
+            read = false,
+            publishedAt = now.minusDays(3).toEpochSecond()
+        )
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = now.minusDays(2).toEpochSecond(),
+            articleIDs = listOf(oldArticle.id)
+        )
+
+        val middleArticle = articleFixture.create(
+            id = "middle-article",
+            title = "Middle Article",
+            read = false,
+            publishedAt = now.minusDays(2).toEpochSecond()
+        )
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = now.minusDays(1).toEpochSecond(),
+            articleIDs = listOf(middleArticle.id)
+        )
+
+        val latestArticle = articleFixture.create(
+            id = "latest-article",
+            title = "Latest Article",
+            read = false,
+            publishedAt = now.minusDays(1).toEpochSecond()
+        )
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = now.toEpochSecond(),
+            articleIDs = listOf(latestArticle.id)
+        )
+
+        // Create an unread article to ensure it's not returned
+        articleFixture.create(
+            id = "unread-article",
+            title = "Unread Article",
+            read = false,
+            publishedAt = now.toEpochSecond()
+        )
+
+        val lastReadID = articleRecords.findLastReadArticleID()
+
+        // Should return the article with the most recent lastReadAt timestamp
+        assertEquals(expected = latestArticle.id, actual = lastReadID)
+    }
+
+    @Test
+    fun findLastReadArticleID_returnsNullWhenNoReadArticles() = runTest {
+        // Create only unread articles
+        articleFixture.create(
+            id = "unread-1",
+            title = "Unread Article 1",
+            read = false
+        )
+        articleFixture.create(
+            id = "unread-2",
+            title = "Unread Article 2",
+            read = false
+        )
+
+        val lastReadID = articleRecords.findLastReadArticleID()
+
+        // Should return null when there are no read articles
+        assertNull(lastReadID)
+    }
 }
 
 fun sortedMessage(expected: List<Article>, actual: List<Article>): String {

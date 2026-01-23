@@ -39,6 +39,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -72,6 +74,9 @@ class ArticleScreenViewModel(
         private set
 
     val articlesSince = MutableStateFlow<OffsetDateTime>(OffsetDateTime.now())
+
+    private val _scrollToArticleID = MutableStateFlow<String?>(null)
+    val scrollToArticleID: StateFlow<String?> = _scrollToArticleID.asStateFlow()
 
     private var _showUnauthorizedMessage by mutableStateOf(UnauthorizedMessageState.HIDE)
 
@@ -204,7 +209,18 @@ class ArticleScreenViewModel(
     }
 
     fun selectStatus(status: ArticleStatus) {
+        val previousStatus = latestFilter.status
         val filter = latestFilter.withStatus(status = status)
+
+        // When switching from UNREAD to ALL, scroll to last read article
+        if (previousStatus == ArticleStatus.UNREAD && status == ArticleStatus.ALL) {
+            viewModelScope.launchIO {
+                val lastReadArticleID = account.findLastReadArticleID()
+                _scrollToArticleID.value = lastReadArticleID
+            }
+        } else {
+            _scrollToArticleID.value = null
+        }
 
         updateFilter(filter)
     }
@@ -517,6 +533,10 @@ class ArticleScreenViewModel(
                 _article = article.copy(starred = !article.starred)
             }
         }
+    }
+
+    fun clearScrollTarget() {
+        _scrollToArticleID.value = null
     }
 
     private fun toggleCurrentRead(articleID: String) {
