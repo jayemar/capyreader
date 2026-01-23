@@ -7,9 +7,12 @@ internal fun isDescendingOrder(sortOrder: SortOrder) =
     sortOrder == SortOrder.NEWEST_FIRST
 
 internal fun mapLastRead(read: Boolean?, value: OffsetDateTime?): Long? {
-    // Only filter by lastReadAt for read articles (read = true)
-    // For unread articles (read = false), we want to show all articles regardless of when they were read
-    if (read == true) {
+    // For unread articles (read = false), use the session start time to filter out
+    // articles that were already read before the session, while keeping articles
+    // marked read during the session visible
+    // For read articles (read = true), use the session start time normally
+    // For all articles (read = null), return null to show everything
+    if (read != null) {
         return value?.toEpochSecond()
     }
 
