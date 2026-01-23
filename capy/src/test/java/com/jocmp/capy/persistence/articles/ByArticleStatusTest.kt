@@ -12,6 +12,7 @@ import org.junit.Before
 import java.time.OffsetDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ByArticleStatusTest {
     private lateinit var database: Database
@@ -118,13 +119,13 @@ class ByArticleStatusTest {
             articleIDs = listOf(readArticle.id)
         )
 
-        // Query for unread articles with `since` set to before the read article's lastReadAt
-        // The read article should NOT appear in the results due to correct SQL operator precedence
+        // Query for unread articles with `since` set to after the read article's lastReadAt
+        // The read article should NOT appear in the results because it was marked read before the session started
         val articles = ByArticleStatus(database)
             .all(
                 status = ArticleStatus.UNREAD,
                 sortOrder = SortOrder.NEWEST_FIRST,
-                since = yesterday.minusHours(1),
+                since = yesterday.plusHours(1),
                 query = null,
                 limit = 10,
                 offset = 0,
@@ -133,5 +134,62 @@ class ByArticleStatusTest {
         // Should only return the unread article, not the read one
         assertEquals(expected = 1, actual = articles.size)
         assertEquals(expected = unreadArticle.id, actual = articles[0].id)
+    }
+
+    @Test
+    fun all_readArticlesDuringSessionRemainInUnreadQuery() = runTest {
+        // Given: Current session started at 12:00
+        val sessionStart = OffsetDateTime.now()
+
+        // Article marked read BEFORE session start
+        val oldRead = articleFixture.create(
+            id = "old-read",
+            title = "Old Read Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        )
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = sessionStart.minusMinutes(5).toEpochSecond(),
+            articleIDs = listOf(oldRead.id)
+        )
+
+        // Article marked read DURING session
+        val newRead = articleFixture.create(
+            id = "new-read",
+            title = "New Read Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        )
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = sessionStart.plusMinutes(5).toEpochSecond(),
+            articleIDs = listOf(newRead.id)
+        )
+
+        // Article still unread
+        val unread = articleFixture.create(
+            id = "unread",
+            title = "Unread Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        )
+
+        val articles = ByArticleStatus(database)
+            .all(
+                status = ArticleStatus.UNREAD,
+                query = null,
+                since = sessionStart,
+                limit = 100,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                offset = 0
+            ).executeAsList()
+
+        // Should include: unread article AND recently-read article
+        // Should exclude: article read before session
+        assertEquals(expected = 2, actual = articles.size)
+        val articleIds = articles.map { it.id }.toSet()
+        assertTrue(articleIds.contains(unread.id))
+        assertTrue(articleIds.contains(newRead.id))
     }
 }

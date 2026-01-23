@@ -16,6 +16,15 @@ JOIN article_statuses ON articles.id = article_statuses.article_id
 WHERE articles.id = :articleID
 LIMIT 1;
 
+findLastRead:
+SELECT articles.id
+FROM articles
+JOIN article_statuses ON articles.id = article_statuses.article_id
+WHERE article_statuses.read = 1
+AND article_statuses.last_read_at IS NOT NULL
+ORDER BY article_statuses.last_read_at DESC
+LIMIT 1;
+
 countAll:
 SELECT
  articles.feed_id,

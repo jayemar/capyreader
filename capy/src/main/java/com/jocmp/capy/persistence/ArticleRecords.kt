@@ -40,6 +40,10 @@ internal class ArticleRecords internal constructor(
         ).executeAsOneOrNull()
     }
 
+    suspend fun findLastReadArticleID(): String? = withIOContext {
+        database.articlesQueries.findLastRead().executeAsOneOrNull()
+    }
+
     /**
      * Creates a new status record. On conflict it does nothing.
      */

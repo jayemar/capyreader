@@ -12,6 +12,7 @@ import org.junit.Before
 import java.time.OffsetDateTime
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class BySavedSearchTest {
     private lateinit var database: Database
@@ -53,5 +54,70 @@ class BySavedSearchTest {
             ).executeAsList()
 
         assertEquals(expected = expectedSummary, actual = articles[0].summary)
+    }
+
+    @Test
+    fun all_readArticlesDuringSessionRemainInUnreadQuery() = runTest {
+        // Given: Current session started at 12:00
+        val sessionStart = OffsetDateTime.now()
+        val search = savedSearchFixture.create()
+
+        // Article marked read BEFORE session start
+        val oldRead = articleFixture.create(
+            id = "old-read",
+            title = "Old Read Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        ).apply {
+            savedSearchFixture.createSavedSearchArticle(articleID = id, id = search.id)
+        }
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = sessionStart.minusMinutes(5).toEpochSecond(),
+            articleIDs = listOf(oldRead.id)
+        )
+
+        // Article marked read DURING session
+        val newRead = articleFixture.create(
+            id = "new-read",
+            title = "New Read Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        ).apply {
+            savedSearchFixture.createSavedSearchArticle(articleID = id, id = search.id)
+        }
+        database.articlesQueries.markRead(
+            read = true,
+            lastReadAt = sessionStart.plusMinutes(5).toEpochSecond(),
+            articleIDs = listOf(newRead.id)
+        )
+
+        // Article still unread
+        val unread = articleFixture.create(
+            id = "unread",
+            title = "Unread Article",
+            read = false,
+            publishedAt = sessionStart.minusMinutes(10).toEpochSecond()
+        ).apply {
+            savedSearchFixture.createSavedSearchArticle(articleID = id, id = search.id)
+        }
+
+        val articles = BySavedSearch(database)
+            .all(
+                savedSearchID = search.id,
+                status = ArticleStatus.UNREAD,
+                query = null,
+                since = sessionStart,
+                limit = 100,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                offset = 0
+            ).executeAsList()
+
+        // Should include: unread article AND recently-read article
+        // Should exclude: article read before session
+        assertEquals(expected = 2, actual = articles.size)
+        val articleIds = articles.map { it.id }.toSet()
+        assertTrue(articleIds.contains(unread.id))
+        assertTrue(articleIds.contains(newRead.id))
     }
 }

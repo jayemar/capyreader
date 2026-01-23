@@ -222,6 +222,10 @@ data class Account(
         return articleRecords.find(articleID = articleID)?.copy(enclosures = enclosures)
     }
 
+    suspend fun findLastReadArticleID(): String? {
+        return articleRecords.findLastReadArticleID()
+    }
+
     suspend fun addStar(articleID: String): Result<Unit> {
         articleRecords.addStar(articleID = articleID)
 
