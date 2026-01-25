@@ -10,6 +10,7 @@ import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.articles.SortOrder
+import java.time.OffsetDateTime
 import com.jocmp.capy.common.TimeHelpers.nowUTC
 import com.jocmp.capy.common.toDateTimeFromSeconds
 import com.jocmp.capy.common.transactionWithErrorHandling
@@ -42,6 +43,64 @@ internal class ArticleRecords internal constructor(
 
     suspend fun findLastReadArticleID(): String? = withIOContext {
         database.articlesQueries.findLastRead().executeAsOneOrNull()
+    }
+
+    suspend fun findArticlePosition(
+        filter: ArticleFilter,
+        targetArticleID: String,
+        query: String?,
+        sortOrder: SortOrder,
+        since: OffsetDateTime
+    ): Long? = withIOContext {
+        when (filter) {
+            is ArticleFilter.Articles -> byStatus.findArticlePosition(
+                status = filter.status,
+                targetArticleID = targetArticleID,
+                query = query,
+                sortOrder = sortOrder,
+                since = since
+            )
+
+            is ArticleFilter.Feeds -> byFeed.findArticlePosition(
+                feedIDs = listOf(filter.feedID),
+                status = filter.status,
+                targetArticleID = targetArticleID,
+                query = query,
+                sortOrder = sortOrder,
+                since = since,
+                priority = FeedPriority.FEED,
+            )
+
+            is ArticleFilter.Folders -> {
+                val feedIDs = folderFeedIDs(filter)
+                byFeed.findArticlePosition(
+                    feedIDs = feedIDs,
+                    status = filter.status,
+                    targetArticleID = targetArticleID,
+                    query = query,
+                    sortOrder = sortOrder,
+                    since = since,
+                    priority = FeedPriority.CATEGORY,
+                )
+            }
+
+            is ArticleFilter.SavedSearches -> bySavedSearch.findArticlePosition(
+                savedSearchID = filter.savedSearchID,
+                status = filter.status,
+                targetArticleID = targetArticleID,
+                query = query,
+                sortOrder = sortOrder,
+                since = since
+            )
+
+            is ArticleFilter.Today -> byToday.findArticlePosition(
+                status = filter.status,
+                targetArticleID = targetArticleID,
+                query = query,
+                sortOrder = sortOrder,
+                since = since
+            )
+        }
     }
 
     /**

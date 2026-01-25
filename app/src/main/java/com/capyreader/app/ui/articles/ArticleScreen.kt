@@ -236,7 +236,7 @@ fun ArticleScreen(
             }
         }
 
-        // Scroll to top when filter changes, or to specific article if provided
+        // Scroll to top when filter changes, or to specific position if provided
         LaunchedEffect(Unit) {
             snapshotFlow { filter }
                 .distinctUntilChanged()
@@ -244,24 +244,12 @@ fun ArticleScreen(
                 .collect {
                     delay(200)
 
-                    // Check if we should scroll to a specific article
-                    val targetArticleID = viewModel.scrollToArticleID.value
-                    if (targetArticleID != null) {
-                        // Find the article's position in the loaded items
-                        var targetIndex = -1
-                        for (i in 0 until articles.itemCount) {
-                            if (articles[i]?.id == targetArticleID) {
-                                targetIndex = i
-                                break
-                            }
-                        }
-
-                        // Scroll to article if found, otherwise scroll to top
-                        if (targetIndex >= 0) {
-                            listState.scrollToItem(targetIndex)
-                        } else {
-                            listState.scrollToItem(0)
-                        }
+                    // Check if we should scroll to a specific position
+                    val targetPosition = viewModel.scrollToArticlePosition.value
+                    if (targetPosition != null && targetPosition >= 0) {
+                        // Scroll to the calculated position
+                        // Paging 3 will automatically load only the target page (not all intermediate pages)
+                        listState.scrollToItem(targetPosition)
 
                         // Clear the scroll target after using it
                         viewModel.clearScrollTarget()
