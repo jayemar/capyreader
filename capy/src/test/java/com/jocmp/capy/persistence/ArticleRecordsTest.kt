@@ -664,6 +664,198 @@ class ArticleRecordsTest {
         // Should return null when there are no read articles
         assertNull(lastReadID)
     }
+
+    @Test
+    fun findArticlePosition_byArticleStatus() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create 100 articles
+        val articles = 100.repeated { i ->
+            articleFixture.create(
+                id = "article-$i",
+                title = "Article $i",
+                read = false,
+                publishedAt = now.minusMinutes(i.toLong()).toEpochSecond()
+            )
+        }
+
+        // Target article should be at position 75 (when sorted newest first)
+        val targetArticle = articles[75]
+
+        val position = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = targetArticle.id,
+            query = null,
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Should find the article at position 75
+        assertEquals(expected = 75L, actual = position)
+    }
+
+    @Test
+    fun findArticlePosition_respectsSortOrder() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create 20 articles
+        val articles = 20.repeated { i ->
+            articleFixture.create(
+                id = "article-$i",
+                title = "Article $i",
+                read = false,
+                publishedAt = now.minusMinutes(i.toLong()).toEpochSecond()
+            )
+        }
+
+        // Target article at index 10
+        val targetArticle = articles[10]
+
+        // Test with NEWEST_FIRST (default)
+        val positionNewest = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = targetArticle.id,
+            query = null,
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Test with OLDEST_FIRST
+        val positionOldest = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = targetArticle.id,
+            query = null,
+            sortOrder = SortOrder.OLDEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Positions should be different for different sort orders
+        assertEquals(expected = 10L, actual = positionNewest)
+        assertEquals(expected = 9L, actual = positionOldest) // 19 - 10 = 9
+    }
+
+    @Test
+    fun findArticlePosition_withQuery() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create articles with different titles
+        // "Important Article" will match query "Important"
+        val matchingArticles = 5.repeated { i ->
+            articleFixture.create(
+                id = "important-$i",
+                title = "Important Article $i",
+                read = false,
+                publishedAt = now.minusMinutes(i.toLong()).toEpochSecond()
+            )
+        }
+
+        // "Regular Article" will not match query "Important"
+        5.repeated { i ->
+            articleFixture.create(
+                id = "regular-$i",
+                title = "Regular Article $i",
+                read = false,
+                publishedAt = now.minusMinutes((i + 5).toLong()).toEpochSecond()
+            )
+        }
+
+        // Target is the third matching article
+        val targetArticle = matchingArticles[2]
+
+        val position = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = targetArticle.id,
+            query = "Important",
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Should only count matching articles, so position should be 2
+        assertEquals(expected = 2L, actual = position)
+    }
+
+    @Test
+    fun findArticlePosition_returnsNullForNonexistentArticle() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create some articles
+        5.repeated { i ->
+            articleFixture.create(
+                id = "article-$i",
+                title = "Article $i",
+                read = false,
+                publishedAt = now.minusMinutes(i.toLong()).toEpochSecond()
+            )
+        }
+
+        val position = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = "nonexistent-article",
+            query = null,
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Should return null for nonexistent article
+        assertNull(position)
+    }
+
+    @Test
+    fun findArticlePosition_respectsStatusFilter() = runTest {
+        val now = OffsetDateTime.now()
+
+        // Create 5 unread articles
+        val unreadArticles = 5.repeated { i ->
+            articleFixture.create(
+                id = "unread-$i",
+                title = "Unread Article $i",
+                read = false,
+                publishedAt = now.minusMinutes(i.toLong()).toEpochSecond()
+            )
+        }
+
+        // Create 5 read articles
+        5.repeated { i ->
+            val article = articleFixture.create(
+                id = "read-$i",
+                title = "Read Article $i",
+                read = false,
+                publishedAt = now.minusMinutes((i + 5).toLong()).toEpochSecond()
+            )
+            database.articlesQueries.markRead(
+                read = true,
+                lastReadAt = now.minusMinutes((i + 5).toLong()).toEpochSecond(),
+                articleIDs = listOf(article.id)
+            )
+        }
+
+        // Target is the third unread article
+        val targetArticle = unreadArticles[2]
+
+        // Test with UNREAD filter
+        val positionUnread = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.UNREAD),
+            targetArticleID = targetArticle.id,
+            query = null,
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Should only count unread articles, so position should be 2
+        assertEquals(expected = 2L, actual = positionUnread)
+
+        // Test with ALL filter
+        val positionAll = articleRecords.findArticlePosition(
+            filter = ArticleFilter.Articles(articleStatus = ArticleStatus.ALL),
+            targetArticleID = targetArticle.id,
+            query = null,
+            sortOrder = SortOrder.NEWEST_FIRST,
+            since = now.minusDays(1)
+        )
+
+        // Should count all articles, so position should be 2 (same as unread since target is unread)
+        assertEquals(expected = 2L, actual = positionAll)
+    }
 }
 
 fun sortedMessage(expected: List<Article>, actual: List<Article>): String {

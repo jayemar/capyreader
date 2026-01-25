@@ -81,8 +81,8 @@ class ArticleScreenViewModel(
 
     val articlesSince = MutableStateFlow<OffsetDateTime>(OffsetDateTime.now())
 
-    private val _scrollToArticleID = MutableStateFlow<String?>(null)
-    val scrollToArticleID: StateFlow<String?> = _scrollToArticleID.asStateFlow()
+    private val _scrollToArticlePosition = MutableStateFlow<Int?>(null)
+    val scrollToArticlePosition: StateFlow<Int?> = _scrollToArticlePosition.asStateFlow()
 
     private var _showUnauthorizedMessage by mutableStateOf(UnauthorizedMessageState.HIDE)
 
@@ -218,14 +218,25 @@ class ArticleScreenViewModel(
         val previousStatus = latestFilter.status
         val filter = latestFilter.withStatus(status = status)
 
-        // When switching from UNREAD to ALL, scroll to last read article
+        // When switching from UNREAD to ALL, calculate scroll position to last read article
         if (previousStatus == ArticleStatus.UNREAD && status == ArticleStatus.ALL) {
             viewModelScope.launchIO {
                 val lastReadArticleID = account.findLastReadArticleID()
-                _scrollToArticleID.value = lastReadArticleID
+                if (lastReadArticleID != null) {
+                    val position = account.findArticlePosition(
+                        filter = filter,
+                        targetArticleID = lastReadArticleID,
+                        query = _searchQuery.value,
+                        sortOrder = sortOrder.value,
+                        since = articlesSince.value
+                    )
+                    _scrollToArticlePosition.value = position?.toInt()
+                } else {
+                    _scrollToArticlePosition.value = null
+                }
             }
         } else {
-            _scrollToArticleID.value = null
+            _scrollToArticlePosition.value = null
         }
 
         updateFilter(filter)
@@ -567,7 +578,7 @@ class ArticleScreenViewModel(
     }
 
     fun clearScrollTarget() {
-        _scrollToArticleID.value = null
+        _scrollToArticlePosition.value = null
     }
 
     private fun toggleCurrentRead(articleID: String) {

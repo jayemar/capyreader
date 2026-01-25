@@ -16,6 +16,7 @@ import com.jocmp.capy.accounts.reader.buildReaderDelegate
 import com.jocmp.capy.articles.ArticleContent
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.TimeHelpers.nowUTC
+import java.time.OffsetDateTime
 import com.jocmp.capy.common.sortedByName
 import com.jocmp.capy.common.sortedByTitle
 import com.jocmp.capy.common.transactionWithErrorHandling
@@ -224,6 +225,22 @@ data class Account(
 
     suspend fun findLastReadArticleID(): String? {
         return articleRecords.findLastReadArticleID()
+    }
+
+    suspend fun findArticlePosition(
+        filter: ArticleFilter,
+        targetArticleID: String,
+        query: String?,
+        sortOrder: SortOrder,
+        since: OffsetDateTime
+    ): Long? {
+        return articleRecords.findArticlePosition(
+            filter = filter,
+            targetArticleID = targetArticleID,
+            query = query,
+            sortOrder = sortOrder,
+            since = since
+        )
     }
 
     suspend fun addStar(articleID: String): Result<Unit> {

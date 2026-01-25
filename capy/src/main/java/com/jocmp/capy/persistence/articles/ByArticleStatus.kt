@@ -6,6 +6,7 @@ import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
+import com.jocmp.capy.common.withIOContext
 import com.jocmp.capy.persistence.forUnreadCounts
 import com.jocmp.capy.persistence.listMapper
 import com.jocmp.capy.persistence.toStatusPair
@@ -89,5 +90,36 @@ class ByArticleStatus(private val database: Database) {
             lastReadAt = mapLastRead(read, since),
             publishedSince = null
         )
+    }
+
+    suspend fun findArticlePosition(
+        status: ArticleStatus,
+        targetArticleID: String,
+        query: String? = null,
+        sortOrder: SortOrder,
+        since: OffsetDateTime? = null
+    ): Long? = withIOContext {
+        // Check if article exists first
+        val articleExists = database.articlesQueries.findBy(
+            articleID = targetArticleID,
+            mapper = { id, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> id }
+        ).executeAsOneOrNull() != null
+
+        if (!articleExists) {
+            return@withIOContext null
+        }
+
+        val (read, starred) = status.toStatusPair
+        val newestFirst = isNewestFirst(sortOrder)
+
+        database.articlesByStatusQueries.findArticlePosition(
+            read = read,
+            starred = starred,
+            targetArticleID = targetArticleID,
+            lastReadAt = mapLastRead(read, since),
+            publishedSince = null,
+            query = query,
+            newestFirst = newestFirst,
+        ).executeAsOneOrNull()
     }
 }
