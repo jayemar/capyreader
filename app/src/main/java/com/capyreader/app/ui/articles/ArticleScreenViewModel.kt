@@ -228,12 +228,16 @@ class ArticleScreenViewModel(
                 } else {
                     _scrollToArticlePosition.value = null
                 }
+
+                // CHANGE 1: Move updateFilter inside coroutine to execute after position calculation
+                updateFilter(filter)
             }
         } else {
-            _scrollToArticlePosition.value = null
+            // CHANGE 2: Explicitly set to 0 instead of null to force scroll to top
+            // This overrides saved scroll state from rememberLazyListState
+            _scrollToArticlePosition.value = 0
+            updateFilter(filter)
         }
-
-        updateFilter(filter)
     }
 
     fun selectToday() {
