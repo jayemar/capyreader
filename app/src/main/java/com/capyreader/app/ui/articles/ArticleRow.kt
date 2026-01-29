@@ -29,8 +29,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
+import com.capyreader.app.common.PunctuationNormalizer
+import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.preferences.AppTheme
 import com.capyreader.app.ui.articles.list.ArticleActionMenu
 import com.capyreader.app.ui.articles.list.ArticleListItem
@@ -63,6 +68,7 @@ import com.jocmp.capy.Article
 import com.jocmp.capy.EnclosureType
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.articles.relativeTime
+import org.koin.compose.koinInject
 import java.net.URL
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -89,7 +95,23 @@ fun ArticleRow(
     onMarkAllRead: (range: MarkRead) -> Unit = {},
     currentTime: LocalDateTime,
     options: ArticleRowOptions = ArticleRowOptions(),
+    appPreferences: AppPreferences = koinInject(),
 ) {
+    val scope = rememberCoroutineScope()
+    val replaceFullwidth by appPreferences.readerOptions.replaceFullwidthCharacters.stateIn(scope).collectAsState()
+
+    val displayTitle = remember(article.title, replaceFullwidth) {
+        PunctuationNormalizer.normalize(article.title, replaceFullwidth)
+    }
+
+    val displayFeedName = remember(article.feedName, replaceFullwidth) {
+        PunctuationNormalizer.normalize(article.feedName, replaceFullwidth)
+    }
+
+    val displaySummary = remember(article.summary, replaceFullwidth) {
+        PunctuationNormalizer.normalize(article.summary, replaceFullwidth)
+    }
+
     val imageURL = article.imageURL
     val isMonochrome = LocalAppTheme.current == AppTheme.MONOCHROME
     val deEmphasizeFontWeight = article.read && isMonochrome
@@ -116,7 +138,7 @@ fun ArticleRow(
                 headlineContent = {
                     if (article.title.isNotBlank()) {
                         Text(
-                            article.title,
+                            displayTitle,
                             maxLines = if (options.shortenTitles) 3 else Int.MAX_VALUE,
                             overflow = TextOverflow.Ellipsis,
                             fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else FontWeight.Bold,
@@ -134,7 +156,7 @@ fun ArticleRow(
 
                         if (options.showFeedName) {
                             Text(
-                                text = article.feedName,
+                                text = displayFeedName,
                                 color = feedNameColor,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
@@ -184,7 +206,7 @@ fun ArticleRow(
                     ) {
                         if (article.summary.isNotBlank() && options.showSummary) {
                             Text(
-                                text = article.summary,
+                                text = displaySummary,
                                 maxLines = if (options.shortenSummaries) options.summaryMaxLines.lines else Int.MAX_VALUE,
                                 overflow = TextOverflow.Ellipsis,
                                 fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,

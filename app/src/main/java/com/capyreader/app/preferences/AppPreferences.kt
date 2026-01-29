@@ -126,6 +126,9 @@ class AppPreferences(context: Context) {
                 ReaderImageVisibility.ALWAYS_SHOW
             )
 
+        val replaceFullwidthCharacters: Preference<Boolean>
+            get() = preferenceStore.getBoolean("replace_fullwidth_characters", false)
+
         val enablePagingTapGesture: Preference<Boolean>
             get() = preferenceStore.getBoolean("article_enable_paging_tap_gesture", false)
 

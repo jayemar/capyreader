@@ -79,6 +79,8 @@ class DisplaySettingsViewModel(
     var imageVisibility by mutableStateOf(appPreferences.readerOptions.imageVisibility.get())
         private set
 
+    val replaceFullwidthCharacters = appPreferences.readerOptions.replaceFullwidthCharacters
+
     var layout by mutableStateOf(appPreferences.layout.get())
         private set
 
@@ -131,6 +133,10 @@ class DisplaySettingsViewModel(
         appPreferences.readerOptions.imageVisibility.set(option)
 
         this.imageVisibility = option
+    }
+
+    fun updateReplaceFullwidthCharacters(enable: Boolean) {
+        appPreferences.readerOptions.replaceFullwidthCharacters.set(enable)
     }
 
     fun updateLayoutPreference(layout: LayoutPreference) {
