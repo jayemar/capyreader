@@ -61,7 +61,7 @@ fun ArticleList(
             items(count = articles.itemCount, key = articles.itemKey { it.id }) { index ->
                 val item = articles[index]
 
-                Box {
+                Box(Modifier.animateItem()) {
                     if (item == null) {
                         PlaceholderArticleRow(articleOptions.imagePreview)
                     } else {
@@ -180,6 +180,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         .collectAsState()
     val summaryMaxLines by appPreferences.articleListOptions.summaryMaxLines.stateIn(scope)
         .collectAsState()
+    val showAudioIcon by appPreferences.enableAudioPlayer.stateIn(scope).collectAsState()
 
     return ArticleRowOptions(
         showSummary = showSummary,
@@ -190,6 +191,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         shortenTitles = shortenTitles,
         shortenSummaries = shortenSummaries,
         summaryMaxLines = summaryMaxLines,
+        showAudioIcon = showAudioIcon,
     )
 }
 

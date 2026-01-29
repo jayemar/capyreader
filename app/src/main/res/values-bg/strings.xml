@@ -222,6 +222,7 @@
     <string name="after_read_all_behavior_open_next_feed">Отвори следваща емисия</string>
     <string name="full_content_error_missing_response">Неуспешно извличане на статия</string>
     <string name="full_content_error_generic">Неуспешно анализиране на статия</string>
+    <string name="full_content_error_forbidden">Извличането е блокирано от сайта</string>
     <string name="settings_donate_button">Дарение</string>
     <string name="after_read_all_behavior_default">По подразбиране</string>
     <string name="article_actions_copy_link">Копирай връзката</string>
@@ -302,4 +303,11 @@
     <string name="freshrss_visibility_option_category">Категория</string>
     <string name="freshrss_visibility_option_feed">Емисия</string>
     <string name="theme_mode_label">Режим</string>
+    <string name="settings_section_experimental">Експериментално</string>
+    <string name="settings_option_enable_audio_player">Аудио плейър</string>
+    <string name="audio_player_play">Възпроизвеждане</string>
+    <string name="audio_player_pause">Пауза</string>
+    <string name="audio_player_close">Затвори плейъра</string>
+    <string name="audio_player_skip_back">Прескочи 30 секунди назад</string>
+    <string name="audio_player_skip_forward">Прескочи 30 секунди напред</string>
 </resources>

@@ -45,6 +45,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.capyreader.app.R
 import com.capyreader.app.common.Media

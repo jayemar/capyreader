@@ -244,6 +244,7 @@
     <string name="after_read_all_behavior_open_next_feed">Наступна стрічка</string>
     <string name="full_content_error_missing_response">Не вдалося завантажити статтю</string>
     <string name="full_content_error_generic">Не вдалося розпізнати статтю</string>
+    <string name="full_content_error_forbidden">Отримання заблоковано сайтом</string>
     <string name="feed_nav_drawer_title">Стрічки</string>
     <string name="search_bar_placeholder">Пошук</string>
     <string name="media_save">Зберегти</string>
@@ -300,4 +301,6 @@
     <string name="audio_player_pause">Призупинити</string>
     <string name="audio_player_close">Закрити програвач</string>
     <string name="theme_mode_label">Режим</string>
+    <string name="audio_player_skip_back">Назад на 30 секунд</string>
+    <string name="audio_player_skip_forward">Уперед на 30 секунд</string>
 </resources>
