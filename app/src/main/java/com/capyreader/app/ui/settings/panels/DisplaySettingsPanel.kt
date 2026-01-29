@@ -45,6 +45,7 @@ fun DisplaySettingsPanel(
     val improveTalkback by viewModel.improveTalkback.collectChangesWithCurrent()
     val enableBottomBarActions by viewModel.enableBottomBarActions.collectChangesWithCurrent()
     val markReadButtonPosition by viewModel.markReadButtonPosition.collectChangesWithCurrent()
+    val replaceFullwidthCharacters by viewModel.replaceFullwidthCharacters.collectChangesWithCurrent()
 
     DisplaySettingsPanelView(
         themeMode = viewModel.themeMode,
@@ -59,6 +60,8 @@ fun DisplaySettingsPanel(
         enablePinArticleBars = !improveTalkback,
         updateImageVisibility = viewModel::updateImageVisibility,
         imageVisibility = viewModel.imageVisibility,
+        replaceFullwidthCharacters = replaceFullwidthCharacters,
+        updateReplaceFullwidthCharacters = viewModel::updateReplaceFullwidthCharacters,
         layout = viewModel.layout,
         updateLayoutPreference = viewModel::updateLayoutPreference,
         markReadButtonPosition = markReadButtonPosition,
@@ -93,6 +96,8 @@ fun DisplaySettingsPanelView(
     enableBottomBarActions: Boolean,
     enablePinArticleBars: Boolean,
     imageVisibility: ReaderImageVisibility,
+    replaceFullwidthCharacters: Boolean,
+    updateReplaceFullwidthCharacters: (enable: Boolean) -> Unit,
     layout: LayoutPreference,
     markReadButtonPosition: MarkReadPosition,
     updateLayoutPreference: (layout: LayoutPreference) -> Unit,
@@ -139,6 +144,13 @@ fun DisplaySettingsPanelView(
                     stringResource(it.translationKey)
                 }
             )
+            RowItem {
+                TextSwitch(
+                    checked = replaceFullwidthCharacters,
+                    onCheckedChange = updateReplaceFullwidthCharacters,
+                    title = stringResource(R.string.settings_replace_fullwidth_characters),
+                )
+            }
             RowItem {
                 TextSwitch(
                     enabled = enablePinArticleBars,
@@ -250,6 +262,8 @@ private fun DisplaySettingsPanelViewPreview() {
                 updateImageVisibility = {},
                 updateBottomBarActions = {},
                 imageVisibility = ReaderImageVisibility.ALWAYS_SHOW,
+                replaceFullwidthCharacters = false,
+                updateReplaceFullwidthCharacters = {},
                 enablePinArticleBars = false,
                 enableBottomBarActions = false,
                 markReadButtonPosition = MarkReadPosition.TOOLBAR,
