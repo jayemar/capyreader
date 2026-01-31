@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material3.Icon
@@ -148,6 +149,15 @@ fun ArticleRow(
                             if (article.starred) {
                                 Icon(
                                     Icons.Rounded.Star,
+                                    contentDescription = null,
+                                    tint = feedNameColor,
+                                    modifier = Modifier
+                                        .width(12.dp.relative(options.fontScale))
+                                )
+                            }
+                            if (article.labelCount > 0) {
+                                Icon(
+                                    Icons.AutoMirrored.Outlined.Label,
                                     contentDescription = null,
                                     tint = feedNameColor,
                                     modifier = Modifier

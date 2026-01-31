@@ -14,10 +14,16 @@ SELECT
   feeds.open_articles_in_browser,
   article_statuses.updated_at,
   article_statuses.starred,
-  article_statuses.read
+  article_statuses.read,
+  COALESCE(label_counts.cnt, 0) AS label_count
 FROM articles
 JOIN feeds ON articles.feed_id = feeds.id
 JOIN article_statuses ON articles.id = article_statuses.article_id
+LEFT JOIN (
+  SELECT article_id, COUNT(*) cnt
+  FROM saved_search_articles
+  GROUP BY article_id
+) AS label_counts ON articles.id = label_counts.article_id
 WHERE ((article_statuses.read = :read AND article_statuses.last_read_at IS NULL OR article_statuses.last_read_at >= :lastReadAt) OR :read IS NULL)
 AND (feeds.priority IS NULL OR feeds.priority IN ('main', 'important'))
 AND (article_statuses.starred = :starred OR :starred IS NULL)
