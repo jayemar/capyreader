@@ -3,6 +3,7 @@ package com.capyreader.app.ui.articles.detail
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.FormatSize
@@ -76,7 +77,7 @@ fun ArticleActions(
                 onClick = { labelsActions.openSheet(article.id) },
             ) {
                 Icon(
-                    Icons.AutoMirrored.Outlined.Label,
+                    labelIcon(article),
                     contentDescription = stringResource(R.string.freshrss_article_actions_label)
                 )
             }
@@ -151,6 +152,14 @@ private fun starredIcon(article: Article) =
         Icons.Rounded.Star
     } else {
         Icons.Rounded.StarOutline
+    }
+
+@Composable
+private fun labelIcon(article: Article) =
+    if (article.labelCount > 0) {
+        Icons.AutoMirrored.Filled.Label
+    } else {
+        Icons.AutoMirrored.Outlined.Label
     }
 
 @Composable
