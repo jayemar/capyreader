@@ -66,6 +66,7 @@
     <string name="article_actions_mark_after_as_read">Mark above as read</string>
     <string name="article_actions_copy_link">Copy link</string>
     <string name="freshrss_article_actions_label">Label</string>
+    <string name="freshrss_nav_headline_categories">Categories</string>
     <string name="freshrss_labels_sheet_title">Labels</string>
     <string name="freshrss_labels_new_label">New Label</string>
     <string name="freshrss_labels_create_dialog_title">New Label</string>
@@ -156,6 +157,7 @@
     <string name="refresh_on_start">On start</string>
     <string name="empty_onboarding_title">No feeds yet</string>
     <string name="empty_onboarding_prompt">Start by adding a feed</string>
+    <string name="article_list_empty">Nothing here</string>
     <string name="article_style_options">Font style options</string>
     <string name="font_option_vollkorn" translatable="false">Vollkorn</string>
     <string name="font_option_atkinson_hyperlegible" translatable="false">Atkinson Hyperlegible</string>
@@ -271,6 +273,7 @@
     <string name="after_read_all_behavior_open_next_feed">Open Next Feed</string>
     <string name="full_content_error_missing_response">Failed to fetch article</string>
     <string name="full_content_error_generic">Failed to parse article</string>
+    <string name="full_content_error_forbidden">Fetch blocked by site</string>
     <string name="feed_nav_drawer_title">Feeds</string>
     <string name="search_bar_placeholder">Search</string>
     <string name="media_save">Save</string>

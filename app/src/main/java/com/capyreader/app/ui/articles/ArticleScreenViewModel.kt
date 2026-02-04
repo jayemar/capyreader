@@ -88,6 +88,10 @@ class ArticleScreenViewModel(
         account.countAll(latestFilter.status)
     }
 
+    private val _savedSearchCounts = filter.flatMapLatest { latestFilter ->
+        account.countAllBySavedSearch(latestFilter.status)
+    }
+
     val articles: Flow<PagingData<Article>> =
         combine(
             filter,
@@ -112,7 +116,14 @@ class ArticleScreenViewModel(
             .withPositiveCount(filter.status)
     }
 
-    val savedSearches = account.savedSearches
+    val savedSearches: Flow<List<SavedSearch>> = combine(
+        account.savedSearches,
+        _savedSearchCounts,
+        filter,
+    ) { searches, latestCounts, filter ->
+        searches.map { copySavedSearchCounts(it, latestCounts) }
+            .withPositiveCount(filter.status)
+    }
 
     val allFeeds = account.taggedFeeds
 
@@ -585,6 +596,10 @@ class ArticleScreenViewModel(
         return feed.copy(count = counts.getOrDefault(feed.id, 0))
     }
 
+    private fun copySavedSearchCounts(savedSearch: SavedSearch, counts: Map<String, Long>): SavedSearch {
+        return savedSearch.copy(count = counts.getOrDefault(savedSearch.id, 0))
+    }
+
     private suspend fun buildArticle(articleID: String): Article? {
         val article = account.findArticle(articleID = articleID) ?: return null
 
@@ -755,8 +770,11 @@ class ArticleScreenViewModel(
 }
 
 fun Context.showFullContentErrorToast(throwable: Throwable) {
-    val message = when (throwable) {
-        is ArticleContent.MissingBodyError -> R.string.full_content_error_missing_response
+    val message = when {
+        throwable is ArticleContent.HttpError && throwable.code == 403 ->
+            R.string.full_content_error_forbidden
+        throwable is ArticleContent.MissingBodyError ->
+            R.string.full_content_error_missing_response
         else -> R.string.full_content_error_generic
     }
 

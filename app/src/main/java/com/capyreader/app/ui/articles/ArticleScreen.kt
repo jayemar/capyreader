@@ -25,7 +25,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,6 +43,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.capyreader.app.R
 import com.capyreader.app.common.Media
@@ -260,14 +260,15 @@ fun ArticleScreen(
                 }
         }
 
-        LaunchedEffect(listState) {
-            snapshotFlow { filter }
-                .distinctUntilChanged()
-                .collect {
-                    delay(200)
-                    listState.scrollToItem(0)
-                    resetScrollBehaviorOffset()
-                }
+        val (scrolledFilter, setScrolledFilter) = remember { mutableStateOf<ArticleFilter?>(null) }
+
+        LaunchedEffect(filter, articles.loadState.refresh) {
+            val refreshComplete = articles.loadState.refresh is LoadState.NotLoading
+            if (refreshComplete && filter != scrolledFilter) {
+                listState.scrollToItem(0)
+                resetScrollBehaviorOffset()
+                setScrolledFilter(filter)
+            }
         }
 
         suspend fun openNextStatus(action: suspend () -> Unit) {
