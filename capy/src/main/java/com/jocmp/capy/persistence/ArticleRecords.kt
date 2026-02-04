@@ -37,7 +37,15 @@ internal class ArticleRecords internal constructor(
     suspend fun find(articleID: String): Article? = withIOContext {
         database.articlesQueries.findBy(
             articleID = articleID,
-            mapper = ::articleMapper
+            mapper = { id, feedID, title, author, contentHtml, extractedContentURL, url, summary,
+                       imageURL, publishedAt, enclosureType, feedTitle, faviconURL, enableStickyContent,
+                       openInBrowser, feedURL, siteURL, updatedAt, starred, read, labelCount ->
+                articleMapper(
+                    id, feedID, title, author, contentHtml, extractedContentURL, url, summary,
+                    imageURL, publishedAt, enclosureType, feedTitle, faviconURL, enableStickyContent,
+                    openInBrowser, feedURL, siteURL, updatedAt, starred, read, labelCount.toInt()
+                )
+            }
         ).executeAsOneOrNull()
     }
 
