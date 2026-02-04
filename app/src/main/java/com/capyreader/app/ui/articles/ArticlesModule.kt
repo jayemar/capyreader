@@ -35,6 +35,7 @@ internal val articlesModule = module {
             hideTopMargin = get<AppPreferences>().readerOptions.pinTopToolbar,
             enableHorizontalScroll = get<AppPreferences>().readerOptions.enableHorizontaPagination,
             enableAudioPlayer = get<AppPreferences>().enableAudioPlayer,
+            replaceFullwidthCharacters = get<AppPreferences>().readerOptions.replaceFullwidthCharacters,
             audioPlayerLabels = AudioPlayerLabels(
                 play = context.getString(R.string.audio_player_play),
                 pause = context.getString(R.string.audio_player_pause),

@@ -54,8 +54,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
-import com.capyreader.app.common.PunctuationNormalizer
 import com.capyreader.app.preferences.AppPreferences
+import com.jocmp.capy.common.PunctuationNormalizer
 import com.capyreader.app.preferences.AppTheme
 import com.capyreader.app.ui.articles.list.ArticleActionMenu
 import com.capyreader.app.ui.articles.list.ArticleListItem
