@@ -3,6 +3,7 @@ package com.jocmp.capy.articles
 import android.content.Context
 import com.jocmp.capy.Article
 import com.jocmp.capy.MacroProcessor
+import com.jocmp.capy.common.PunctuationNormalizer
 import com.jocmp.capy.preferences.Preference
 import com.jocmp.capy.R as CapyRes
 
@@ -16,6 +17,7 @@ class ArticleRenderer(
     private val hideTopMargin: Preference<Boolean>,
     private val enableHorizontalScroll: Preference<Boolean>,
     private val enableAudioPlayer: Preference<Boolean>,
+    private val replaceFullwidthCharacters: Preference<Boolean>,
     private val audioPlayerLabels: AudioPlayerLabels = AudioPlayerLabels(),
 ) {
     private val template by lazy {
@@ -32,20 +34,21 @@ class ArticleRenderer(
     ): String {
         val fontFamily = fontOption.get()
         val showPlaceholderTitle = article.title.isBlank()
+        val replaceFullwidth = replaceFullwidthCharacters.get()
 
         val title = if (showPlaceholderTitle) {
-            article.feedName
+            PunctuationNormalizer.normalize(article.feedName, replaceFullwidth)
         } else {
-            article.title
+            PunctuationNormalizer.normalize(article.title, replaceFullwidth)
         }
 
         val feedName = if (showPlaceholderTitle) {
             ""
         } else {
-            article.feedName
+            PunctuationNormalizer.normalize(article.feedName, replaceFullwidth)
         }
 
-        val content = buildContent(article, hideImages)
+        val content = buildContent(article, hideImages, replaceFullwidth)
 
         val titleFontFamily = if (titleFollowsBodyFont.get()) {
             fontFamily
@@ -72,7 +75,7 @@ class ArticleRenderer(
         return MacroProcessor(template, substitutions).renderedText
     }
 
-    private fun buildContent(article: Article, hideImages: Boolean): String {
+    private fun buildContent(article: Article, hideImages: Boolean, replaceFullwidth: Boolean): String {
         return if (article.parseFullContent) {
             parseHtml(article, hideImages)
         } else {
@@ -85,7 +88,8 @@ class ArticleRenderer(
                 ""
             }
             val otherEnclosures = article.enclosureHTML()
-            audioEnclosures + article.content + otherEnclosures + postProcessScript(article, hideImages)
+            val normalizedContent = PunctuationNormalizer.normalize(article.content, replaceFullwidth)
+            audioEnclosures + normalizedContent + otherEnclosures + postProcessScript(article, hideImages)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.capyreader.app.common
+package com.jocmp.capy.common
 
 import org.junit.Assert.assertEquals
 import org.junit.Test

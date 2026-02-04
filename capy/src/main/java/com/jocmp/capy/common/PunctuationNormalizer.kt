@@ -1,4 +1,4 @@
-package com.capyreader.app.common
+package com.jocmp.capy.common
 
 /**
  * Normalizes fullwidth punctuation characters to their ASCII equivalents.
