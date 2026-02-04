@@ -9,10 +9,16 @@ SELECT
   feeds.site_url,
   article_statuses.updated_at,
   article_statuses.starred,
-  article_statuses.read
+  article_statuses.read,
+  COALESCE(label_counts.cnt, 0) AS label_count
 FROM articles
 JOIN feeds ON articles.feed_id = feeds.id
 JOIN article_statuses ON articles.id = article_statuses.article_id
+LEFT JOIN (
+  SELECT article_id, COUNT(*) AS cnt
+  FROM saved_search_articles
+  GROUP BY article_id
+) AS label_counts ON articles.id = label_counts.article_id
 WHERE articles.id = :articleID
 LIMIT 1;
 
