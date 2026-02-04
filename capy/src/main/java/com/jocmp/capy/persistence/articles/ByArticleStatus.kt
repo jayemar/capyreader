@@ -102,7 +102,7 @@ class ByArticleStatus(private val database: Database) {
         // Check if article exists first
         val articleExists = database.articlesQueries.findBy(
             articleID = targetArticleID,
-            mapper = { id, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> id }
+            mapper = { id, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> id }
         ).executeAsOneOrNull() != null
 
         if (!articleExists) {
