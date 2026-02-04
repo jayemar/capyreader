@@ -527,6 +527,22 @@ class ArticleScreenViewModel(
         }
     }
 
+    private fun incrementCurrentLabelCount(articleID: String) {
+        _article?.let { article ->
+            if (articleID == article.id) {
+                _article = article.copy(labelCount = article.labelCount + 1)
+            }
+        }
+    }
+
+    private fun decrementCurrentLabelCount(articleID: String) {
+        _article?.let { article ->
+            if (articleID == article.id) {
+                _article = article.copy(labelCount = maxOf(0, article.labelCount - 1))
+            }
+        }
+    }
+
     private fun updateFilter(filter: ArticleFilter) {
         appPreferences.filter.set(filter)
 
@@ -695,12 +711,14 @@ class ArticleScreenViewModel(
     }
 
     fun addLabelAsync(articleID: String, savedSearchID: String) {
+        incrementCurrentLabelCount(articleID)
         viewModelScope.launchIO {
             account.addSavedSearch(articleID, savedSearchID)
         }
     }
 
     fun removeLabelAsync(articleID: String, savedSearchID: String) {
+        decrementCurrentLabelCount(articleID)
         viewModelScope.launchIO {
             account.removeSavedSearch(articleID, savedSearchID)
         }
