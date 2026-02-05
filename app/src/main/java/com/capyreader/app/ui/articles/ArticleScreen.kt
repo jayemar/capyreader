@@ -338,11 +338,13 @@ fun ArticleScreen(
         }
 
         fun refreshPullUp() {
-            coroutineScope.launchUI {
-                isPullUpRefreshing = true
+            if (enableMarkReadOnScroll) {
+                scrollToTop()
+            }
 
-                viewModel.refreshAndMarkReadSuspend(filter)
+            isPullUpRefreshing = true
 
+            viewModel.refreshAndMarkRead(filter) {
                 isPullUpRefreshing = false
                 refreshPagination()
             }
