@@ -52,11 +52,6 @@ fun ArticleList(
     val articleOptions = rememberArticleOptions()
     val currentTime = rememberCurrentTime()
 
-    if (articles.loadState.isIdle && articles.itemCount == 0) {
-        ArticleListEmptyView()
-        return
-    }
-
     LazyScrollbar(state = listState) {
         LazyColumn(
             state = listState,

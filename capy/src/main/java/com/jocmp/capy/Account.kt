@@ -72,11 +72,13 @@ data class Account(
             )
         )
 
-        Source.MINIFLUX -> MinifluxAccountDelegate(
+        Source.MINIFLUX,
+        Source.MINIFLUX_TOKEN -> MinifluxAccountDelegate(
             database = database,
             miniflux = Miniflux.forAccount(
                 path = cacheDirectory,
-                preferences = preferences
+                preferences = preferences,
+                source = source
             )
         )
 

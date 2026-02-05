@@ -254,9 +254,18 @@ fun ArticleScreen(
             }
         }
 
-        // Scroll to top when filter changes, or to specific position if provided
-        LaunchedEffect(Unit) {
-            snapshotFlow { filter }
+        val scrollToBottom = {
+            coroutineScope.launch {
+                val lastIndex = listState.layoutInfo.totalItemsCount - 1
+                if (lastIndex > 0) {
+                    listState.scrollToItem(lastIndex)
+                }
+            }
+        }
+
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.layoutInfo.totalItemsCount }
+                .drop(if (enableMarkReadOnScroll) 0 else 1)
                 .distinctUntilChanged()
                 .drop(1)  // Skip first emission to prevent scroll reset on rotation
                 .collect {
@@ -628,6 +637,9 @@ fun ArticleScreen(
                         ArticleListTopBar(
                             onRequestJumpToTop = {
                                 scrollToTop()
+                            },
+                            onRequestJumpToBottom = {
+                                scrollToBottom()
                             },
                             onNavigateToDrawer = {
                                 openDrawer()

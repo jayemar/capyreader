@@ -46,6 +46,7 @@ import com.jocmp.capy.SavedSearch
 @Composable
 fun ArticleListTopBar(
     onRequestJumpToTop: () -> Unit,
+    onRequestJumpToBottom: () -> Unit,
     onNavigateToDrawer: () -> Unit,
     onRemoveFolder: (folderTitle: String, completion: (result: Result<Unit>) -> Unit) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -151,6 +152,7 @@ fun ArticleListTopBar(
                 currentFeed = currentFeed,
                 onRemoveFolder = onRemoveFolder,
                 onRequestSearch = { search.start() },
+                onRequestJumpToBottom = onRequestJumpToBottom,
                 onMarkAllRead = { onMarkAllRead() },
                 hideSearchIcon = enableSearch,
             )
@@ -165,6 +167,7 @@ private fun FeedListTopBarPreview() {
     val scrollBehavior = pinnedScrollBehavior()
     ArticleListTopBar(
         onRequestJumpToTop = { },
+        onRequestJumpToBottom = { },
         onNavigateToDrawer = { },
         onRemoveFolder = { _, _ -> },
         scrollBehavior = scrollBehavior,
