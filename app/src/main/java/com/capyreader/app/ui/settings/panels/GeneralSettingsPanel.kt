@@ -102,8 +102,6 @@ fun GeneralSettingsPanel(
             enableStickyFullContent = viewModel.enableStickyFullContent,
             showTodayFilter = viewModel.showTodayFilter,
             updateShowTodayFilter = viewModel::updateShowTodayFilter,
-            enableAudioPlayer = viewModel.enableAudioPlayer,
-            updateEnableAudioPlayer = viewModel::updateEnableAudioPlayer,
             copyLinkFormat = viewModel.copyLinkFormat,
             updateCopyLinkFormat = viewModel::updateCopyLinkFormat,
         )
@@ -135,8 +133,6 @@ fun GeneralSettingsPanelView(
     markReadOnScroll: Boolean,
     showTodayFilter: Boolean,
     updateShowTodayFilter: (show: Boolean) -> Unit,
-    enableAudioPlayer: Boolean,
-    updateEnableAudioPlayer: (enable: Boolean) -> Unit,
     copyLinkFormat: CopyLinkFormat,
     updateCopyLinkFormat: (CopyLinkFormat) -> Unit,
 ) {
@@ -253,16 +249,6 @@ fun GeneralSettingsPanelView(
                     optionText = {
                         stringResource(id = it.translationKey)
                     }
-                )
-            }
-        }
-
-        FormSection(title = stringResource(R.string.settings_section_experimental)) {
-            RowItem {
-                TextSwitch(
-                    checked = enableAudioPlayer,
-                    onCheckedChange = updateEnableAudioPlayer,
-                    title = stringResource(R.string.settings_option_enable_audio_player)
                 )
             }
         }
@@ -412,8 +398,6 @@ private fun GeneralSettingsPanelPreview() {
                 updateAfterReadAll = {},
                 showTodayFilter = true,
                 updateShowTodayFilter = {},
-                enableAudioPlayer = false,
-                updateEnableAudioPlayer = {},
                 copyLinkFormat = CopyLinkFormat.default,
                 updateCopyLinkFormat = {}
             )

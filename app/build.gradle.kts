@@ -32,8 +32,8 @@ android {
         applicationId = "com.capyreader.app"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1188
-        versionName = "2026.01.1188"
+        versionCode = 1189
+        versionName = "2026.02.1189"
 
         val buildTime = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " UTC"
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
@@ -148,6 +148,7 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.compose)
     implementation(libs.coil.gif)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.coil.svg)
     implementation(libs.coil.video)
     implementation(libs.lazycolumnscrollbar)

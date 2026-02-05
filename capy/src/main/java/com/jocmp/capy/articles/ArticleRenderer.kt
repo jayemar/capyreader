@@ -16,7 +16,6 @@ class ArticleRenderer(
     private val titleFollowsBodyFont: Preference<Boolean>,
     private val hideTopMargin: Preference<Boolean>,
     private val enableHorizontalScroll: Preference<Boolean>,
-    private val enableAudioPlayer: Preference<Boolean>,
     private val replaceFullwidthCharacters: Preference<Boolean>,
     private val audioPlayerLabels: AudioPlayerLabels = AudioPlayerLabels(),
 ) {
@@ -79,14 +78,10 @@ class ArticleRenderer(
         return if (article.parseFullContent) {
             parseHtml(article, hideImages)
         } else {
-            val audioEnclosures = if (enableAudioPlayer.get()) {
-                article.audioEnclosureHTML(
-                    playLabel = audioPlayerLabels.play,
-                    pauseLabel = audioPlayerLabels.pause,
-                )
-            } else {
-                ""
-            }
+            val audioEnclosures = article.audioEnclosureHTML(
+                playLabel = audioPlayerLabels.play,
+                pauseLabel = audioPlayerLabels.pause,
+            )
             val otherEnclosures = article.enclosureHTML()
             val normalizedContent = PunctuationNormalizer.normalize(article.content, replaceFullwidth)
             audioEnclosures + normalizedContent + otherEnclosures + postProcessScript(article, hideImages)

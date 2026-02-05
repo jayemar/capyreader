@@ -33,6 +33,7 @@ import com.jocmp.capy.buildArticlePager
 import com.jocmp.capy.common.UnauthorizedError
 import com.jocmp.capy.common.launchIO
 import com.jocmp.capy.common.launchUI
+import com.jocmp.capy.common.withIOContext
 import com.jocmp.capy.countToday
 import com.jocmp.capy.logging.CapyLog
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -95,6 +96,10 @@ class ArticleScreenViewModel(
         account.countAll(latestFilter.status)
     }
 
+    private val _savedSearchCounts = filter.flatMapLatest { latestFilter ->
+        account.countAllBySavedSearch(latestFilter.status)
+    }
+
     val articles: Flow<PagingData<Article>> =
         combine(
             filter,
@@ -119,7 +124,14 @@ class ArticleScreenViewModel(
             .withPositiveCount(filter.status)
     }
 
-    val savedSearches = account.savedSearches
+    val savedSearches: Flow<List<SavedSearch>> = combine(
+        account.savedSearches,
+        _savedSearchCounts,
+        filter,
+    ) { searches, latestCounts, filter ->
+        searches.map { copySavedSearchCounts(it, latestCounts) }
+            .withPositiveCount(filter.status)
+    }
 
     val allFeeds = account.taggedFeeds
 
@@ -353,6 +365,20 @@ class ArticleScreenViewModel(
         }
     }
 
+    private suspend fun refreshFilterSuspend(filter: ArticleFilter) = withIOContext {
+        updateArticlesSince()
+
+        account.refresh(filter).onFailure { throwable ->
+            if (throwable is UnauthorizedError && _showUnauthorizedMessage == UnauthorizedMessageState.HIDE) {
+                _showUnauthorizedMessage = UnauthorizedMessageState.SHOW
+            }
+        }
+
+        WidgetUpdater.update(context)
+
+        updateArticlesSince()
+    }
+
     private fun refreshFilter(
         filter: ArticleFilter,
         onComplete: () -> Unit,
@@ -360,16 +386,7 @@ class ArticleScreenViewModel(
         refreshJob?.cancel()
 
         refreshJob = viewModelScope.launchIO {
-            account.refresh(filter).onFailure { throwable ->
-                if (throwable is UnauthorizedError && _showUnauthorizedMessage == UnauthorizedMessageState.HIDE) {
-                    _showUnauthorizedMessage = UnauthorizedMessageState.SHOW
-                }
-            }
-
-            launchIO {
-                WidgetUpdater.update(context)
-            }
-
+            refreshFilterSuspend(filter)
             onComplete()
         }
     }
@@ -383,27 +400,30 @@ class ArticleScreenViewModel(
         }
     }
 
-    fun refreshAndMarkRead(filter: ArticleFilter, onComplete: () -> Unit) {
-        viewModelScope.launchIO {
-            val articleIDs = account.unreadArticleIDs(
-                filter = filter,
-                range = MarkRead.All,
-                sortOrder = sortOrder.value,
-                query = _searchQuery.value,
-            )
+    suspend fun refreshAndMarkReadSuspend(filter: ArticleFilter) = withIOContext {
+        val articleIDs = account.unreadArticleIDs(
+            filter = filter,
+            range = MarkRead.All,
+            sortOrder = sortOrder.value,
+            query = _searchQuery.value,
+        )
 
-            if (articleIDs.isNotEmpty()) {
-                account.markAllRead(articleIDs).onFailure {
-                    Sync.markReadAsync(articleIDs, context)
-                }
-
-                launchIO {
-                    notificationHelper.dismissNotifications(articleIDs)
-                }
+        if (articleIDs.isNotEmpty()) {
+            account.markAllRead(articleIDs).onFailure {
+                Sync.markReadAsync(articleIDs, context)
             }
 
+            notificationHelper.dismissNotifications(articleIDs)
+        }
+
+        refreshFilterSuspend(filter)
+    }
+
+    fun refreshAndMarkRead(filter: ArticleFilter, onComplete: () -> Unit) {
+        viewModelScope.launchIO {
+            refreshAndMarkReadSuspend(filter)
             launchUI {
-                refresh(filter, onComplete)
+                onComplete()
             }
         }
     }
@@ -641,6 +661,10 @@ class ArticleScreenViewModel(
 
     private fun copyFeedCounts(feed: Feed, counts: Map<String, Long>): Feed {
         return feed.copy(count = counts.getOrDefault(feed.id, 0))
+    }
+
+    private fun copySavedSearchCounts(savedSearch: SavedSearch, counts: Map<String, Long>): SavedSearch {
+        return savedSearch.copy(count = counts.getOrDefault(savedSearch.id, 0))
     }
 
     private suspend fun buildArticle(articleID: String): Article? {

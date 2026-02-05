@@ -52,6 +52,11 @@ fun ArticleList(
     val articleOptions = rememberArticleOptions()
     val currentTime = rememberCurrentTime()
 
+    if (articles.loadState.isIdle && articles.itemCount == 0) {
+        ArticleListEmptyView()
+        return
+    }
+
     LazyScrollbar(state = listState) {
         LazyColumn(
             state = listState,
@@ -180,7 +185,6 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         .collectAsState()
     val summaryMaxLines by appPreferences.articleListOptions.summaryMaxLines.stateIn(scope)
         .collectAsState()
-    val showAudioIcon by appPreferences.enableAudioPlayer.stateIn(scope).collectAsState()
 
     return ArticleRowOptions(
         showSummary = showSummary,
@@ -191,7 +195,7 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         shortenTitles = shortenTitles,
         shortenSummaries = shortenSummaries,
         summaryMaxLines = summaryMaxLines,
-        showAudioIcon = showAudioIcon,
+        showAudioIcon = false,
     )
 }
 

@@ -54,9 +54,6 @@ class GeneralSettingsViewModel(
     var showTodayFilter by mutableStateOf(appPreferences.showTodayFilter.get())
         private set
 
-    var enableAudioPlayer by mutableStateOf(appPreferences.enableAudioPlayer.get())
-        private set
-
     var copyLinkFormat by mutableStateOf(appPreferences.copyLinkFormat.get())
         private set
 
@@ -147,12 +144,6 @@ class GeneralSettingsViewModel(
         appPreferences.showTodayFilter.set(show)
 
         showTodayFilter = show
-    }
-
-    fun updateEnableAudioPlayer(enable: Boolean) {
-        appPreferences.enableAudioPlayer.set(enable)
-
-        enableAudioPlayer = enable
     }
 
     fun updateCopyLinkFormat(format: CopyLinkFormat) {

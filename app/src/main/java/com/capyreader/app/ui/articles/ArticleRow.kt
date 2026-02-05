@@ -52,7 +52,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.preferences.AppPreferences
@@ -188,7 +188,7 @@ fun ArticleRow(
                                         .width(12.dp.relative(options.fontScale))
                                 )
                             }
-                            if (options.showAudioIcon && article.enclosureType == EnclosureType.AUDIO) {
+                            if (article.enclosureType == EnclosureType.AUDIO) {
                                 Icon(
                                     Icons.Rounded.PlayArrow,
                                     contentDescription = null,
@@ -430,7 +430,6 @@ fun ArticleRowPreview_Selected_DarkMode() {
                     selected = true,
                     onSelect = {},
                     currentTime = LocalDateTime.now(),
-                    options = ArticleRowOptions(showAudioIcon = true),
                 )
                 ArticleRow(
                     article = article.copy(read = false),
@@ -438,7 +437,6 @@ fun ArticleRowPreview_Selected_DarkMode() {
                     selected = false,
                     onSelect = {},
                     currentTime = LocalDateTime.now(),
-                    options = ArticleRowOptions(showAudioIcon = true),
                 )
             }
         }
@@ -498,7 +496,6 @@ fun ArticleRowPreview_Medium(@PreviewParameter(ArticleSample::class) article: Ar
                 currentTime = LocalDateTime.now(),
                 options = ArticleRowOptions(
                     imagePreview = ImagePreview.MEDIUM,
-                    showAudioIcon = true,
                 )
             )
         }

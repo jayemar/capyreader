@@ -253,22 +253,24 @@ fun SwipeRefresh(
     val isBottomIndicator = (indicatorAlignment as BiasAlignment).verticalBias == 1f
 
     LaunchedEffect(refreshState) {
-        state.isRefreshing = when (refreshState) {
-            AngleRefreshState.STOPPED -> false
-            AngleRefreshState.RUNNING, AngleRefreshState.SETTLING -> true
-        }
-
         when (refreshState) {
             AngleRefreshState.RUNNING, AngleRefreshState.SETTLING -> {
+                // External state indicates refresh is running
+                state.isRefreshing = true
                 // Keep indicator at trigger position while refreshing
                 if (state.indicatorOffset < refreshTriggerPx) {
                     state.animateOffsetTo(refreshTriggerPx)
                 }
             }
             AngleRefreshState.STOPPED -> {
-                // When refresh completes, reset indicator offset to 0
+                // External state indicates refresh should stop
+                state.isRefreshing = false
+                // When refresh completes, animate indicator to hidden position
                 if (!state.isSwipeInProgress) {
-                    state.animateOffsetTo(0f)
+                    // For bottom indicators, hide below screen (negative offset)
+                    // For top indicators, hide above screen (0f offset)
+                    val hiddenOffset = if (isBottomIndicator) -refreshTriggerPx else 0f
+                    state.animateOffsetTo(hiddenOffset)
                 }
             }
         }
