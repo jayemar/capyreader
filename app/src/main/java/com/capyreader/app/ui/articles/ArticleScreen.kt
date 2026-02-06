@@ -301,14 +301,9 @@ fun ArticleScreen(
         }
 
         fun refreshAll() {
-            if (enableMarkReadOnScroll) {
-                scrollToTop()
-            }
-
             if (refreshAllState == AngleRefreshState.RUNNING) {
                 return
             }
-
 
             refreshAllState = AngleRefreshState.RUNNING
 
