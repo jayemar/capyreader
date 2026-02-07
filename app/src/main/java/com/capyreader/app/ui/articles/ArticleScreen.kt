@@ -110,6 +110,7 @@ fun ArticleScreen(
     val allFolders by viewModel.allFolders.collectAsStateWithLifecycle(initialValue = emptyList())
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
     val savedSearches by viewModel.savedSearches.collectAsStateWithLifecycle(initialValue = emptyList())
+    val allSavedSearches by viewModel.allSavedSearches.collectAsStateWithLifecycle(initialValue = emptyList())
     val statusCount by viewModel.statusCount.collectAsStateWithLifecycle(initialValue = 0)
     val todayCount by viewModel.todayCount.collectAsStateWithLifecycle(initialValue = 0)
     val unreadCount by viewModel.unreadCount.collectAsStateWithLifecycle(initialValue = 0L)
@@ -137,7 +138,7 @@ fun ArticleScreen(
     val articleActions = rememberArticleActions(viewModel)
     val folderActions = rememberFolderActions(viewModel)
     val feedActions = rememberFeedActions(viewModel)
-    val labelsActions = rememberLabelsActions(viewModel, savedSearches)
+    val labelsActions = rememberLabelsActions(viewModel, allSavedSearches)
     val connectivity = rememberLocalConnectivity()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val showOnboarding by viewModel.showOnboarding.collectAsState(false)
@@ -264,11 +265,10 @@ fun ArticleScreen(
         }
 
         LaunchedEffect(listState) {
+            var previousCount = 0
             snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .drop(if (enableMarkReadOnScroll) 0 else 1)
                 .distinctUntilChanged()
-                .drop(1)  // Skip first emission to prevent scroll reset on rotation
-                .collect {
+                .collect { currentCount ->
                     delay(200)
 
                     // Check if we should scroll to a specific position
@@ -280,11 +280,15 @@ fun ArticleScreen(
 
                         // Clear the scroll target after using it
                         viewModel.clearScrollTarget()
-                    } else {
+                        resetScrollBehaviorOffset()
+                    } else if (previousCount == 0 && currentCount > 0) {
+                        // Only scroll to top when list goes from empty to non-empty (initial load)
                         listState.scrollToItem(0)
+                        resetScrollBehaviorOffset()
                     }
 
-                    resetScrollBehaviorOffset()
+                    previousCount = currentCount
+
                     delay(600) // Wait for 500ms debounce in MarkReadOnScroll to pass
                     viewModel.clearFilterTransition()
                 }
