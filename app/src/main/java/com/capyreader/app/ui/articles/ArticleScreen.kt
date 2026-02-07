@@ -237,12 +237,16 @@ fun ArticleScreen(
         }
 
         LaunchedEffect(listState) {
+            var previousCount = 0
             snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .drop(if (enableMarkReadOnScroll) 0 else 1)
                 .distinctUntilChanged()
-                .collect {
-                    listState.scrollToItem(0)
-                    resetScrollBehaviorOffset()
+                .collect { currentCount ->
+                    // Only scroll to top when list goes from empty to non-empty (initial load)
+                    if (previousCount == 0 && currentCount > 0) {
+                        listState.scrollToItem(0)
+                        resetScrollBehaviorOffset()
+                    }
+                    previousCount = currentCount
                 }
         }
 
