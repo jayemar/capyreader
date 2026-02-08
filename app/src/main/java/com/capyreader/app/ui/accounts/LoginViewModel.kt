@@ -35,7 +35,18 @@ class LoginViewModel(
     private var _url by mutableStateOf("")
     private var _clientCertAlias by mutableStateOf("")
     private var _result by mutableStateOf<Async<Unit>>(Async.Uninitialized)
-    val source = handle.toRoute<Route.Login>().source
+    private var _useApiToken by mutableStateOf(false)
+    private val routeSource = handle.toRoute<Route.Login>().source
+
+    val source: Source
+        get() = if (routeSource == Source.MINIFLUX && _useApiToken) {
+            Source.MINIFLUX_TOKEN
+        } else {
+            routeSource
+        }
+
+    val useApiToken: Boolean
+        get() = _useApiToken
 
     val username
         get() = _username
@@ -77,8 +88,14 @@ class LoginViewModel(
         _clientCertAlias = ""
     }
 
+    fun updateUseApiToken(useToken: Boolean) {
+        _useApiToken = useToken
+    }
+
     fun submit(onSuccess: () -> Unit) {
-        if (username.isBlank() || password.isBlank()) {
+        val missingUsername = source.requiresUsername && username.isBlank()
+
+        if (missingUsername || password.isBlank()) {
             _result = Async.Failure(loginError())
         }
 
@@ -111,7 +128,8 @@ class LoginViewModel(
             .withTrailingSeparator
             .let {
                 when (source) {
-                    Source.MINIFLUX -> withMinifluxPath(it)
+                    Source.MINIFLUX,
+                    Source.MINIFLUX_TOKEN -> withMinifluxPath(it)
                     else -> withFreshRSSPath(it, source)
                 }
             }

@@ -130,6 +130,8 @@ class ArticleScreenViewModel(
 
     val showOnboarding = allFeeds.map { it.isEmpty() }
 
+    val allSavedSearches = account.savedSearches
+
     val allFolders = account.folders
 
     val topLevelFeeds = combine(

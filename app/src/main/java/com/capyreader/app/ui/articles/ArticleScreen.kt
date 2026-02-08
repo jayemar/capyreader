@@ -110,6 +110,7 @@ fun ArticleScreen(
     val allFolders by viewModel.allFolders.collectAsStateWithLifecycle(initialValue = emptyList())
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
     val savedSearches by viewModel.savedSearches.collectAsStateWithLifecycle(initialValue = emptyList())
+    val allSavedSearches by viewModel.allSavedSearches.collectAsStateWithLifecycle(initialValue = emptyList())
     val statusCount by viewModel.statusCount.collectAsStateWithLifecycle(initialValue = 0)
     val todayCount by viewModel.todayCount.collectAsStateWithLifecycle(initialValue = 0)
     val unreadCount by viewModel.unreadCount.collectAsStateWithLifecycle(initialValue = 0L)
@@ -139,7 +140,7 @@ fun ArticleScreen(
     val articleActions = rememberArticleActions(viewModel)
     val folderActions = rememberFolderActions(viewModel)
     val feedActions = rememberFeedActions(viewModel)
-    val labelsActions = rememberLabelsActions(viewModel, savedSearches)
+    val labelsActions = rememberLabelsActions(viewModel, allSavedSearches)
     val connectivity = rememberLocalConnectivity()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val showOnboarding by viewModel.showOnboarding.collectAsState(false)
@@ -616,20 +617,24 @@ fun ArticleScreen(
                                 },
                             ) {
                                 key(filter, articles.itemCount) {
-                                    ArticleList(
-                                        articles = articles,
-                                        selectedArticleKey = article?.id,
-                                        listState = listState,
-                                        enableMarkReadOnScroll = enableMarkReadOnScroll,
-                                        refreshingAll = viewModel.refreshingAll,
-                                        contentPadding = contentPadding,
-                                        onMarkAllRead = { range ->
-                                            onMarkAllRead(range)
-                                        },
-                                        onSelect = { articleID ->
-                                            selectArticle(articleID)
-                                        },
-                                    )
+                                    if (isRefreshInitialized && articles.itemCount == 0) {
+                                        ArticleListEmptyView()
+                                    } else {
+                                        ArticleList(
+                                            articles = articles,
+                                            selectedArticleKey = article?.id,
+                                            listState = listState,
+                                            enableMarkReadOnScroll = enableMarkReadOnScroll,
+                                            refreshingAll = viewModel.refreshingAll,
+                                            contentPadding = contentPadding,
+                                            onMarkAllRead = { range ->
+                                                onMarkAllRead(range)
+                                            },
+                                            onSelect = { articleID ->
+                                                selectArticle(articleID)
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         }

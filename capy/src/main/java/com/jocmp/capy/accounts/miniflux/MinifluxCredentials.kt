@@ -8,22 +8,34 @@ internal data class MinifluxCredentials(
     override val username: String,
     override val secret: String,
     override val url: String,
+    override val source: Source,
 ) : Credentials {
     override val clientCertAlias: String = ""
 
-    override val source: Source = Source.MINIFLUX
-
     override suspend fun verify(): Result<Credentials> {
-        val verified = Miniflux.verifyCredentials(
-            username = username,
-            password = secret,
-            baseURL = url
-        )
+        if (source == Source.MINIFLUX_TOKEN) {
+            val response = Miniflux.verifyToken(
+                token = secret,
+                baseURL = url
+            )
 
-        return if (verified) {
-            Result.success(this)
+            val username = response?.body()?.username
+
+            if (response?.isSuccessful == true && username != null) {
+                return Result.success(this.copy(username = username))
+            }
         } else {
-            Result.failure(Throwable("Failed to verify Miniflux credentials"))
+            val verified = Miniflux.verifyCredentials(
+                username = username,
+                password = secret,
+                baseURL = url
+            )
+
+            if (verified) {
+                return Result.success(this)
+            }
         }
+
+        return Result.failure(Throwable("Failed to verify Miniflux credentials"))
     }
 }
