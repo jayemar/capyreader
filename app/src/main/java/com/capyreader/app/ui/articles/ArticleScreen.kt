@@ -726,21 +726,25 @@ fun ArticleScreen(
                                 },
                             ) {
                                 key(filter) {
-                                    ArticleList(
-                                        articles = articles,
-                                        selectedArticleKey = article?.id,
-                                        listState = listState,
-                                        enableMarkReadOnScroll = enableMarkReadOnScroll,
-                                        refreshing = viewModel.refreshingAll || isPullToRefreshing,
-                                        contentPadding = contentPadding,
-                                        isFilterTransitioning = viewModel.isFilterTransitioning,
-                                        onMarkAllRead = { range ->
-                                            onMarkAllRead(range)
-                                        },
-                                        onSelect = { articleID ->
-                                            selectArticle(articleID)
-                                        },
-                                    )
+                                    if (isRefreshInitialized && articles.itemCount == 0) {
+                                        ArticleListEmptyView()
+                                    } else {
+                                        ArticleList(
+                                            articles = articles,
+                                            selectedArticleKey = article?.id,
+                                            listState = listState,
+                                            enableMarkReadOnScroll = enableMarkReadOnScroll,
+                                            refreshing = viewModel.refreshingAll || isPullToRefreshing,
+                                            contentPadding = contentPadding,
+                                            isFilterTransitioning = viewModel.isFilterTransitioning,
+                                            onMarkAllRead = { range ->
+                                                onMarkAllRead(range)
+                                            },
+                                            onSelect = { articleID ->
+                                                selectArticle(articleID)
+                                            },
+                                        )
+                                    }
                                 }
                             }
                         }
