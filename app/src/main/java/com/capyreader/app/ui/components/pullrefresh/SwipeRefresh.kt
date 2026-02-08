@@ -257,10 +257,9 @@ fun SwipeRefresh(
             AngleRefreshState.RUNNING, AngleRefreshState.SETTLING -> {
                 // External state indicates refresh is running
                 state.isRefreshing = true
-                // Keep indicator at trigger position while refreshing
-                if (state.indicatorOffset < refreshTriggerPx) {
-                    state.animateOffsetTo(refreshTriggerPx)
-                }
+                // Always lock indicator at trigger position while refreshing
+                // regardless of where it was when released
+                state.animateOffsetTo(refreshTriggerPx)
             }
             AngleRefreshState.STOPPED -> {
                 // External state indicates refresh should stop
