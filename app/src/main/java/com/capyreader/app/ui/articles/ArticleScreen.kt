@@ -200,10 +200,8 @@ fun ArticleScreen(
             mutableStateOf(skipInitialRefresh)
         }
         var isPullToRefreshing by remember { mutableStateOf(false) }
-        var isPullUpRefreshing by remember { mutableStateOf(false) }
         var isRefreshingAll by remember { mutableStateOf(false) }
         val refreshAllState = if (isRefreshingAll) AngleRefreshState.RUNNING else AngleRefreshState.STOPPED
-        val pullUpRefreshState = if (isPullUpRefreshing) AngleRefreshState.RUNNING else AngleRefreshState.STOPPED
 
         val (isUpdatePasswordDialogOpen, setUpdatePasswordDialogOpen) = rememberSaveable {
             mutableStateOf(false)
@@ -439,19 +437,6 @@ fun ArticleScreen(
                         }
                     }
                 }
-            }
-        }
-
-        fun refreshPullUp() {
-            if (enableMarkReadOnScroll) {
-                scrollToTop()
-            }
-
-            isPullUpRefreshing = true
-
-            viewModel.refreshAndMarkRead(filter) {
-                isPullUpRefreshing = false
-                refreshPagination()
             }
         }
 
@@ -716,11 +701,11 @@ fun ArticleScreen(
                             PullToNextFeedBox(
                                 modifier = Modifier.fillMaxSize(),
                                 enabled = canSwipeUp,
-                                refreshState = pullUpRefreshState,
+                                refreshState = refreshAllState,
                                 onRequestNext = {
                                     when (listSwipeBottom) {
                                         ArticleListVerticalSwipe.NEXT_FEED -> requestNextFeed()
-                                        ArticleListVerticalSwipe.REFRESH_ARTICLES -> refreshPullUp()
+                                        ArticleListVerticalSwipe.REFRESH_ARTICLES -> refreshAll()
                                         ArticleListVerticalSwipe.DISABLED -> {}
                                     }
                                 },

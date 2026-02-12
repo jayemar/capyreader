@@ -402,34 +402,6 @@ class ArticleScreenViewModel(
         }
     }
 
-    suspend fun refreshAndMarkReadSuspend(filter: ArticleFilter) = withIOContext {
-        val articleIDs = account.unreadArticleIDs(
-            filter = filter,
-            range = MarkRead.All,
-            sortOrder = sortOrder.value,
-            query = _searchQuery.value,
-        )
-
-        if (articleIDs.isNotEmpty()) {
-            account.markAllRead(articleIDs).onFailure {
-                Sync.markReadAsync(articleIDs, context)
-            }
-
-            notificationHelper.dismissNotifications(articleIDs)
-        }
-
-        refreshFilterSuspend(filter)
-    }
-
-    fun refreshAndMarkRead(filter: ArticleFilter, onComplete: () -> Unit) {
-        viewModelScope.launchIO {
-            refreshAndMarkReadSuspend(filter)
-            launchUI {
-                onComplete()
-            }
-        }
-    }
-
     fun refreshAll(onComplete: () -> Unit) {
         refreshingAll = true
 
