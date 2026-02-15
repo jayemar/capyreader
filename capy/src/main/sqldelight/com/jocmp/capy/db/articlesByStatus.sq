@@ -24,7 +24,10 @@ AND ((article_statuses.starred = :starred AND article_statuses.last_starred_at I
 AND (articles.published_at >= :publishedSince OR :publishedSince IS NULL)
 AND (articles.title LIKE '%' || :query || '%' OR articles.summary  LIKE '%' || :query || '%' OR :query IS NULL)
 GROUP BY articles.id
-ORDER BY CASE WHEN :newestFirst THEN articles.published_at ELSE (-1 * articles.published_at) END DESC
+ORDER BY CASE
+    WHEN :newestFirst THEN (CASE WHEN :sortByPublishedAt THEN articles.published_at ELSE article_statuses.updated_at END)
+    ELSE (CASE WHEN :sortByPublishedAt THEN (-1 * articles.published_at) ELSE (-1 * article_statuses.updated_at) END)
+END DESC
 LIMIT :limit OFFSET :offset;
 
 countAll:
@@ -51,15 +54,23 @@ AND (articles.title LIKE '%' || :query || '%' OR articles.summary  LIKE '%' || :
 AND (
     :afterArticleID IS NULL
     OR CASE WHEN :newestFirst
-        THEN articles.published_at >= (SELECT published_at FROM articles WHERE id = :afterArticleID)
-        ELSE articles.published_at <= (SELECT published_at FROM articles WHERE id = :afterArticleID)
+        THEN (CASE WHEN :sortByPublishedAt THEN articles.published_at ELSE article_statuses.updated_at END) >=
+             (SELECT CASE WHEN :sortByPublishedAt THEN a.published_at ELSE s.updated_at END
+              FROM articles a JOIN article_statuses s ON a.id = s.article_id WHERE a.id = :afterArticleID)
+        ELSE (CASE WHEN :sortByPublishedAt THEN articles.published_at ELSE article_statuses.updated_at END) <=
+             (SELECT CASE WHEN :sortByPublishedAt THEN a.published_at ELSE s.updated_at END
+              FROM articles a JOIN article_statuses s ON a.id = s.article_id WHERE a.id = :afterArticleID)
     END
 )
 AND (
     :beforeArticleID IS NULL
     OR CASE WHEN :newestFirst
-        THEN articles.published_at <= (SELECT published_at FROM articles WHERE id = :beforeArticleID)
-        ELSE articles.published_at >= (SELECT published_at FROM articles WHERE id = :beforeArticleID)
+        THEN (CASE WHEN :sortByPublishedAt THEN articles.published_at ELSE article_statuses.updated_at END) <=
+             (SELECT CASE WHEN :sortByPublishedAt THEN a.published_at ELSE s.updated_at END
+              FROM articles a JOIN article_statuses s ON a.id = s.article_id WHERE a.id = :beforeArticleID)
+        ELSE (CASE WHEN :sortByPublishedAt THEN articles.published_at ELSE article_statuses.updated_at END) >=
+             (SELECT CASE WHEN :sortByPublishedAt THEN a.published_at ELSE s.updated_at END
+              FROM articles a JOIN article_statuses s ON a.id = s.article_id WHERE a.id = :beforeArticleID)
     END
 )
 GROUP BY articles.id;

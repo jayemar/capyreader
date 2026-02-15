@@ -5,6 +5,7 @@ import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
 import com.jocmp.capy.persistence.listMapper
@@ -19,6 +20,7 @@ class ByFeed(private val database: Database) {
         since: OffsetDateTime,
         limit: Long,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         offset: Long,
         priority: FeedPriority,
     ): Query<Article> {
@@ -35,6 +37,7 @@ class ByFeed(private val database: Database) {
             lastStarredAt = mapLastStarred(starred, since),
             publishedSince = null,
             newestFirst = isDescendingOrder(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             priorities = priority.inclusivePriorities,
             mapper = ::listMapper
         )
@@ -45,6 +48,7 @@ class ByFeed(private val database: Database) {
         feedIDs: List<String>,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         priority: FeedPriority,
         query: String?,
     ): Query<String> {
@@ -58,6 +62,7 @@ class ByFeed(private val database: Database) {
             beforeArticleID = beforeArticleID,
             publishedSince = null,
             newestFirst = isNewestFirst(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             query = query,
             priorities = priority.inclusivePriorities,
         )

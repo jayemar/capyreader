@@ -5,6 +5,7 @@ import app.cash.sqldelight.paging3.QueryPagingSource
 import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.FeedPriority
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
 import kotlinx.coroutines.Dispatchers
@@ -17,14 +18,15 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
         return when (filter) {
-            is ArticleFilter.Articles -> articleSource(filter, query, sortOrder, since)
-            is ArticleFilter.Feeds -> feedSource(filter, query, sortOrder, since)
-            is ArticleFilter.Folders -> folderSource(filter, query, sortOrder, since)
-            is ArticleFilter.SavedSearches -> savedSearchSource(filter, query, sortOrder, since)
-            is ArticleFilter.Today -> todaySource(filter, query, sortOrder, since)
+            is ArticleFilter.Articles -> articleSource(filter, query, sortOrder, sortField, since)
+            is ArticleFilter.Feeds -> feedSource(filter, query, sortOrder, sortField, since)
+            is ArticleFilter.Folders -> folderSource(filter, query, sortOrder, sortField, since)
+            is ArticleFilter.SavedSearches -> savedSearchSource(filter, query, sortOrder, sortField, since)
+            is ArticleFilter.Today -> todaySource(filter, query, sortOrder, sortField, since)
         }
     }
 
@@ -32,6 +34,7 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter.Articles,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
         return QueryPagingSource(
@@ -49,6 +52,7 @@ class ArticlePagerFactory(private val database: Database) {
                     since = since,
                     limit = limit,
                     sortOrder = sortOrder,
+                    sortField = sortField,
                     offset = offset,
                 )
             }
@@ -59,6 +63,7 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter.Feeds,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         since: OffsetDateTime,
     ): PagingSource<Int, Article> {
         val feedIDs = listOf(filter.feedID)
@@ -68,6 +73,7 @@ class ArticlePagerFactory(private val database: Database) {
             filter = filter,
             query = query,
             sortOrder = sortOrder,
+            sortField = sortField,
             since = since,
             priority = FeedPriority.FEED,
         )
@@ -77,6 +83,7 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter.Folders,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
         val feedIDs = database
@@ -89,6 +96,7 @@ class ArticlePagerFactory(private val database: Database) {
             filter = filter,
             query = query,
             sortOrder = sortOrder,
+            sortField = sortField,
             since = since,
             priority = FeedPriority.CATEGORY,
         )
@@ -99,6 +107,7 @@ class ArticlePagerFactory(private val database: Database) {
         query: String?,
         filter: ArticleFilter,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         priority: FeedPriority,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
@@ -120,6 +129,7 @@ class ArticlePagerFactory(private val database: Database) {
                     since = since,
                     limit = limit,
                     sortOrder = sortOrder,
+                    sortField = sortField,
                     offset = offset,
                     priority = priority,
                 )
@@ -131,6 +141,7 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter.SavedSearches,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
         return QueryPagingSource(
@@ -150,6 +161,7 @@ class ArticlePagerFactory(private val database: Database) {
                     since = since,
                     limit = limit,
                     sortOrder = sortOrder,
+                    sortField = sortField,
                     offset = offset,
                 )
             }
@@ -160,6 +172,7 @@ class ArticlePagerFactory(private val database: Database) {
         filter: ArticleFilter.Today,
         query: String?,
         sortOrder: SortOrder,
+        sortField: ArticleSortField,
         since: OffsetDateTime
     ): PagingSource<Int, Article> {
         return QueryPagingSource(
@@ -176,6 +189,7 @@ class ArticlePagerFactory(private val database: Database) {
                     query = query,
                     limit = limit,
                     sortOrder = sortOrder,
+                    sortField = sortField,
                     offset = offset,
                     since = since,
                 )

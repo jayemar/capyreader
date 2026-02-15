@@ -28,6 +28,7 @@ import com.jocmp.capy.Folder
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.SavedSearch
 import com.jocmp.capy.articles.ArticleContent
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.NextFilter
 import com.jocmp.capy.buildArticlePager
 import com.jocmp.capy.common.UnauthorizedError
@@ -77,6 +78,8 @@ class ArticleScreenViewModel(
 
     val sortOrder = appPreferences.articleListOptions.sortOrder.stateIn(viewModelScope)
 
+    val sortField = appPreferences.articleListOptions.sortField.stateIn(viewModelScope)
+
     val afterReadAll =
         appPreferences.articleListOptions.afterReadAllBehavior.stateIn(viewModelScope)
 
@@ -93,12 +96,14 @@ class ArticleScreenViewModel(
             filter,
             _searchQuery,
             articlesSince,
-            sortOrder
-        ) { filter, query, since, sort ->
+            sortOrder,
+            sortField
+        ) { filter, query, since, sort, field ->
             account.buildArticlePager(
                 filter = filter,
                 query = query,
                 sortOrder = sort,
+                sortField = field,
                 since = since
             ).flow
         }.flatMapLatest { it }
@@ -289,6 +294,7 @@ class ArticleScreenViewModel(
                 filter = latestFilter,
                 range = range,
                 sortOrder = sortOrder.value,
+                sortField = sortField.value,
                 query = _searchQuery.value,
             )
 
