@@ -57,6 +57,7 @@ import com.capyreader.app.ui.settings.keywordblocklist.LocalBlockedKeywords
 import com.capyreader.app.ui.theme.CapyTheme
 import com.jocmp.capy.accounts.AutoDelete
 import com.jocmp.capy.accounts.Source
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.launchUI
 import org.koin.androidx.compose.koinViewModel
@@ -92,6 +93,8 @@ fun GeneralSettingsPanel(
             onClearArticles = viewModel::clearAllArticles,
             updateSortOrder = viewModel::updateSortOrder,
             sortOrder = viewModel.sortOrder,
+            updateSortField = viewModel::updateSortField,
+            sortField = viewModel.sortField,
             updateConfirmMarkAllRead = viewModel::updateConfirmMarkAllRead,
             updateMarkReadOnScroll = viewModel::updateMarkReadOnScroll,
             confirmMarkAllRead = viewModel.confirmMarkAllRead,
@@ -123,6 +126,8 @@ fun GeneralSettingsPanelView(
     autoDelete: AutoDelete,
     updateSortOrder: (SortOrder) -> Unit,
     sortOrder: SortOrder,
+    updateSortField: (ArticleSortField) -> Unit,
+    sortField: ArticleSortField,
     updateStickyFullContent: (enable: Boolean) -> Unit,
     enableStickyFullContent: Boolean,
     updateConfirmMarkAllRead: (enable: Boolean) -> Unit,
@@ -154,6 +159,11 @@ fun GeneralSettingsPanelView(
         SortOrderSelect(
             sortOrder,
             updateSortOrder
+        )
+
+        SortFieldSelect(
+            selected = sortField,
+            update = updateSortField
         )
 
         FormSection(title = stringResource(R.string.settings_section_categories)) {
@@ -387,6 +397,8 @@ private fun GeneralSettingsPanelPreview() {
                 autoDelete = AutoDelete.WEEKLY,
                 sortOrder = SortOrder.NEWEST_FIRST,
                 updateSortOrder = {},
+                sortField = ArticleSortField.default,
+                updateSortField = {},
                 onNavigateToNotifications = {},
                 markReadOnScroll = true,
                 updateConfirmMarkAllRead = {},

@@ -4,8 +4,11 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import com.jocmp.capy.ArticleStatus.UNREAD
 import com.jocmp.capy.accounts.AddFeedResult
+import com.jocmp.feedfinder.DefaultFeedFinder
+import com.jocmp.feedfinder.FeedFinder
 import com.jocmp.capy.accounts.AutoDelete
-import com.jocmp.capy.accounts.FaviconFetcher
+import com.jocmp.capy.accounts.FaviconFinder
+import com.jocmp.capy.accounts.FaviconPolicy
 import com.jocmp.capy.accounts.LocalOkHttpClient
 import com.jocmp.capy.accounts.Source
 import com.jocmp.capy.accounts.asOPML
@@ -16,6 +19,7 @@ import com.jocmp.capy.accounts.local.LocalAccountDelegate
 import com.jocmp.capy.accounts.miniflux.MinifluxAccountDelegate
 import com.jocmp.capy.accounts.reader.buildReaderDelegate
 import com.jocmp.capy.articles.ArticleContent
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.TimeHelpers.nowUTC
 import java.time.OffsetDateTime
@@ -53,14 +57,15 @@ data class Account(
     val database: Database,
     val preferences: AccountPreferences,
     val source: Source = Source.LOCAL,
-    val faviconFetcher: FaviconFetcher,
+    val faviconPolicy: FaviconPolicy,
     private val clientCertManager: ClientCertManager,
-    val httpClient: OkHttpClient = LocalOkHttpClient.forAccount(path = cacheDirectory),
+    private val userAgent: String,
+    private val acceptLanguage: String,
+    private val localHttpClient: OkHttpClient = LocalOkHttpClient.forAccount(path = cacheDirectory),
     val delegate: AccountDelegate = when (source) {
         Source.LOCAL -> LocalAccountDelegate(
             database = database,
-            httpClient = httpClient,
-            faviconFetcher = faviconFetcher,
+            httpClient = localHttpClient,
             preferences = preferences,
         )
 
@@ -99,7 +104,9 @@ data class Account(
     private val taggingRecords = TaggingRecords(database)
     private val savedSearchRecords = SavedSearchRecords(database)
 
-    private val articleContent = ArticleContent(httpClient)
+    private val feedFinder: FeedFinder by lazy { DefaultFeedFinder(localHttpClient) }
+
+    private val articleContent = ArticleContent(localHttpClient, userAgent, acceptLanguage)
 
     val taggedFeeds = feedRecords.taggedFeeds().map {
         it.sortedByTitle()
@@ -122,10 +129,16 @@ data class Account(
             Folder(
                 title = it.key,
                 feeds = it.value.sortedByTitle(),
-                expanded = it.value.firstOrNull()?.folderExpanded ?: false
+                expanded = it.value.firstOrNull()?.folderExpanded ?: false,
             )
         }.sortedByTitle()
     }
+
+    suspend fun createPage(url: String) = delegate.createPage(url)
+
+    suspend fun deletePage(articleID: String) = delegate.deletePage(articleID)
+
+    suspend fun searchFeed(url: String) = feedFinder.find(url)
 
     suspend fun addFeed(
         url: String,
@@ -287,12 +300,14 @@ data class Account(
         filter: ArticleFilter,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         query: String?,
     ): List<String> {
         return articleRecords.unreadArticleIDs(
             filter = filter,
             range = range,
             sortOrder = sortOrder,
+            sortField = sortField,
             query = query,
         )
     }
@@ -405,6 +420,27 @@ data class Account(
         feedRecords.updateOpenInBrowser(feedID, enabled)
     }
 
+    suspend fun toggleFeedUnreadBadge(feedID: String, enabled: Boolean) {
+        feedRecords.updateShowUnreadBadge(feedID, enabled)
+    }
+
+    suspend fun toggleAllFeedUnreadBadges(enabled: Boolean) {
+        feedRecords.toggleAllShowUnreadBadge(enabled)
+    }
+
+    suspend fun toggleSavedSearchUnreadBadge(id: String, enabled: Boolean) {
+        savedSearchRecords.updateShowUnreadBadge(id, enabled)
+    }
+
+    suspend fun toggleAllSavedSearchUnreadBadges(enabled: Boolean) {
+        savedSearchRecords.toggleAllShowUnreadBadge(enabled)
+    }
+
+    suspend fun toggleAllUnreadBadges(enabled: Boolean) {
+        toggleAllFeedUnreadBadges(enabled)
+        toggleAllSavedSearchUnreadBadges(enabled)
+    }
+
     suspend fun disableStickyContent(feedID: String) {
         feedRecords.updateStickyFullContent(enabled = false, feedID = feedID)
     }
@@ -415,6 +451,19 @@ data class Account(
 
     suspend fun clearStickyFullContent() {
         feedRecords.clearStickyFullContent()
+    }
+
+    suspend fun reloadFavicon(feedID: String) {
+        findFeed(feedID)?.let { findFavicon(it) }
+    }
+
+    private suspend fun findFavicon(feed: Feed) {
+        withIOContext {
+            val siteURL = FaviconFinder.siteURL(feed) ?: return@withIOContext
+            FaviconFinder(localHttpClient, faviconPolicy, userAgent, acceptLanguage).find(siteURL.toString())?.let {
+                feedRecords.updateFavicon(feed.id, it)
+            }
+        }
     }
 
     val supportsMultiFolderFeeds: Boolean

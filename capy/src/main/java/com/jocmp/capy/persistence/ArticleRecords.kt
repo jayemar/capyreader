@@ -9,6 +9,7 @@ import com.jocmp.capy.ArticleNotification
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import java.time.OffsetDateTime
 import com.jocmp.capy.common.TimeHelpers.nowUTC
@@ -280,6 +281,7 @@ internal class ArticleRecords internal constructor(
         database.articlesQueries.markStarred(
             articleID = articleID,
             starred = true,
+            lastStarredAt = null,
         )
     }
 
@@ -287,6 +289,7 @@ internal class ArticleRecords internal constructor(
         database.articlesQueries.markStarred(
             articleID = articleID,
             starred = false,
+            lastStarredAt = nowUTC().toEpochSecond(),
         )
     }
 
@@ -393,6 +396,7 @@ internal class ArticleRecords internal constructor(
         filter: ArticleFilter,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         query: String?,
     ): List<String> {
         val ids = when (filter) {
@@ -400,6 +404,7 @@ internal class ArticleRecords internal constructor(
                 filter.articleStatus,
                 range = range,
                 sortOrder = sortOrder,
+                sortField = sortField,
                 query = query,
             )
 
@@ -408,6 +413,7 @@ internal class ArticleRecords internal constructor(
                 feedIDs = listOf(filter.feedID),
                 range = range,
                 sortOrder = sortOrder,
+                sortField = sortField,
                 query = query,
                 priority = FeedPriority.FEED,
             )
@@ -418,6 +424,7 @@ internal class ArticleRecords internal constructor(
                     feedIDs = folderFeedIDs(filter),
                     range = range,
                     sortOrder = sortOrder,
+                    sortField = sortField,
                     query = query,
                     priority = FeedPriority.CATEGORY,
                 )
@@ -428,6 +435,7 @@ internal class ArticleRecords internal constructor(
                 savedSearchID = filter.savedSearchID,
                 range = range,
                 sortOrder = sortOrder,
+                sortField = sortField,
                 query = query,
             )
 
@@ -435,6 +443,7 @@ internal class ArticleRecords internal constructor(
                 filter.status,
                 range = range,
                 sortOrder = sortOrder,
+                sortField = sortField,
                 query = query,
             )
         }

@@ -9,6 +9,7 @@
     <string name="filter_all">Semua</string>
     <string name="feed_action_unsubscribe">Berhenti berlangganan</string>
     <string name="feed_action_edit">Sunting Umpan</string>
+    <string name="feed_action_reload_icon">Muat ulang ikon</string>
     <string name="feed_action_unsubscribe_confirm">Berhenti berlangganan</string>
     <string name="edit_feed_submit">Simpan</string>
     <string name="dialog_cancel">Batal</string>
@@ -159,10 +160,7 @@
     <string name="reader_image_visibility_show_on_wifi">Hanya tampilkan gambar saat menggunakan WiFi</string>
     <string name="reader_image_visibility_always_hide">Blokir gambar</string>
     <string name="reader_image_visibility_always_show">Selalu tampilkan gambar</string>
-    <string name="layout_preference_single">Kolom Tunggal</string>
     <string name="after_read_all_behavior_label">Setelah Baca Semua</string>
-    <string name="layout_preference_responsive">Responsif</string>
-    <string name="layout_preference_label">Pilihan Tata Letak</string>
     <string name="after_read_all_behavior_open_next_feed">Buka Umpan Berikutnya</string>
     <string name="after_read_all_behavior_open_drawer">Buka Laci Navigasi</string>
     <string name="account_source_reader">Pustaka</string>
@@ -212,7 +210,7 @@
     <string name="edit_feed_tag_section">Tambah atau Pilih Label</string>
     <string name="edit_feed_notifications_title">Hidupkan notifikasi</string>
     <string name="settings_enable_refresh_call_to_action">Penyegaran berkala harus diaktifkan terlebih dahulu</string>
-    <string name="settings_notifications_select_all">Pilih Semuanya</string>
+    <string name="settings_select_all">Pilih Semuanya</string>
     <string name="crash_log_export_item_title">Bagikan catatan kerusakan</string>
     <string name="article_view_open_externally">Buka secara eksternal</string>
     <string name="settings_mark_read_on_scroll">Tandai sebagai sudah dibaca saat digulir</string>
@@ -222,7 +220,7 @@
     <string name="full_content_error_missing_response">Gagal mengambil artikel</string>
     <string name="full_content_error_generic">Gagal menguraikan artikel</string>
     <string name="full_content_error_forbidden">Pengambilan diblokir oleh situs</string>
-    <string name="settings_notifications_select_none">Tidak ada pilihan</string>
+    <string name="settings_select_none">Tidak ada pilihan</string>
     <string name="article_list_row_swipe_open_externally">Buka artikel di browser</string>
     <string name="settings_section_browser">Peramban</string>
     <string name="feed_nav_drawer_title">Umpan</string>
@@ -246,7 +244,6 @@
     <string name="tag_name_title">Nama</string>
     <string name="actions_share_link">Bagikan tautan</string>
     <string name="delete_tag_error">Kesalahan saat menghapus label</string>
-    <string name="settings_options_reader_show_bottom_toolbar">Tampilkan Tindakan di Bilah Alat Bawah</string>
     <string name="settings_gestures_list_swipe_up">Usap ke Atas</string>
     <string name="article_list_swipe_next_feed">Ke umpan selanjutnya</string>
     <string name="article_list_swipe_refresh_articles">Segarkan artikel</string>

@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -85,6 +85,7 @@ data class ArticleRowOptions(
     val shortenSummaries: Boolean = true,
     val summaryMaxLines: SummaryMaxLines = SummaryMaxLines.default,
     val showAudioIcon: Boolean = false,
+    val dim: Boolean = true,
 )
 
 @Composable
@@ -115,12 +116,13 @@ fun ArticleRow(
 
     val imageURL = article.imageURL
     val isMonochrome = LocalAppTheme.current == AppTheme.MONOCHROME
-    val deEmphasizeFontWeight = article.read && isMonochrome
+    val dim = article.read && options.dim
+    val deEmphasizeFontWeight = dim && isMonochrome
     val colors = listItemColors(
         selected = selected,
-        read = article.read
+        read = dim
     )
-    val feedNameColor = findFeedNameColor(read = article.read)
+    val feedNameColor = findFeedNameColor(read = dim)
     val haptics = LocalHapticFeedback.current
     val (isArticleMenuOpen, setArticleMenuOpen) = remember { mutableStateOf(false) }
     val labelsActions = LocalLabelsActions.current
@@ -287,7 +289,6 @@ private fun ArticleImage(
             Modifier
                 .fillMaxWidth()
                 .aspectRatio(3 / 2f)
-                .clip(RoundedCornerShape(8.dp))
         }
     }
 
@@ -296,6 +297,7 @@ private fun ArticleImage(
         contentDescription = null,
         contentScale = ContentScale.Crop,
         modifier = sizeModifier
+            .clip(MaterialTheme.shapes.small)
             .background(colorScheme.surfaceContainer)
     )
 }
@@ -309,8 +311,8 @@ fun PlaceholderArticleRow(imagePreview: ImagePreview = ImagePreview.NONE) {
                     Modifier
                         .fillMaxWidth()
                         .aspectRatio(3 / 2f)
+                        .clip(MaterialTheme.shapes.small)
                         .background(colorScheme.surfaceContainer)
-                        .clip(RoundedCornerShape(8.dp))
                 ) {}
             }
         },

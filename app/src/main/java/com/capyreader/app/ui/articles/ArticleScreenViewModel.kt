@@ -28,6 +28,7 @@ import com.jocmp.capy.Folder
 import com.jocmp.capy.MarkRead
 import com.jocmp.capy.SavedSearch
 import com.jocmp.capy.articles.ArticleContent
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.NextFilter
 import com.jocmp.capy.buildArticlePager
 import com.jocmp.capy.common.UnauthorizedError
@@ -89,6 +90,8 @@ class ArticleScreenViewModel(
 
     val sortOrder = appPreferences.articleListOptions.sortOrder.stateIn(viewModelScope)
 
+    val sortField = appPreferences.articleListOptions.sortField.stateIn(viewModelScope)
+
     val afterReadAll =
         appPreferences.articleListOptions.afterReadAllBehavior.stateIn(viewModelScope)
 
@@ -105,12 +108,14 @@ class ArticleScreenViewModel(
             filter,
             _searchQuery,
             articlesSince,
-            sortOrder
-        ) { filter, query, since, sort ->
+            sortOrder,
+            sortField
+        ) { filter, query, since, sort, field ->
             account.buildArticlePager(
                 filter = filter,
                 query = query,
                 sortOrder = sort,
+                sortField = field,
                 since = since
             ).flow
         }.flatMapLatest { it }
@@ -146,8 +151,19 @@ class ArticleScreenViewModel(
         _counts,
         filter,
     ) { feeds, latestCounts, filter ->
-        feeds.map { copyFeedCounts(it, latestCounts) }
+        feeds.filter { !it.isPages }
+            .map { copyFeedCounts(it, latestCounts) }
             .withPositiveCount(filter.status)
+    }
+
+    val pagesFeed: Flow<Feed?> = combine(
+        account.feeds,
+        _counts,
+        filter,
+    ) { feeds, latestCounts, filter ->
+        feeds.find { it.isPages }
+            ?.let { copyFeedCounts(it, latestCounts) }
+            ?.takeIf { it.count > 0 || filter.status != ArticleStatus.UNREAD }
     }
 
     val currentFeed: Flow<Feed?> = combine(allFeeds, filter) { feeds, filter ->
@@ -316,6 +332,7 @@ class ArticleScreenViewModel(
                 filter = latestFilter,
                 range = range,
                 sortOrder = sortOrder.value,
+                sortField = sortField.value,
                 query = _searchQuery.value,
             )
 
@@ -336,6 +353,12 @@ class ArticleScreenViewModel(
             } else if (afterReadAll.value == AfterReadAllBehavior.OPEN_NEXT_FEED) {
                 openNextFeedOnAllRead(onArticlesCleared, searches, folders, feeds)
             }
+        }
+    }
+
+    fun deletePage(articleID: String) {
+        viewModelScope.launchIO {
+            account.deletePage(articleID)
         }
     }
 
@@ -760,6 +783,24 @@ class ArticleScreenViewModel(
         viewModelScope.launchIO {
             account.updateOpenInBrowser(feedID, enabled = enabled)
             WidgetUpdater.update(context = application.applicationContext)
+        }
+    }
+
+    fun toggleFeedUnreadBadge(feedID: String, enabled: Boolean) {
+        viewModelScope.launchIO {
+            account.toggleFeedUnreadBadge(feedID, enabled)
+        }
+    }
+
+    fun toggleSavedSearchUnreadBadge(id: String, enabled: Boolean) {
+        viewModelScope.launchIO {
+            account.toggleSavedSearchUnreadBadge(id, enabled)
+        }
+    }
+
+    fun reloadFavicon(feedID: String) {
+        viewModelScope.launchIO {
+            account.reloadFavicon(feedID)
         }
     }
 

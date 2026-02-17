@@ -19,6 +19,7 @@ import com.jocmp.capy.persistence.EnclosureRecords
 import com.jocmp.capy.persistence.FeedRecords
 import com.jocmp.capy.persistence.SavedSearchRecords
 import com.jocmp.capy.persistence.TaggingRecords
+import com.jocmp.feedbinclient.CreatePageRequest
 import com.jocmp.feedbinclient.CreateSubscriptionRequest
 import com.jocmp.feedbinclient.CreateTaggingRequest
 import com.jocmp.feedbinclient.DeleteTagRequest
@@ -112,6 +113,21 @@ internal class FeedbinAccountDelegate(
 
     override suspend fun createSavedSearch(name: String): Result<String> {
         return Result.failure(UnsupportedOperationException("Labels not supported"))
+    }
+
+    override suspend fun createPage(url: String): Result<Unit> {
+        return withErrorHandling {
+            val response = feedbin.createPage(CreatePageRequest(url = url))
+            val entry = response.body()
+
+            if (!response.isSuccessful || entry == null) {
+                throw IOException("Failed to save page")
+            }
+
+            saveEntries(listOf(entry), read = false)
+
+            Unit
+        }
     }
 
     override suspend fun addFeed(
@@ -223,11 +239,23 @@ internal class FeedbinAccountDelegate(
         Unit
     }
 
+    override suspend fun deletePage(articleID: String): Result<Unit> {
+        val response = feedbin.deletePage(articleID)
+
+        return if (response.isSuccessful) {
+            database.articlesQueries.deletePageByID(articleID)
+            Result.success(Unit)
+        } else {
+            Result.failure(Throwable("Failed to delete page"))
+        }
+    }
+
     private suspend fun refreshArticles(since: String = maxArrivedAt()) {
         refreshStarredEntries()
         refreshUnreadEntries()
         refreshAllArticles(since = since)
         fetchMissingArticles()
+        refreshPages()
     }
 
     private suspend fun refreshFeeds() {
@@ -345,6 +373,45 @@ internal class FeedbinAccountDelegate(
         }
     }
 
+    private suspend fun refreshPages() {
+        val feedID = database.feedsQueries
+            .findPagesFeedID()
+            .executeAsOneOrNull() ?: return
+
+        val remoteIDs = fetchAllFeedEntryIDs(feedID)
+
+        val localIDs = database.articlesQueries
+            .findIDsByFeed(feedID)
+            .executeAsList()
+            .toSet()
+
+        val orphanedIDs = localIDs - remoteIDs
+
+        if (orphanedIDs.isNotEmpty()) {
+            database.articlesQueries.deleteArticlesByID(orphanedIDs)
+        }
+    }
+
+    private suspend fun fetchAllFeedEntryIDs(feedID: String): Set<String> {
+        val remoteIDs = mutableSetOf<String>()
+        var nextPage: Int? = 1
+
+        while (nextPage != null) {
+            val response = feedbin.feedEntries(
+                feedID = feedID,
+                page = nextPage.toString()
+            )
+            val entries = response.body().orEmpty()
+
+            saveEntries(entries)
+            entries.forEach { remoteIDs.add(it.id.toString()) }
+
+            nextPage = response.pagingInfo?.nextPage
+        }
+
+        return remoteIDs
+    }
+
     private suspend fun fetchPaginatedEntries(
         since: String? = null,
         nextPage: Int? = 1,
@@ -374,6 +441,7 @@ internal class FeedbinAccountDelegate(
     private fun saveEntries(
         entries: List<Entry>,
         savedSearchID: String? = null,
+        read: Boolean = true,
     ) {
         database.transactionWithErrorHandling {
             entries.forEach { entry ->
@@ -399,7 +467,7 @@ internal class FeedbinAccountDelegate(
                 articleRecords.createStatus(
                     articleID = articleID,
                     updatedAt = updated,
-                    read = true
+                    read = read
                 )
 
                 if (enclosure != null && enclosureType != null) {

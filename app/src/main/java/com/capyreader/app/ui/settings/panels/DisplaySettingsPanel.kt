@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
@@ -24,7 +27,6 @@ import com.capyreader.app.R
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.common.RowItem
 import com.capyreader.app.preferences.AppPreferences
-import com.capyreader.app.preferences.LayoutPreference
 import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.ui.articles.ArticleListFontScale
@@ -41,10 +43,10 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun DisplaySettingsPanel(
     viewModel: DisplaySettingsViewModel = koinViewModel(),
+    onNavigateToUnreadBadges: () -> Unit = {},
 ) {
     val pinArticleBars by viewModel.pinArticleBars.collectChangesWithCurrent()
     val improveTalkback by viewModel.improveTalkback.collectChangesWithCurrent()
-    val enableBottomBarActions by viewModel.enableBottomBarActions.collectChangesWithCurrent()
     val markReadButtonPosition by viewModel.markReadButtonPosition.collectChangesWithCurrent()
     val replaceFullwidthCharacters by viewModel.replaceFullwidthCharacters.collectChangesWithCurrent()
 
@@ -55,18 +57,15 @@ fun DisplaySettingsPanel(
         updatePureBlackDarkMode = viewModel::updatePureBlackDarkMode,
         appPreferences = viewModel.appPreferences,
         updatePinArticleBars = viewModel::updatePinArticleBars,
-        updateBottomBarActions = viewModel::updateBottomBarActions,
-        enableBottomBarActions = enableBottomBarActions,
         pinArticleBars = pinArticleBars,
         enablePinArticleBars = !improveTalkback,
         updateImageVisibility = viewModel::updateImageVisibility,
         imageVisibility = viewModel.imageVisibility,
         replaceFullwidthCharacters = replaceFullwidthCharacters,
         updateReplaceFullwidthCharacters = viewModel::updateReplaceFullwidthCharacters,
-        layout = viewModel.layout,
-        updateLayoutPreference = viewModel::updateLayoutPreference,
         markReadButtonPosition = markReadButtonPosition,
         updateMarkReadButtonPosition = viewModel::updateMarkReadButtonPosition,
+        onNavigateToUnreadBadges = onNavigateToUnreadBadges,
         articleListOptions = ArticleListOptions(
             imagePreview = viewModel.imagePreview,
             showSummary = viewModel.showSummary,
@@ -98,18 +97,15 @@ fun DisplaySettingsPanelView(
     updatePureBlackDarkMode: (Boolean) -> Unit,
     appPreferences: AppPreferences?,
     updatePinArticleBars: (enable: Boolean) -> Unit,
-    updateBottomBarActions: (enable: Boolean) -> Unit,
     pinArticleBars: Boolean,
-    enableBottomBarActions: Boolean,
     enablePinArticleBars: Boolean,
     imageVisibility: ReaderImageVisibility,
     replaceFullwidthCharacters: Boolean,
     updateReplaceFullwidthCharacters: (enable: Boolean) -> Unit,
-    layout: LayoutPreference,
     markReadButtonPosition: MarkReadPosition,
-    updateLayoutPreference: (layout: LayoutPreference) -> Unit,
     updateImageVisibility: (option: ReaderImageVisibility) -> Unit,
     updateMarkReadButtonPosition: (position: MarkReadPosition) -> Unit,
+    onNavigateToUnreadBadges: () -> Unit = {},
     articleListOptions: ArticleListOptions,
 ) {
     Column(
@@ -135,6 +131,13 @@ fun DisplaySettingsPanelView(
                     onCheckedChange = updatePureBlackDarkMode,
                     checked = pureBlackDarkMode,
                     title = stringResource(R.string.settings_pure_black_dark_mode)
+                )
+            }
+            Box(Modifier.clickable { onNavigateToUnreadBadges() }) {
+                ListItem(
+                    headlineContent = {
+                        Text(stringResource(R.string.settings_panel_unread_counts_title))
+                    }
                 )
             }
         }
@@ -166,13 +169,6 @@ fun DisplaySettingsPanelView(
                     title = stringResource(R.string.settings_options_reader_pin_top_toolbar),
                 )
             }
-            RowItem {
-                TextSwitch(
-                    checked = enableBottomBarActions,
-                    onCheckedChange = updateBottomBarActions,
-                    title = stringResource(R.string.settings_options_reader_show_bottom_toolbar),
-                )
-            }
         }
 
         FormSection(
@@ -184,15 +180,6 @@ fun DisplaySettingsPanelView(
         }
 
         FormSection(title = stringResource(R.string.settings_display_miscellaneous_title)) {
-            PreferenceSelect(
-                selected = layout,
-                update = updateLayoutPreference,
-                options = LayoutPreference.entries,
-                label = R.string.layout_preference_label,
-                optionText = {
-                    stringResource(it.translationKey)
-                }
-            )
             PreferenceSelect(
                 selected = markReadButtonPosition,
                 update = updateMarkReadButtonPosition,
@@ -248,8 +235,6 @@ private fun DisplaySettingsPanelViewPreview() {
                 pureBlackDarkMode = false,
                 updatePureBlackDarkMode = {},
                 appPreferences = null,
-                layout = LayoutPreference.RESPONSIVE,
-                updateLayoutPreference = {},
                 articleListOptions = ArticleListOptions(
                     imagePreview = ImagePreview.default,
                     showSummary = true,
@@ -273,12 +258,10 @@ private fun DisplaySettingsPanelViewPreview() {
                 updatePinArticleBars = {},
                 pinArticleBars = false,
                 updateImageVisibility = {},
-                updateBottomBarActions = {},
                 imageVisibility = ReaderImageVisibility.ALWAYS_SHOW,
                 replaceFullwidthCharacters = false,
                 updateReplaceFullwidthCharacters = {},
                 enablePinArticleBars = false,
-                enableBottomBarActions = false,
                 markReadButtonPosition = MarkReadPosition.TOOLBAR,
                 updateMarkReadButtonPosition = {}
             )

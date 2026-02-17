@@ -12,6 +12,7 @@ import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.refresher.RefreshScheduler
 import com.jocmp.capy.Account
 import com.jocmp.capy.accounts.AutoDelete
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.preferences.getAndSet
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,9 @@ class GeneralSettingsViewModel(
         private set
 
     var sortOrder by mutableStateOf(appPreferences.articleListOptions.sortOrder.get())
+        private set
+
+    var sortField by mutableStateOf(appPreferences.articleListOptions.sortField.get())
         private set
 
     var confirmMarkAllRead by mutableStateOf(appPreferences.articleListOptions.confirmMarkAllRead.get())
@@ -78,6 +82,12 @@ class GeneralSettingsViewModel(
         appPreferences.articleListOptions.sortOrder.set(sort)
 
         this.sortOrder = sort
+    }
+
+    fun updateSortField(field: ArticleSortField) {
+        appPreferences.articleListOptions.sortField.set(field)
+
+        this.sortField = field
     }
 
     fun updateAutoDelete(autoDelete: AutoDelete) {

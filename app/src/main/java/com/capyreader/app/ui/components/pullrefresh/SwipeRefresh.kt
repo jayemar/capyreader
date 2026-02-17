@@ -32,7 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
-private const val DragMultiplier = 0.5f
+private const val DragMultiplier = 0.6f
 
 /**
  * Creates a [SwipeRefreshState] that is remembered across compositions.

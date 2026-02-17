@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.preferences.AppPreferences
-import com.capyreader.app.preferences.LayoutPreference
 import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.preferences.AppTheme
@@ -48,8 +47,6 @@ class DisplaySettingsViewModel(
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
         private set
 
-    var enableBottomBarActions = appPreferences.readerOptions.bottomBarActions
-
     val imagePreview: ImagePreview
         get() = _imagePreview.value
 
@@ -74,15 +71,13 @@ class DisplaySettingsViewModel(
     val showUnreadCount: Boolean
         get() = _showUnreadCount.value
 
-    val pinArticleBars = appPreferences.readerOptions.pinTopToolbar
+    val pinArticleBars = appPreferences.readerOptions.pinToolbars
 
     var imageVisibility by mutableStateOf(appPreferences.readerOptions.imageVisibility.get())
         private set
 
     val replaceFullwidthCharacters = appPreferences.readerOptions.replaceFullwidthCharacters
 
-    var layout by mutableStateOf(appPreferences.layout.get())
-        private set
 
     val improveTalkback = appPreferences.readerOptions.improveTalkback
 
@@ -104,11 +99,7 @@ class DisplaySettingsViewModel(
     }
 
     fun updatePinArticleBars(pinBars: Boolean) {
-        appPreferences.readerOptions.pinTopToolbar.set(pinBars)
-    }
-
-    fun updateBottomBarActions(enable: Boolean) {
-        appPreferences.readerOptions.bottomBarActions.set(enable)
+        appPreferences.readerOptions.pinToolbars.set(pinBars)
     }
 
     fun updateFontScale(fontScale: ArticleListFontScale) {
@@ -139,11 +130,6 @@ class DisplaySettingsViewModel(
         appPreferences.readerOptions.replaceFullwidthCharacters.set(enable)
     }
 
-    fun updateLayoutPreference(layout: LayoutPreference) {
-        appPreferences.layout.set(layout)
-
-        this.layout = layout
-    }
 
     fun updateMarkReadButtonPosition(position: MarkReadPosition) {
         appPreferences.articleListOptions.markReadButtonPosition.set(position)

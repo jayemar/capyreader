@@ -61,6 +61,7 @@ import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.preferences.ArticleListVerticalSwipe
 import com.capyreader.app.ui.LocalConnectivity
+import com.capyreader.app.ui.LocalBadgeStyle
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.LocalMarkAllReadButtonPosition
 import com.capyreader.app.ui.LocalUnreadCount
@@ -74,6 +75,8 @@ import com.capyreader.app.ui.articles.feeds.FeedList
 import com.capyreader.app.ui.articles.feeds.FolderActions
 import com.capyreader.app.ui.articles.feeds.LocalFeedActions
 import com.capyreader.app.ui.articles.feeds.LocalFolderActions
+import com.capyreader.app.ui.articles.feeds.LocalSavedSearchActions
+import com.capyreader.app.ui.articles.feeds.SavedSearchActions
 import com.capyreader.app.ui.articles.feeds.rememberRefreshButtonState
 import com.capyreader.app.ui.articles.list.ArticleListTopBar
 import com.capyreader.app.ui.articles.list.EmptyOnboardingView
@@ -114,6 +117,7 @@ fun ArticleScreen(
     onNavigateToSettings: () -> Unit,
 ) {
     val feeds by viewModel.topLevelFeeds.collectAsStateWithLifecycle(initialValue = emptyList())
+    val pagesFeed by viewModel.pagesFeed.collectAsStateWithLifecycle(initialValue = null)
     val allFeeds by viewModel.allFeeds.collectAsStateWithLifecycle(initialValue = emptyList())
     val allFolders by viewModel.allFolders.collectAsStateWithLifecycle(initialValue = emptyList())
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -146,6 +150,7 @@ fun ArticleScreen(
     val articleActions = rememberArticleActions(viewModel)
     val folderActions = rememberFolderActions(viewModel)
     val feedActions = rememberFeedActions(viewModel)
+    val savedSearchActions = rememberSavedSearchActions(viewModel)
     val labelsActions = rememberLabelsActions(viewModel, allSavedSearches)
     val connectivity = rememberLocalConnectivity()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -154,6 +159,7 @@ fun ArticleScreen(
         .articleListOptions
         .markReadButtonPosition
         .collectChangesWithCurrent()
+    val badgeStyle by appPreferences.badgeStyle.collectChangesWithDefault()
 
     val showUnreadCount by appPreferences
         .articleListOptions
@@ -193,10 +199,12 @@ fun ArticleScreen(
         LocalArticleActions provides articleActions,
         LocalFolderActions provides folderActions,
         LocalFeedActions provides feedActions,
+        LocalSavedSearchActions provides savedSearchActions,
         LocalLabelsActions provides labelsActions,
         LocalConnectivity provides connectivity,
         LocalLinkOpener provides provideLinkOpener(context),
         LocalMarkAllReadButtonPosition provides markAllReadButtonPosition,
+        LocalBadgeStyle provides badgeStyle,
         LocalUnreadCount provides unreadCount,
         LocalSnackbarHost provides snackbarHostState,
     ) {
@@ -218,6 +226,7 @@ fun ArticleScreen(
         val coroutineScope = rememberCoroutineScope()
         val scaffoldNavigator = rememberArticleScaffoldNavigator()
         val showMultipleColumns = scaffoldNavigator.scaffoldDirective.maxHorizontalPartitions > 1
+        val paneExpansion = rememberArticlePaneExpansion()
         val addFeedSuccessMessage = stringResource(R.string.add_feed_success)
         val currentFeed by viewModel.currentFeed.collectAsStateWithLifecycle(null)
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -233,6 +242,9 @@ fun ArticleScreen(
 
         suspend fun navigateToDetail() {
             scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+            if (showMultipleColumns) {
+                paneExpansion.restoreAnchor()
+            }
         }
 
         val listState = articles.rememberLazyListState(key = filter)
@@ -581,11 +593,13 @@ fun ArticleScreen(
         ArticleScaffold(
             drawerState = drawerState,
             scaffoldNavigator = scaffoldNavigator,
+            paneExpansion = paneExpansion,
             drawerPane = {
                 FeedList(
                     source = viewModel.source,
                     folders = folders,
                     feeds = feeds,
+                    pagesFeed = pagesFeed,
                     onSelectFolder = selectFolder,
                     onSelectFeed = selectFeed,
                     onFeedAdded = { onFeedAdded(it) },
@@ -659,7 +673,8 @@ fun ArticleScreen(
                             savedSearches = savedSearches,
                             folders = allFolders,
                             unreadCount = unreadCount,
-                            showUnreadCount = showUnreadCount
+                            showUnreadCount = showUnreadCount,
+                            source = viewModel.source,
                         )
                     },
                     snackbarHost = {
@@ -730,6 +745,7 @@ fun ArticleScreen(
                                             enableMarkReadOnScroll = enableMarkReadOnScroll,
                                             refreshing = viewModel.refreshingAll || isPullToRefreshing,
                                             contentPadding = contentPadding,
+                                            filterStatus = filter.status,
                                             isFilterTransitioning = viewModel.isFilterTransitioning,
                                             onMarkAllRead = { range ->
                                                 onMarkAllRead(range)
@@ -796,6 +812,10 @@ fun ArticleScreen(
                         onToggleRead = viewModel::toggleArticleRead,
                         onToggleStar = viewModel::toggleArticleStar,
                         enableBackHandler = media == null,
+                        onDeletePage = {
+                            clearArticle()
+                            viewModel.deletePage(article.id)
+                        },
                         onSelectMedia = { media = it },
                         onSelectAudio = { audio ->
                             audioController.play(audio)
@@ -811,10 +831,19 @@ fun ArticleScreen(
                         },
                         currentAudioUrl = currentAudio?.url,
                         isAudioPlaying = isAudioPlaying,
+                        isFullscreen = paneExpansion.isFullscreen,
+                        onExitFullscreen = { paneExpansion.exitFullscreen() },
                     )
                 }
             }
         )
+
+        LaunchedEffect(scaffoldNavigator.currentDestination) {
+            val isOnList = scaffoldNavigator.currentDestination?.pane != ListDetailPaneScaffoldRole.Detail
+            if (isOnList && article != null) {
+                viewModel.clearArticle()
+            }
+        }
 
         AnimatedVisibility(
             enter = fadeIn(),
@@ -875,6 +904,10 @@ fun ArticleScreen(
             media = null
         }
 
+        BackHandler(media == null && article != null) {
+            clearArticle()
+        }
+
         BackHandler(media == null && search.isActive && article == null) {
             search.clear()
         }
@@ -918,6 +951,9 @@ fun rememberFolderActions(viewModel: ArticleScreenViewModel): FolderActions {
     return remember {
         FolderActions(
             updateExpanded = viewModel::expandFolder,
+            removeFolder = { folderTitle, completion ->
+                viewModel.removeFolder(folderTitle, completion)
+            },
         )
     }
 }
@@ -931,6 +967,12 @@ fun rememberFeedActions(viewModel: ArticleScreenViewModel): FeedActions {
             },
             removeFeed = { feedID ->
                 viewModel.removeFeed(feedID)
+            },
+            toggleUnreadBadge = { feedID, show ->
+                viewModel.toggleFeedUnreadBadge(feedID, show)
+            },
+            reloadIcon = { feedID ->
+                viewModel.reloadFavicon(feedID)
             }
         )
     }
@@ -958,6 +1000,17 @@ fun rememberLabelsActions(
             addLabel = viewModel::addLabelAsync,
             removeLabel = viewModel::removeLabelAsync,
             createLabel = viewModel::createLabel,
+        )
+    }
+}
+
+@Composable
+fun rememberSavedSearchActions(viewModel: ArticleScreenViewModel): SavedSearchActions {
+    return remember {
+        SavedSearchActions(
+            toggleUnreadBadge = { id, show ->
+                viewModel.toggleSavedSearchUnreadBadge(id, show)
+            },
         )
     }
 }

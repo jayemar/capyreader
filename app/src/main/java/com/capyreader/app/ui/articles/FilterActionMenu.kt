@@ -23,6 +23,7 @@ import com.capyreader.app.ui.fixtures.FeedSample
 import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.Feed
+import com.jocmp.capy.accounts.Source
 
 @Composable
 fun FilterActionMenu(
@@ -33,6 +34,7 @@ fun FilterActionMenu(
     onRequestSearch: () -> Unit,
     onRequestJumpToBottom: () -> Unit,
     hideSearchIcon: Boolean,
+    source: Source,
 ) {
     val markReadPosition = LocalMarkAllReadButtonPosition.current
     val (expanded, setMenuExpanded) = remember(filter) { mutableStateOf(false) }
@@ -70,7 +72,7 @@ fun FilterActionMenu(
             }
 
             Box {
-                if (currentFeed != null || filter is ArticleFilter.Folders) {
+                if ((currentFeed != null && !currentFeed.isPages) || filter is ArticleFilter.Folders) {
                     IconButton(onClick = { setMenuExpanded(true) }) {
                         Icon(
                             imageVector = Icons.Filled.MoreVert,
@@ -79,11 +81,12 @@ fun FilterActionMenu(
                     }
                 }
 
-                if (currentFeed != null) {
+                if (currentFeed != null && !currentFeed.isPages) {
                     FeedActionMenu(
                         expanded = expanded,
                         feed = currentFeed,
                         onDismissMenuRequest = { closeMenu() },
+                        source = source,
                     )
                 }
 
@@ -93,6 +96,7 @@ fun FilterActionMenu(
                         folderTitle = filter.folderTitle,
                         onDismissMenuRequest = { closeMenu() },
                         onRemoveRequest = onRemoveFolder,
+                        source = source,
                     )
                 }
             }
@@ -115,5 +119,6 @@ fun FeedActionsPreview(@PreviewParameter(FeedSample::class) feed: Feed) {
             feedStatus = ArticleStatus.ALL
         ),
         hideSearchIcon = false,
+        source = Source.LOCAL,
     )
 }

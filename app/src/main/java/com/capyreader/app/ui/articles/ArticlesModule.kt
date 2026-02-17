@@ -3,6 +3,7 @@ package com.capyreader.app.ui.articles
 import android.content.Context
 import com.capyreader.app.R
 import com.capyreader.app.preferences.AppPreferences
+import com.capyreader.app.ui.addintent.AddLinkViewModel
 import com.capyreader.app.ui.articles.audio.AudioPlayerController
 import com.capyreader.app.ui.articles.feeds.edit.EditFeedViewModel
 import com.jocmp.capy.articles.ArticleRenderer
@@ -13,6 +14,12 @@ import org.koin.dsl.module
 internal val articlesModule = module {
     factory {
         AddFeedViewModel(
+            account = get(),
+            appPreferences = get()
+        )
+    }
+    factory {
+        AddLinkViewModel(
             account = get(),
             appPreferences = get()
         )
@@ -32,7 +39,7 @@ internal val articlesModule = module {
             titleFontSize = get<AppPreferences>().readerOptions.titleFontSize,
             textAlignment = get<AppPreferences>().readerOptions.titleTextAlignment,
             titleFollowsBodyFont = get<AppPreferences>().readerOptions.titleFollowsBodyFont,
-            hideTopMargin = get<AppPreferences>().readerOptions.pinTopToolbar,
+            hideTopMargin = get<AppPreferences>().readerOptions.pinToolbars,
             enableHorizontalScroll = get<AppPreferences>().readerOptions.enableHorizontaPagination,
             replaceFullwidthCharacters = get<AppPreferences>().readerOptions.replaceFullwidthCharacters,
             audioPlayerLabels = AudioPlayerLabels(

@@ -12,6 +12,7 @@
     <string name="feed_action_unsubscribe">Cancelar suscripción</string>
     <string name="filter_action_menu_description">Editar</string>
     <string name="feed_action_edit">Editar feed</string>
+    <string name="feed_action_reload_icon">Recargar icono</string>
     <string name="feed_action_unsubscribe_message">¿Seguro que quieres cancelar la suscripción de \"%1$s\"?</string>
     <string name="feed_action_unsubscribe_confirm">Cancelar suscripción</string>
     <string name="edit_feed_submit">Guardar</string>
@@ -188,8 +189,8 @@
     <string name="settings_panel_notifications_title">Notificaciones</string>
     <string name="notifications_permissions_disabled_call_to_action">Ajustes</string>
     <string name="settings_enable_refresh_call_to_action">Primero debe activarse la actualización periódica</string>
-    <string name="settings_notifications_select_all">Seleccionar todo</string>
-    <string name="settings_notifications_select_none">Sin seleccionar</string>
+    <string name="settings_select_all">Seleccionar todo</string>
+    <string name="settings_select_none">Sin seleccionar</string>
     <string name="article_list_row_swipe_open_externally">Abrir el artículo en el navegador</string>
     <string name="article_view_open_externally">Abrir externamente</string>
     <string name="settings_confirm_mark_all_read">Confirmar que se ha leído todo</string>
@@ -215,9 +216,6 @@
     <string name="reader_image_visibility_always_show">Mostrar siempre las imágenes</string>
     <string name="reader_image_visibility_label">Imágenes</string>
     <string name="auth_fields_username">Nombre de usuario</string>
-    <string name="layout_preference_responsive">Adaptable (Responsive)</string>
-    <string name="layout_preference_label">Disposición preferida</string>
-    <string name="layout_preference_single">Columna única</string>
     <string name="end_of_feed_text">¡Estás al día!</string>
     <string name="settings_donate_button">Donar</string>
     <string name="after_read_all_behavior_default">Por defecto</string>
@@ -273,8 +271,7 @@
     <string name="widget_headlines_account_error">Añade una cuenta primero</string>
     <string name="settings_gestures_improve_talkback_title">Mejorar TalkBack</string>
     <string name="settings_gestures_improve_talkback_subtitle">Desactiva algunas configuraciones para mejorar el texto a voz de TalkBack</string>
-    <string name="settings_options_reader_pin_top_toolbar">Fijar la barra de herramientas superior</string>
-    <string name="settings_options_reader_show_bottom_toolbar">Mostrar acciones en la barra de herramientas inferior</string>
+    <string name="settings_options_reader_pin_top_toolbar">Fijar la barra de herramientas</string>
     <string name="settings_gestures_list_back_navigation_navigate_to_parent">Un nivel más alto</string>
     <string name="add_account_miniflux_signup_link_text">Más información.</string>
     <string name="add_account_miniflux_signup_prompt">¿No tienes una instancia de Miniflux?</string>
@@ -309,4 +306,9 @@
     <string name="article_list_empty">Nada por aquí</string>
     <string name="freshrss_visibility_option_feed">Contenido</string>
     <string name="freshrss_visibility_option_main">Corriente principal</string>
+    <string name="auth_fields_miniflux_api_token">Token de API</string>
+    <string name="auth_fields_miniflux_use_password">Usar Contraseña en su lugar</string>
+    <string name="auth_fields_show_advanced">Opciones avanzadas</string>
+    <string name="auth_fields_hide_advanced">Ocultar opciones avanzadas</string>
+    <string name="auth_fields_miniflux_use_api_token">Utilizar token API en su lugar</string>
 </resources>

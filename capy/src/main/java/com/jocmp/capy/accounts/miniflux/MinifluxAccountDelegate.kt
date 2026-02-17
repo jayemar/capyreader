@@ -5,6 +5,7 @@ import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.Feed
 import com.jocmp.capy.accounts.AddFeedResult
 import com.jocmp.capy.accounts.withErrorHandling
+import com.jocmp.capy.common.ContentFormatter
 import com.jocmp.capy.common.TimeHelpers
 import com.jocmp.capy.common.UnauthorizedError
 import com.jocmp.capy.common.toDateTime
@@ -118,6 +119,9 @@ internal class MinifluxAccountDelegate(
         return Result.failure(UnsupportedOperationException("Labels not supported"))
     }
 
+    override suspend fun createPage(url: String) =
+        Result.failure<Unit>(UnsupportedOperationException("Pages not supported"))
+
     override suspend fun addFeed(
         url: String,
         title: String?,
@@ -125,7 +129,7 @@ internal class MinifluxAccountDelegate(
     ): AddFeedResult {
         return try {
             val categoryId = folderTitles?.firstOrNull()?.let { folderTitle ->
-                getOrCreateCategory(folderTitle)
+                findOrCreateCategory(folderTitle)
             }
 
             val response = miniflux.createFeed(
@@ -169,7 +173,7 @@ internal class MinifluxAccountDelegate(
         folderTitles: List<String>,
     ): Result<Feed> = withErrorHandling {
         val categoryId = folderTitles.firstOrNull()?.let { folderTitle ->
-            getOrCreateCategory(folderTitle)
+            findOrCreateCategory(folderTitle)
         }
 
         miniflux.updateFeed(
@@ -177,10 +181,31 @@ internal class MinifluxAccountDelegate(
             request = UpdateFeedRequest(title = title, category_id = categoryId)
         )
 
-        feedRecords.update(
-            feedID = feed.id,
-            title = title,
-        )
+        database.transactionWithErrorHandling {
+            feedRecords.update(
+                feedID = feed.id,
+                title = title,
+            )
+
+            if (categoryId != null) {
+                folderTitles.forEach { folderTitle ->
+                    taggingRecords.upsert(
+                        id = taggingID(feed.id, categoryId),
+                        feedID = feed.id,
+                        name = folderTitle,
+                    )
+                }
+            }
+
+            val taggingIDsToDelete = taggingRecords.findFeedTaggingsToDelete(
+                feed = feed,
+                excludedTaggingNames = folderTitles
+            )
+
+            taggingIDsToDelete.forEach { taggingID ->
+                taggingRecords.deleteTagging(taggingID = taggingID)
+            }
+        }
 
         feedRecords.find(feed.id)
     }
@@ -330,7 +355,7 @@ internal class MinifluxAccountDelegate(
                     content_html = entry.content,
                     extracted_content_url = null,
                     url = entry.url,
-                    summary = null,
+                    summary = ContentFormatter.summary(entry.content),
                     image_url = imageURL,
                     published_at = entry.published_at.toDateTime?.toEpochSecond(),
                     enclosure_type = enclosures.firstOrNull()?.mime_type,
@@ -370,14 +395,14 @@ internal class MinifluxAccountDelegate(
 
         feed.category?.let { category ->
             database.taggingsQueries.upsert(
-                id = "${feed.id}-${category.id}",
+                id = taggingID(feed.id.toString(), category.id),
                 feed_id = feed.id.toString(),
                 name = category.title
             )
         }
     }
 
-    private suspend fun getOrCreateCategory(title: String): Long {
+    private suspend fun findOrCreateCategory(title: String): Long {
         val categories = miniflux.categories().body() ?: emptyList()
         val existing = categories.find { it.title == title }
 
@@ -388,6 +413,8 @@ internal class MinifluxAccountDelegate(
             response.body()?.id ?: throw IOException("Failed to create category")
         }
     }
+
+    private fun taggingID(feedID: String, categoryId: Long) = "${feedID}-${categoryId}"
 
     private suspend fun fetchIcons(feeds: List<MinifluxFeed>): Map<Long, String> = coroutineScope {
         val iconIds = feeds.mapNotNull { it.icon?.icon_id }.filter { it > 0 }.distinct()

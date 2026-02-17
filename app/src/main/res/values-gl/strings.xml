@@ -63,6 +63,7 @@
     <string name="filter_starred">Con estrela</string>
     <string name="filter_action_menu_description">Editar</string>
     <string name="feed_action_edit">Editar canle</string>
+    <string name="feed_action_reload_icon">Recargar icona</string>
     <string name="feed_action_unsubscribe_message">Tes certeza de querer retirar a subscrición a «%1$s»?</string>
     <string name="folder_action_delete_title">Eliminar etiqueta</string>
     <string name="folder_action_edit">Cambiar nome</string>
@@ -171,8 +172,8 @@
     <string name="edit_feed_tag_section">Engadir ou seleccionar etiqueta</string>
     <string name="edit_feed_notifications_title">Activar notificacións</string>
     <string name="settings_enable_refresh_call_to_action">Primeiro debes activar a actualización periódica</string>
-    <string name="settings_notifications_select_none">Sen selección</string>
-    <string name="settings_notifications_select_all">Seleccionar todo</string>
+    <string name="settings_select_none">Sen selección</string>
+    <string name="settings_select_all">Seleccionar todo</string>
     <string name="article_list_row_swipe_open_externally">Abrir artigo no navegador</string>
     <string name="settings_confirm_mark_all_read">Confirmar marcar todo como lido</string>
     <string name="settings_mark_read_on_scroll">Marcar como lido ao desprazarte</string>
@@ -185,9 +186,6 @@
     <string name="reader_image_visibility_always_hide">Bloquear imaxes</string>
     <string name="reader_image_visibility_always_show">Mostrar imaxes sempre</string>
     <string name="reader_image_visibility_label">Imaxes</string>
-    <string name="layout_preference_single">Columna única</string>
-    <string name="layout_preference_label">Disposición preferida</string>
-    <string name="layout_preference_responsive">Adaptativo</string>
     <string name="add_feed_success">Engadiuse a canle</string>
     <string name="filter_unread">Sen ler</string>
     <string name="auth_fields_password">Contrasinal</string>
@@ -264,8 +262,7 @@
     <string name="widget_headlines_see_more_button">Ver máis artigos</string>
     <string name="settings_gestures_improve_talkback_title">Mellorar TalkBack</string>
     <string name="settings_gestures_improve_talkback_subtitle">Desactiva algúns axustes para mellorar o texto-a-palabra de TalkBack</string>
-    <string name="settings_options_reader_pin_top_toolbar">Fixar a Barra superior</string>
-    <string name="settings_options_reader_show_bottom_toolbar">Mostrar accións na barra inferior</string>
+    <string name="settings_options_reader_pin_top_toolbar">Fixar Ferramentas</string>
     <string name="add_account_miniflux_signup_prompt">Non tes unha instancia Miniflux?</string>
     <string name="add_account_miniflux_signup_link_text">Coñece máis.</string>
     <string name="mark_read_position_toolbar">Barra de ferramentas</string>
@@ -305,4 +302,26 @@
     <string name="audio_player_skip_forward">Avanzar 30 segundos</string>
     <string name="freshrss_nav_headline_categories">Categorías</string>
     <string name="article_list_empty">Nada por aquí</string>
+    <string name="auth_fields_miniflux_api_token">Token da API</string>
+    <string name="auth_fields_miniflux_use_api_token">Alternativa, usar Token da API</string>
+    <string name="auth_fields_miniflux_use_password">Alternativa, usar contrasinal</string>
+    <string name="auth_fields_show_advanced">Opcións avanzadas</string>
+    <string name="auth_fields_hide_advanced">Ocultar opcións avanzadas</string>
+    <string name="freshrss_tag_action_edit">Editar categoría</string>
+    <string name="settings_panel_unread_counts_title">Marcas de non lidos</string>
+    <string name="settings_option_badge_style">Estilo da marca</string>
+    <string name="badge_style_simple">Simple</string>
+    <string name="badge_style_exact">Exacto</string>
+    <string name="show_unread_badge">Mostrar marca de non lidos</string>
+    <string name="add_link_title">Engadir Ligazón</string>
+    <string name="tab_add_feed">Engadir Canle</string>
+    <string name="tab_save_page">Gardar Páxina</string>
+    <string name="save_page_success">Gardouse a páxina</string>
+    <string name="save_page_error">Non se puido gardar a páxina</string>
+    <string name="save_page_network_error">Non se puido gardar a páxina, comproba a conexión.</string>
+    <string name="save_page_submit">Gardar</string>
+    <string name="add_link_searching">Buscando canles…</string>
+    <string name="add_link_subscribe">Subscribir</string>
+    <string name="add_link_feed_added">Engadiuse a canle</string>
+    <string name="add_link_page_saved">Gardouse a páxina</string>
 </resources>

@@ -2,6 +2,7 @@ package com.jocmp.capy
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.persistence.ArticlePagerFactory
 import java.time.OffsetDateTime
@@ -10,6 +11,7 @@ fun Account.buildArticlePager(
     filter: ArticleFilter,
     query: String? = null,
     sortOrder: SortOrder = SortOrder.NEWEST_FIRST,
+    sortField: ArticleSortField = ArticleSortField.default,
     since: OffsetDateTime = OffsetDateTime.now()
 ): Pager<Int, Article> {
     return Pager(
@@ -22,6 +24,7 @@ fun Account.buildArticlePager(
                 filter = filter,
                 query = query,
                 sortOrder = sortOrder,
+                sortField = sortField,
                 since = since
             )
         }

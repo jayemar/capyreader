@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -23,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
@@ -30,6 +33,7 @@ import androidx.paging.compose.itemKey
 import com.capyreader.app.R
 import com.capyreader.app.preferences.AppPreferences
 import com.jocmp.capy.Article
+import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.MarkRead
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -48,45 +52,56 @@ fun ArticleList(
     isFilterTransitioning: Boolean = false,
     enableMarkReadOnScroll: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    filterStatus: ArticleStatus = ArticleStatus.ALL,
 ) {
-    val articleOptions = rememberArticleOptions()
+    val articleOptions = rememberArticleOptions().copy(
+        dim = filterStatus != ArticleStatus.STARRED,
+    )
     val currentTime = rememberCurrentTime()
+    var listHeight by remember { mutableStateOf(0.dp) }
+    val localDensity = LocalDensity.current
 
-    LazyScrollbar(state = listState) {
-        LazyColumn(
-            state = listState,
-            contentPadding = contentPadding,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(count = articles.itemCount, key = articles.itemKey { it.id }) { index ->
-                val item = articles[index]
+    key(listState) {
+        LazyScrollbar(state = listState) {
+            LazyColumn(
+                state = listState,
+                contentPadding = contentPadding,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned { coordinates ->
+                        listHeight = with(localDensity) { coordinates.size.height.toDp() }
+                    }
+            ) {
+                items(count = articles.itemCount, key = articles.itemKey { it.id }) { index ->
+                    val item = articles[index]
 
-                Box(Modifier.animateItem()) {
-                    if (item == null) {
-                        PlaceholderArticleRow(articleOptions.imagePreview)
-                    } else {
-                        ArticleRow(
-                            article = item,
-                            index = index,
-                            selected = selectedArticleKey == item.id,
-                            onSelect = {
-                                onSelect(it)
-                            },
-                            onMarkAllRead = onMarkAllRead,
-                            currentTime = currentTime,
-                            options = articleOptions
-                        )
+                    Box(Modifier.animateItem()) {
+                        if (item == null) {
+                            PlaceholderArticleRow(articleOptions.imagePreview)
+                        } else {
+                            ArticleRow(
+                                article = item,
+                                index = index,
+                                selected = selectedArticleKey == item.id,
+                                onSelect = {
+                                    onSelect(it)
+                                },
+                                onMarkAllRead = onMarkAllRead,
+                                currentTime = currentTime,
+                                options = articleOptions
+                            )
+                        }
                     }
                 }
-            }
 
-            if (enableMarkReadOnScroll && articles.itemCount > 0) {
-                item {
-                    FeedOverScrollBox(height = 300.dp)
-                }
-            } else {
-                item {
-                    Spacer(Modifier.height(120.dp))
+                if (enableMarkReadOnScroll && articles.itemCount > 0) {
+                    item {
+                        FeedOverScrollBox(height = listHeight)
+                    }
+                } else {
+                    item {
+                        Spacer(Modifier.height(120.dp))
+                    }
                 }
             }
         }

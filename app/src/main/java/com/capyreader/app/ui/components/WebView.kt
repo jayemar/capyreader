@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebView.HitTestResult.SRC_ANCHOR_TYPE
 import android.webkit.WebViewClient
@@ -25,12 +26,14 @@ import com.capyreader.app.common.rememberTalkbackPreference
 import com.capyreader.app.ui.articles.detail.articleTemplateColors
 import com.capyreader.app.ui.articles.detail.byline
 import com.jocmp.capy.Article
+import com.jocmp.capy.BrowserHeadersInterceptor
 import com.jocmp.capy.articles.ArticleRenderer
 import com.jocmp.capy.logging.CapyLog
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.koin.compose.koinInject
 import org.koin.core.component.KoinComponent
+import java.util.Locale
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -315,7 +318,6 @@ class WebViewState(
 @Composable
 fun rememberWebViewState(
     renderer: ArticleRenderer = koinInject(),
-    httpClient: OkHttpClient = koinInject<com.jocmp.capy.Account>().httpClient,
     onNavigateToMedia: (media: Media) -> Unit,
     onRequestLinkDialog: (link: ShareLink) -> Unit,
     onRequestImageDialog: (imageUrl: String, title: String?) -> Unit = { _, _ -> },
@@ -339,6 +341,12 @@ fun rememberWebViewState(
     }
 
     val client = remember {
+        val userAgent = WebSettings.getDefaultUserAgent(context)
+        val acceptLanguage = Locale.getDefault().toAcceptLanguageTag()
+        val httpClient = OkHttpClient.Builder()
+            .addInterceptor(BrowserHeadersInterceptor(userAgent, acceptLanguage))
+            .build()
+
         AccompanistWebViewClient(
             assetLoader = WebViewAssetLoader.Builder()
                 .addPathHandler("/assets/", AssetsPathHandler(context))
@@ -389,5 +397,15 @@ fun rememberWebViewState(
                 it.updateAudioPlayState(currentAudioUrlState, isAudioPlayingState)
             }
         }
+    }
+}
+
+private fun Locale.toAcceptLanguageTag(): String {
+    val primary = toLanguageTag()
+    val lang = language
+    return if (primary != lang) {
+        "$primary,$lang;q=0.9"
+    } else {
+        primary
     }
 }

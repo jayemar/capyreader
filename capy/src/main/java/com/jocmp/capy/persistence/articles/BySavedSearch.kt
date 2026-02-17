@@ -4,6 +4,7 @@ import app.cash.sqldelight.Query
 import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
 import com.jocmp.capy.common.withIOContext
@@ -20,6 +21,7 @@ class BySavedSearch(private val database: Database) {
         since: OffsetDateTime,
         limit: Long,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         offset: Long,
     ): Query<Article> {
         val (read, starred) = status.toStatusPair
@@ -32,8 +34,10 @@ class BySavedSearch(private val database: Database) {
             limit = limit,
             offset = offset,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = null,
             newestFirst = isDescendingOrder(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             mapper = ::listMapper
         )
     }
@@ -43,6 +47,7 @@ class BySavedSearch(private val database: Database) {
         savedSearchID: String,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         query: String?,
     ): Query<String> {
         val (_, starred) = status.toStatusPair
@@ -56,6 +61,7 @@ class BySavedSearch(private val database: Database) {
             beforeArticleID = beforeArticleID,
             publishedSince = null,
             newestFirst = isNewestFirst(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             query = query,
         )
     }
@@ -74,6 +80,7 @@ class BySavedSearch(private val database: Database) {
             read = read,
             starred = starred,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = null
         )
     }
@@ -92,6 +99,7 @@ class BySavedSearch(private val database: Database) {
             read = read,
             starred = starred,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = null
         )
     }

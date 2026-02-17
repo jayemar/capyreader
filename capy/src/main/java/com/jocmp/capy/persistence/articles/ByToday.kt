@@ -4,6 +4,7 @@ import app.cash.sqldelight.Query
 import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.withIOContext
 import com.jocmp.capy.db.Database
@@ -19,6 +20,7 @@ class ByToday(private val database: Database) {
         limit: Long,
         offset: Long,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         since: OffsetDateTime?,
     ): Query<Article> {
         val (read, starred) = status.toStatusPair
@@ -30,9 +32,11 @@ class ByToday(private val database: Database) {
             limit = limit,
             offset = offset,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = mapTodayStartDate(),
             query = query,
             newestFirst = newestFirst,
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             mapper = ::listMapper
         )
     }
@@ -41,6 +45,7 @@ class ByToday(private val database: Database) {
         status: ArticleStatus,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         query: String?,
     ): Query<String> {
         val (_, starred) = status.toStatusPair
@@ -52,6 +57,7 @@ class ByToday(private val database: Database) {
             beforeArticleID = beforeArticleID,
             publishedSince = mapTodayStartDate(),
             newestFirst = isNewestFirst(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             query = query,
         )
     }
@@ -68,6 +74,7 @@ class ByToday(private val database: Database) {
             starred = starred,
             query = query,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = mapTodayStartDate()
         )
     }
@@ -84,6 +91,7 @@ class ByToday(private val database: Database) {
             starred = starred,
             query = query,
             lastReadAt = mapLastRead(read, since),
+            lastStarredAt = mapLastStarred(starred, since),
             publishedSince = mapTodayStartDate()
         )
     }

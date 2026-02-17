@@ -92,7 +92,7 @@ class ArticleRenderer(
         return if (hideTopMargin.get()) {
             "0px"
         } else {
-            "64px"
+            "100px"
         }
     }
 
