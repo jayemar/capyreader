@@ -17,6 +17,7 @@ class ArticleFixture(private val database: Database) {
         feed: Feed = feedFixture.create(feedURL = "https://example.com/${RandomUUID.generate()}"),
         read: Boolean = true,
         publishedAt: Long = TimeHelpers.nowUTC().toEpochSecond(),
+        updatedAt: Long = publishedAt,
     ): Article {
         database.transaction {
             database.articlesQueries.create(
@@ -34,7 +35,7 @@ class ArticleFixture(private val database: Database) {
             )
             database.articlesQueries.createStatus(
                 article_id = id,
-                updated_at = publishedAt,
+                updated_at = updatedAt,
                 read = read,
             )
         }

@@ -6,6 +6,7 @@ import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.InMemoryDatabaseProvider
 import com.jocmp.capy.RandomUUID
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.TimeHelpers.nowUTC
 import com.jocmp.capy.db.Database
@@ -610,6 +611,189 @@ class ArticleRecordsTest {
         ).firstOrNull()
 
         assertEquals(expected = 2, actual = count)
+    }
+
+    @Test
+    fun allByStatus_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byStatus
+            .all(
+                status = ArticleStatus.ALL,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
+    }
+
+    @Test
+    fun allByStatus_sortByRetrievalDate_oldestFirst() {
+        val now = nowUTC()
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byStatus
+            .all(
+                status = ArticleStatus.ALL,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.OLDEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleC.id, articleB.id, articleA.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleC, articleB, articleA), results),
+        )
+    }
+
+    @Test
+    fun allByFeed_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val since = OffsetDateTime.now().minusDays(7)
+
+        val articleA = articleFixture.create(
+            title = "Article A",
+            feed = feed,
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            feed = feed,
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            feed = feed,
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byFeed
+            .all(
+                feedIDs = listOf(feed.id),
+                status = ArticleStatus.ALL,
+                since = since,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                priority = FeedPriority.FEED,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
+    }
+
+    @Test
+    fun allBySavedSearch_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val savedSearchFixture = SavedSearchFixture(database)
+        val savedSearchRecords = SavedSearchRecords(database)
+        val savedSearch = savedSearchFixture.create()
+        val since = OffsetDateTime.now().minusDays(7)
+
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        listOf(articleA, articleB, articleC).forEach { article ->
+            savedSearchRecords.upsertArticle(
+                articleID = article.id,
+                savedSearchID = savedSearch.id,
+            )
+        }
+
+        val results = articleRecords
+            .bySavedSearch
+            .all(
+                savedSearchID = savedSearch.id,
+                status = ArticleStatus.ALL,
+                since = since,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
     }
 
     @Test
