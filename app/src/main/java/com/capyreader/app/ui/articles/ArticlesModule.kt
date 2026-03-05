@@ -39,7 +39,6 @@ internal val articlesModule = module {
             titleFontSize = get<AppPreferences>().readerOptions.titleFontSize,
             textAlignment = get<AppPreferences>().readerOptions.titleTextAlignment,
             titleFollowsBodyFont = get<AppPreferences>().readerOptions.titleFollowsBodyFont,
-            hideTopMargin = get<AppPreferences>().readerOptions.pinToolbars,
             enableHorizontalScroll = get<AppPreferences>().readerOptions.enableHorizontaPagination,
             replaceFullwidthCharacters = get<AppPreferences>().readerOptions.replaceFullwidthCharacters,
             audioPlayerLabels = AudioPlayerLabels(

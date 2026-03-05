@@ -30,7 +30,7 @@ WHERE (
   OR :read IS NULL
 )
 AND (feeds.priority IS NULL OR feeds.priority IN ('main', 'important'))
-AND ((article_statuses.starred = :starred AND article_statuses.last_starred_at IS NULL OR article_statuses.last_starred_at >= :lastStarredAt) OR :starred IS NULL)
+AND ((article_statuses.starred = :starred AND article_statuses.last_unstarred_at IS NULL OR article_statuses.last_unstarred_at >= :lastUnstarredAt) OR :starred IS NULL)
 AND (articles.published_at >= :publishedSince OR :publishedSince IS NULL)
 AND (articles.title LIKE '%' || :query || '%' OR articles.summary  LIKE '%' || :query || '%' OR :query IS NULL)
 GROUP BY articles.id
@@ -52,7 +52,7 @@ WHERE (
   OR :read IS NULL
 )
 AND (feeds.priority IS NULL OR feeds.priority IN ('main', 'important'))
-AND ((article_statuses.starred = :starred AND article_statuses.last_starred_at IS NULL OR article_statuses.last_starred_at >= :lastStarredAt) OR :starred IS NULL)
+AND ((article_statuses.starred = :starred AND article_statuses.last_unstarred_at IS NULL OR article_statuses.last_unstarred_at >= :lastUnstarredAt) OR :starred IS NULL)
 AND (articles.published_at >= :publishedSince OR :publishedSince IS NULL)
 AND (articles.title LIKE '%' || :query || '%' OR articles.summary  LIKE '%' || :query || '%' OR :query IS NULL);
 

@@ -191,10 +191,15 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
     val fontScale by appPreferences.articleListOptions.fontScale.stateIn(scope).collectAsState()
     val shortenTitles by appPreferences.articleListOptions.shortenTitles.stateIn(scope)
         .collectAsState()
+<<<<<<< HEAD
     val shortenSummaries by appPreferences.articleListOptions.shortenSummaries.stateIn(scope)
         .collectAsState()
     val summaryMaxLines by appPreferences.articleListOptions.summaryMaxLines.stateIn(scope)
         .collectAsState()
+||||||| 15777e40
+=======
+    val accentColors by appPreferences.accentColors.stateIn(scope).collectAsState()
+>>>>>>> main
 
     return ArticleRowOptions(
         showSummary = showSummary,
@@ -203,9 +208,14 @@ fun rememberArticleOptions(appPreferences: AppPreferences = koinInject()): Artic
         imagePreview = imagePreview,
         fontScale = fontScale,
         shortenTitles = shortenTitles,
+<<<<<<< HEAD
         shortenSummaries = shortenSummaries,
         summaryMaxLines = summaryMaxLines,
         showAudioIcon = false,
+||||||| 15777e40
+=======
+        accentColors = accentColors,
+>>>>>>> main
     )
 }
 

@@ -34,7 +34,7 @@ LIMIT 1;
 countAll:
 SELECT
  articles.feed_id,
- COUNT(DISTINCT articles.id)
+ COUNT(*)
 FROM articles
 JOIN article_statuses ON articles.id = article_statuses.article_id
 WHERE (article_statuses.read = :read OR :read IS NULL)
@@ -44,7 +44,7 @@ GROUP BY articles.feed_id;
 countAllBySavedSearch:
 SELECT
  saved_search_articles.saved_search_id,
- COUNT(DISTINCT articles.id)
+ COUNT(*)
 FROM articles
 JOIN article_statuses ON articles.id = article_statuses.article_id
 JOIN saved_search_articles ON articles.id = saved_search_articles.article_id
@@ -216,8 +216,15 @@ UPDATE article_statuses SET read = :read, last_read_at = :lastReadAt
 WHERE article_statuses.article_id IN :articleIDs;
 
 markStarred:
-UPDATE article_statuses SET starred = :starred, last_starred_at = :lastStarredAt
+UPDATE article_statuses SET starred = :starred, last_unstarred_at = :lastUnstarredAt
 WHERE article_statuses.article_id = :articleID;
+
+starredExports:
+SELECT articles.title, articles.url, articles.published_at
+FROM articles
+JOIN article_statuses ON articles.id = article_statuses.article_id
+WHERE article_statuses.starred = 1
+ORDER BY articles.published_at DESC;
 
 deleteAllArticles {
   DELETE FROM article_statuses WHERE starred = 0 AND read = 1;

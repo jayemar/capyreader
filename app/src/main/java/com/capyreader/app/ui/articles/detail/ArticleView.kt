@@ -1,13 +1,13 @@
 package com.capyreader.app.ui.articles.detail
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
@@ -58,7 +58,7 @@ fun ArticleView(
     onBackPressed: () -> Unit,
     onToggleRead: () -> Unit,
     onToggleStar: () -> Unit,
-    enableBackHandler: Boolean = false,
+    canSaveExternally: Boolean = false,
     onDeletePage: () -> Unit = {},
     onScrollToArticle: (index: Int) -> Unit,
     onSelectArticle: (id: String) -> Unit,
@@ -68,7 +68,7 @@ fun ArticleView(
     currentAudioUrl: String? = null,
     isAudioPlaying: Boolean = false,
     isFullscreen: Boolean = false,
-    onExitFullscreen: () -> Unit = {},
+    onToggleFullscreen: () -> Unit = {},
     appPreferences: AppPreferences = koinInject()
 ) {
     val enableHorizontalPager by appPreferences.readerOptions.enableHorizontaPagination.collectChangesWithDefault()
@@ -150,9 +150,10 @@ fun ArticleView(
     CompositionLocalProvider(
         LocalSnackbarHost provides snackbarHostState,
     ) {
-        Box(Modifier
+        BoxWithConstraints(Modifier
             .fillMaxSize()
             .nestedScroll(scrollState.connection)) {
+          if (maxWidth > 0.dp) {
             Box(
                 modifier = Modifier
                     .padding(contentPadding)
@@ -179,6 +180,7 @@ fun ArticleView(
                         ) { targetArticle ->
                             ArticleReader(
                                 article = targetArticle,
+                                pinToolbars = pinToolbars,
                                 onSelectMedia = onSelectMedia,
                                 onSelectAudio = onSelectAudio,
                                 onPauseAudio = onPauseAudio,
@@ -195,9 +197,10 @@ fun ArticleView(
                 isScrolled = scrollState.showTopDivider,
                 articleId = article.id,
                 canDeletePage = article.isPages,
+                canSaveExternally = canSaveExternally,
                 onDeletePage = onDeletePage,
                 isFullscreen = isFullscreen,
-                onExitFullscreen = onExitFullscreen,
+                onToggleFullscreen = onToggleFullscreen,
                 onClose = onBackPressed,
             )
 
@@ -215,8 +218,9 @@ fun ArticleView(
                 hostState = snackbarHostState,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 68.dp)
+                    .padding(bottom = 80.dp)
             )
+          }
         }
     }
 
@@ -299,7 +303,7 @@ private data class SwipePreferences(
 private fun rememberContentPadding(pinToolbars: Boolean): PaddingValues {
     return if (pinToolbars) {
         PaddingValues(
-            top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + ArticleBarDefaults.TopBarHeight,
+            top = ArticleBarDefaults.topBarOffset,
             bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ArticleBarDefaults.BottomBarHeight,
         )
     } else {

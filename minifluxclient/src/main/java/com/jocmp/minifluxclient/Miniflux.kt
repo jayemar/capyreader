@@ -81,6 +81,12 @@ interface Miniflux {
     @PUT("entries/{entryID}/bookmark")
     suspend fun toggleBookmark(@Path("entryID") entryID: Long): Response<Unit>
 
+    @POST("entries/{entryID}/save")
+    suspend fun saveEntry(@Path("entryID") entryID: Long): Response<Unit>
+
+    @GET("integrations/status")
+    suspend fun integrationStatus(): Response<IntegrationStatus>
+
     @GET("categories")
     suspend fun categories(@Query("counts") counts: Boolean? = null): Response<List<Category>>
 
@@ -139,9 +145,10 @@ interface Miniflux {
         suspend fun verifyCredentials(
             username: String,
             password: String,
-            baseURL: String
+            baseURL: String,
+            client: OkHttpClient = OkHttpClient(),
         ): Boolean {
-            val client = OkHttpClient.Builder()
+            val client = client.newBuilder()
                 .addInterceptor { chain ->
                     val request = chain.request().newBuilder()
                         .header("Authorization", Credentials.basic(username, password))
@@ -162,9 +169,10 @@ interface Miniflux {
 
         suspend fun verifyToken(
             token: String,
-            baseURL: String
+            baseURL: String,
+            client: OkHttpClient = OkHttpClient(),
         ): Response<User>? {
-            val client = OkHttpClient.Builder()
+            val client = client.newBuilder()
                 .addInterceptor { chain ->
                     val request = chain.request().newBuilder()
                         .header("X-Auth-Token", token)

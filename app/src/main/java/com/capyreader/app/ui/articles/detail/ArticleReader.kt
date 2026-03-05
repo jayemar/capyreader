@@ -3,8 +3,10 @@ package com.capyreader.app.ui.articles.detail
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -18,7 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+<<<<<<< HEAD
 import androidx.compose.ui.Alignment
+||||||| 15777e40
+=======
+import androidx.compose.runtime.snapshotFlow
+>>>>>>> main
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +59,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ArticleReader(
     article: Article,
+    pinToolbars: Boolean,
     onSelectMedia: (media: Media) -> Unit,
     onSelectAudio: (audio: AudioEnclosure) -> Unit = {},
     onPauseAudio: () -> Unit = {},
@@ -206,6 +214,14 @@ fun ArticleReader(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
+<<<<<<< HEAD
+||||||| 15777e40
+    } else {
+        ScrollableWebView(webViewState, article, showImages)
+=======
+    } else {
+        ScrollableWebView(webViewState, article, showImages, pinToolbars)
+>>>>>>> main
     }
 
     ArticleStyleListener(webView = webViewState.webView)
@@ -234,7 +250,7 @@ fun ArticleReader(
 }
 
 @Composable
-fun ScrollableWebView(webViewState: WebViewState, article: Article, showImages: Boolean) {
+fun ScrollableWebView(webViewState: WebViewState, article: Article, showImages: Boolean, pinToolbars: Boolean) {
     var maxHeight by remember { mutableFloatStateOf(0f) }
     val scrollState = rememberSaveable(article.id, saver = ScrollState.Saver) {
         ScrollState(initial = 0)
@@ -245,6 +261,7 @@ fun ScrollableWebView(webViewState: WebViewState, article: Article, showImages: 
     CornerTapGestureScroll(
         maxArticleHeight = maxHeight,
         scrollState = scrollState,
+        pinToolbars = pinToolbars,
     ) {
         ColumnScrollbar(state = scrollState) {
             Column(
@@ -255,6 +272,9 @@ fun ScrollableWebView(webViewState: WebViewState, article: Article, showImages: 
                         maxHeight = coordinates.size.height.toFloat()
                     }
             ) {
+                if (!pinToolbars) {
+                    Spacer(Modifier.height(ArticleBarDefaults.topBarOffset))
+                }
                 WebView(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -267,10 +287,13 @@ fun ScrollableWebView(webViewState: WebViewState, article: Article, showImages: 
         }
     }
 
-    LaunchedEffect(scrollState.value, maxHeight) {
-        if (scrollState.value > 0 && maxHeight > 0) {
-            lastScrollYPercent = scrollState.value / maxHeight
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { scrollState.value to maxHeight }
+            .collect { (value, height) ->
+                if (value > 0 && height > 0f) {
+                    lastScrollYPercent = value / height
+                }
+            }
     }
     LaunchedEffect(scrollState.maxValue, maxHeight) {
         if (scrollState.maxValue > 0 && maxHeight > 0) {

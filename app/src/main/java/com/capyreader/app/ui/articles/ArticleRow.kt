@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -24,6 +23,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,6 +58,7 @@ import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.preferences.AppPreferences
 import com.jocmp.capy.common.PunctuationNormalizer
 import com.capyreader.app.preferences.AppTheme
+import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.ui.articles.list.ArticleActionMenu
 import com.capyreader.app.ui.articles.list.ArticleListItem
 import com.capyreader.app.ui.articles.list.ArticleRowSwipeBox
@@ -82,9 +83,14 @@ data class ArticleRowOptions(
     val imagePreview: ImagePreview = ImagePreview.default,
     val fontScale: ArticleListFontScale = ArticleListFontScale.MEDIUM,
     val shortenTitles: Boolean = true,
+<<<<<<< HEAD
     val shortenSummaries: Boolean = true,
     val summaryMaxLines: SummaryMaxLines = SummaryMaxLines.default,
     val showAudioIcon: Boolean = false,
+||||||| 15777e40
+=======
+    val accentColors: Boolean = false,
+>>>>>>> main
     val dim: Boolean = true,
 )
 
@@ -115,14 +121,18 @@ fun ArticleRow(
     }
 
     val imageURL = article.imageURL
-    val isMonochrome = LocalAppTheme.current == AppTheme.MONOCHROME
+    val isMonochrome = LocalAppTheme.current.value == AppTheme.MONOCHROME
     val dim = article.read && options.dim
     val deEmphasizeFontWeight = dim && isMonochrome
     val colors = listItemColors(
         selected = selected,
         read = dim
     )
-    val feedNameColor = findFeedNameColor(read = dim)
+    val feedNameColor = findFeedNameColor(
+        faviconURL = article.faviconURL,
+        accentColors = options.accentColors,
+        read = dim,
+    )
     val haptics = LocalHapticFeedback.current
     val (isArticleMenuOpen, setArticleMenuOpen) = remember { mutableStateOf(false) }
     val labelsActions = LocalLabelsActions.current
@@ -341,25 +351,40 @@ private fun listItemColors(
     read: Boolean,
 ): ListItemColors {
     val defaults = ListItemDefaults.colors()
-    val isMonochrome = LocalAppTheme.current == AppTheme.MONOCHROME
+    val isMonochrome = LocalAppTheme.current.value == AppTheme.MONOCHROME
     val dimColors = read && !isMonochrome
 
     return ListItemDefaults.colors(
         containerColor = if (selected) colorScheme.surfaceVariant else defaults.containerColor,
-        headlineColor = if (dimColors) defaults.disabledContentColor else defaults.headlineColor,
-        supportingColor = if (dimColors) defaults.disabledContentColor else defaults.supportingTextColor
+        headlineColor = if (dimColors) defaults.disabledContentColor else defaults.contentColor,
+        supportingColor = if (dimColors) defaults.disabledContentColor else defaults.supportingContentColor
     )
 }
 
 @Composable
-fun findFeedNameColor(read: Boolean): Color {
+fun findFeedNameColor(
+    faviconURL: String? = null,
+    accentColors: Boolean = false,
+    read: Boolean,
+): Color {
+    val appThemeState = LocalAppTheme.current
+    val showAccentColor = appThemeState.value.supportsFeedAccentColor && accentColors
+
+    if (showAccentColor) {
+        val accentColor = rememberAccentColor(faviconURL)
+
+        if (accentColor != null) {
+            return if (read) accentColor.copy(alpha = 0.5f) else accentColor
+        }
+    }
+
     val defaults = ListItemDefaults.colors()
-    val isMonochrome = LocalAppTheme.current == AppTheme.MONOCHROME
+    val isMonochrome = appThemeState.value == AppTheme.MONOCHROME
 
     return if (read && !isMonochrome) {
-        defaults.disabledHeadlineColor
+        defaults.disabledContentColor
     } else {
-        defaults.overlineColor
+        defaults.overlineContentColor
     }
 }
 
@@ -626,5 +651,52 @@ fun ArticleRowPreview_Rtl() {
 fun ArticleRowPreviewPlaceholder() {
     CapyTheme {
         PlaceholderArticleRow(ImagePreview.LARGE)
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+fun ArticleRowPreview_AccentBar() {
+    val article = Article(
+        id = "288",
+        feedID = "123",
+        title = "How to use the Galaxy S24's AI photo editing tool",
+        author = "Andrew Romero",
+        contentHTML = "<div>Test</div>",
+        imageURL = "https://example.com",
+        summary = "The Galaxy S24 series packs a lot of AI narrative.",
+        url = URL("https://9to5google.com/?p=605559"),
+        updatedAt = ZonedDateTime.of(2024, 2, 11, 8, 33, 0, 0, ZoneOffset.UTC),
+        publishedAt = ZonedDateTime.of(2024, 2, 11, 8, 33, 0, 0, ZoneOffset.UTC),
+        read = false,
+        starred = false,
+        feedName = "9to5Google"
+    )
+
+    PreviewKoinApplication {
+        CapyTheme(
+            appTheme = AppTheme.MONOCHROME,
+            themeMode = ThemeMode.DARK,
+            pureBlack = true,
+        ) {
+            Column {
+                ArticleRow(
+                    article = article,
+                    index = 0,
+                    selected = false,
+                    onSelect = {},
+                    currentTime = LocalDateTime.now(),
+                )
+                ArticleRow(
+                    article = article.copy(read = true),
+                    index = 1,
+                    selected = false,
+                    onSelect = {},
+                    currentTime = LocalDateTime.now(),
+                )
+            }
+        }
     }
 }

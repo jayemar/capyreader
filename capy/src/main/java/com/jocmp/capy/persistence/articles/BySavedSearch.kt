@@ -34,7 +34,7 @@ class BySavedSearch(private val database: Database) {
             limit = limit,
             offset = offset,
             lastReadAt = mapLastRead(read, since),
-            lastStarredAt = mapLastStarred(starred, since),
+            lastUnstarredAt = mapLastUnstarred(starred, since),
             publishedSince = null,
             newestFirst = isDescendingOrder(sortOrder),
             sortByPublishedAt = isSortByPublishedAt(sortField),
@@ -80,7 +80,7 @@ class BySavedSearch(private val database: Database) {
             read = read,
             starred = starred,
             lastReadAt = mapLastRead(read, since),
-            lastStarredAt = mapLastStarred(starred, since),
+            lastUnstarredAt = mapLastUnstarred(starred, since),
             publishedSince = null
         )
     }
@@ -99,7 +99,7 @@ class BySavedSearch(private val database: Database) {
             read = read,
             starred = starred,
             lastReadAt = mapLastRead(read, since),
-            lastStarredAt = mapLastStarred(starred, since),
+            lastUnstarredAt = mapLastUnstarred(starred, since),
             publishedSince = null
         )
     }

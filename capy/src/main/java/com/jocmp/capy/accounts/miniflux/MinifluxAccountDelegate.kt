@@ -1,6 +1,7 @@
 package com.jocmp.capy.accounts.miniflux
 
 import com.jocmp.capy.AccountDelegate
+import com.jocmp.capy.AccountPreferences
 import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.Feed
 import com.jocmp.capy.accounts.AddFeedResult
@@ -37,7 +38,8 @@ import com.jocmp.minifluxclient.Feed as MinifluxFeed
 
 internal class MinifluxAccountDelegate(
     private val database: Database,
-    private val miniflux: Miniflux
+    private val miniflux: Miniflux,
+    private val preferences: AccountPreferences,
 ) : AccountDelegate {
     private val articleRecords = ArticleRecords(database)
     private val enclosureRecords = EnclosureRecords(database)
@@ -46,8 +48,10 @@ internal class MinifluxAccountDelegate(
 
     override suspend fun refresh(filter: ArticleFilter, cutoffDate: ZonedDateTime?): Result<Unit> {
         return try {
+            refreshIntegrationStatus()
             refreshFeeds()
             refreshArticles()
+            preferences.touchLastRefreshedAt()
 
             Result.success(Unit)
         } catch (exception: IOException) {
@@ -121,6 +125,19 @@ internal class MinifluxAccountDelegate(
 
     override suspend fun createPage(url: String) =
         Result.failure<Unit>(UnsupportedOperationException("Pages not supported"))
+
+    override suspend fun saveArticleExternally(articleID: String): Result<Unit> {
+        return try {
+            val response = miniflux.saveEntry(articleID.toLong())
+            if (response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(IOException("Save failed"))
+            }
+        } catch (e: IOException) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun addFeed(
         url: String,
@@ -247,6 +264,18 @@ internal class MinifluxAccountDelegate(
         Unit
     }
 
+    private suspend fun refreshIntegrationStatus() {
+        try {
+            val response = miniflux.integrationStatus()
+            val status = response.body()
+            if (response.isSuccessful && status != null) {
+                preferences.canSaveArticleExternally.set(status.has_integrations)
+            }
+        } catch (e: Exception) {
+            CapyLog.warn("refresh_integration_status", mapOf("error" to e.message))
+        }
+    }
+
     private suspend fun refreshFeeds() {
         val refreshResponse = miniflux.feeds()
         val initialFeeds = refreshResponse.body()
@@ -305,6 +334,7 @@ internal class MinifluxAccountDelegate(
         var offset = MAX_ENTRY_LIMIT
         while (ids.size < firstPage.total) {
             val page = fetch(offset).body() ?: break
+            if (page.entries.isEmpty()) break
             ids.addAll(page.entries.map { it.id.toString() })
             offset += MAX_ENTRY_LIMIT
         }
@@ -315,28 +345,20 @@ internal class MinifluxAccountDelegate(
     private suspend fun fetchAllEntries() {
         var offset = 0
         val limit = MAX_ENTRY_LIMIT
+        var hasMore = true
 
-        do {
-            val response = miniflux.entries(
+        while (hasMore) {
+            val result = miniflux.entries(
                 limit = limit,
                 offset = offset,
                 order = "published_at",
                 direction = "desc"
-            )
-            val result = response.body()
+            ).body() ?: return
 
-            if (result != null) {
-                saveEntries(result.entries)
-                offset += limit
-
-                // Continue if we got a full page
-                if (result.entries.size < limit) {
-                    break
-                }
-            } else {
-                break
-            }
-        } while (true)
+            saveEntries(result.entries)
+            offset += limit
+            hasMore = result.entries.size >= limit
+        }
     }
 
     private fun saveEntries(entries: List<Entry>) {

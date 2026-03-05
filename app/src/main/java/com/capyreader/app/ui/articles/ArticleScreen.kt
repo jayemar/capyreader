@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -59,9 +60,17 @@ import com.capyreader.app.common.Media
 import com.capyreader.app.common.Saver
 import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
+<<<<<<< HEAD
 import com.capyreader.app.preferences.ArticleListVerticalSwipe
 import com.capyreader.app.ui.LocalConnectivity
+||||||| 15777e40
+import com.capyreader.app.refresher.RefreshInterval
+import com.capyreader.app.ui.LocalConnectivity
+=======
+import com.capyreader.app.refresher.RefreshInterval
+>>>>>>> main
 import com.capyreader.app.ui.LocalBadgeStyle
+import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener
 import com.capyreader.app.ui.LocalMarkAllReadButtonPosition
 import com.capyreader.app.ui.LocalUnreadCount
@@ -146,6 +155,8 @@ fun ArticleScreen(
     val canSwipeToNextFeed = nextFilter != null
     val context = LocalContext.current
 
+    val canSaveExternally by viewModel.canSaveArticleExternally.collectAsStateWithLifecycle()
+
     val fullContent = rememberFullContent(viewModel)
     val articleActions = rememberArticleActions(viewModel)
     val folderActions = rememberFolderActions(viewModel)
@@ -224,7 +235,7 @@ fun ArticleScreen(
             mutableStateOf(false)
         }
         val coroutineScope = rememberCoroutineScope()
-        val scaffoldNavigator = rememberArticleScaffoldNavigator()
+        val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator()
         val showMultipleColumns = scaffoldNavigator.scaffoldDirective.maxHorizontalPartitions > 1
         val paneExpansion = rememberArticlePaneExpansion()
         val addFeedSuccessMessage = stringResource(R.string.add_feed_success)
@@ -243,7 +254,7 @@ fun ArticleScreen(
         suspend fun navigateToDetail() {
             scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
             if (showMultipleColumns) {
-                paneExpansion.restoreAnchor()
+                paneExpansion.restore()
             }
         }
 
@@ -811,7 +822,7 @@ fun ArticleScreen(
                         },
                         onToggleRead = viewModel::toggleArticleRead,
                         onToggleStar = viewModel::toggleArticleStar,
-                        enableBackHandler = media == null,
+                        canSaveExternally = canSaveExternally,
                         onDeletePage = {
                             clearArticle()
                             viewModel.deletePage(article.id)
@@ -832,7 +843,7 @@ fun ArticleScreen(
                         currentAudioUrl = currentAudio?.url,
                         isAudioPlaying = isAudioPlaying,
                         isFullscreen = paneExpansion.isFullscreen,
-                        onExitFullscreen = { paneExpansion.exitFullscreen() },
+                        onToggleFullscreen = { paneExpansion.toggleFullscreen() },
                     )
                 }
             }
@@ -905,6 +916,7 @@ fun ArticleScreen(
         }
 
         BackHandler(media == null && article != null) {
+            paneExpansion.reset()
             clearArticle()
         }
 
@@ -942,6 +954,7 @@ fun rememberArticleActions(viewModel: ArticleScreenViewModel): ArticleActions {
             markUnread = viewModel::markUnreadAsync,
             star = viewModel::addStarAsync,
             unstar = viewModel::removeStarAsync,
+            saveExternally = viewModel::saveArticleExternallyAsync,
         )
     }
 }
