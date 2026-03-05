@@ -83,14 +83,10 @@ data class ArticleRowOptions(
     val imagePreview: ImagePreview = ImagePreview.default,
     val fontScale: ArticleListFontScale = ArticleListFontScale.MEDIUM,
     val shortenTitles: Boolean = true,
-<<<<<<< HEAD
     val shortenSummaries: Boolean = true,
     val summaryMaxLines: SummaryMaxLines = SummaryMaxLines.default,
     val showAudioIcon: Boolean = false,
-||||||| 15777e40
-=======
     val accentColors: Boolean = false,
->>>>>>> main
     val dim: Boolean = true,
 )
 

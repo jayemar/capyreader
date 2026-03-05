@@ -60,15 +60,7 @@ import com.capyreader.app.common.Media
 import com.capyreader.app.common.Saver
 import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
-<<<<<<< HEAD
 import com.capyreader.app.preferences.ArticleListVerticalSwipe
-import com.capyreader.app.ui.LocalConnectivity
-||||||| 15777e40
-import com.capyreader.app.refresher.RefreshInterval
-import com.capyreader.app.ui.LocalConnectivity
-=======
-import com.capyreader.app.refresher.RefreshInterval
->>>>>>> main
 import com.capyreader.app.ui.LocalBadgeStyle
 import com.capyreader.app.ui.LocalConnectivity
 import com.capyreader.app.ui.LocalLinkOpener

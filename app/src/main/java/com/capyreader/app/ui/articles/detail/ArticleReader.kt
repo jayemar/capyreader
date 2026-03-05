@@ -20,12 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-<<<<<<< HEAD
 import androidx.compose.ui.Alignment
-||||||| 15777e40
-=======
 import androidx.compose.runtime.snapshotFlow
->>>>>>> main
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -186,7 +182,7 @@ fun ArticleReader(
                 )
             }
         } else {
-            ScrollableWebView(webViewState, article, showImages)
+            ScrollableWebView(webViewState, article, showImages, pinToolbars)
         }
 
         if (findInPage.isVisible) {
@@ -214,14 +210,6 @@ fun ArticleReader(
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
-<<<<<<< HEAD
-||||||| 15777e40
-    } else {
-        ScrollableWebView(webViewState, article, showImages)
-=======
-    } else {
-        ScrollableWebView(webViewState, article, showImages, pinToolbars)
->>>>>>> main
     }
 
     ArticleStyleListener(webView = webViewState.webView)

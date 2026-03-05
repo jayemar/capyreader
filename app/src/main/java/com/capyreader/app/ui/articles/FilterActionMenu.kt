@@ -76,35 +76,12 @@ fun FilterActionMenu(
                 }
             }
 
-<<<<<<< HEAD
-            if (!hideSearchIcon) {
-                IconButton(onClick = onRequestJumpToBottom) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowDownward,
-                        contentDescription = stringResource(R.string.filter_action_menu_jump_to_bottom)
-                    )
-                }
-            }
-
-            if (markReadPosition == MarkReadPosition.TOOLBAR) {
-                MarkAllReadButton(
-                    onMarkAllRead = {
-                        onMarkAllRead()
-                    },
-||||||| 15777e40
-            if (markReadPosition == MarkReadPosition.TOOLBAR) {
-                MarkAllReadButton(
-                    onMarkAllRead = {
-                        onMarkAllRead()
-                    },
-=======
             if (currentFeed != null && !currentFeed.isPages) {
                 FeedActionMenu(
                     expanded = expanded,
                     feed = currentFeed,
                     onDismissMenuRequest = { closeMenu() },
                     source = source,
->>>>>>> main
                 )
             }
 

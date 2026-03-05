@@ -34,12 +34,8 @@ import com.jocmp.capy.buildArticlePager
 import com.jocmp.capy.common.UnauthorizedError
 import com.jocmp.capy.common.launchIO
 import com.jocmp.capy.common.launchUI
-<<<<<<< HEAD
 import com.jocmp.capy.common.withIOContext
-||||||| 15777e40
-=======
 import com.jocmp.capy.common.withUIContext
->>>>>>> main
 import com.jocmp.capy.countToday
 import com.jocmp.capy.logging.CapyLog
 import kotlinx.coroutines.ExperimentalCoroutinesApi

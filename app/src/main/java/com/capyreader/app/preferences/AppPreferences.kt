@@ -80,16 +80,11 @@ class AppPreferences(context: Context) {
     val enableStickyFullContent: Preference<Boolean>
         get() = preferenceStore.getBoolean("enable_sticky_full_content", false)
 
-<<<<<<< HEAD
     val copyLinkFormat: Preference<CopyLinkFormat>
         get() = preferenceStore.getEnum("copy_link_format", CopyLinkFormat.default)
-||||||| 15777e40
-    val paneExpansionIndex: Preference<Int>
-        get() = preferenceStore.getInt("pane_expansion_index", 1)
-=======
+
     val paneExpansionIndex: Preference<Int>
         get() = preferenceStore.getInt("pane_expansion_index", DefaultPaneExpansionIndex)
->>>>>>> main
 
     fun pinFeedGroup(type: FeedGroup): Preference<Boolean> {
         return preferenceStore.getBoolean("feed_group_${type.toString().lowercase()}", true)
@@ -100,9 +95,6 @@ class AppPreferences(context: Context) {
 
     val badgeStyle: Preference<BadgeStyle>
         get() = preferenceStore.getEnum("badge_style", BadgeStyle.default)
-
-    val paneExpansionIndex: Preference<Int>
-        get() = preferenceStore.getInt("pane_expansion_index", 0)
 
     fun clearAll() {
         preferenceStore.clearAll()

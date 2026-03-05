@@ -52,12 +52,8 @@ fun DisplaySettingsPanel(
     val pinArticleBars by viewModel.pinArticleBars.collectChangesWithCurrent()
     val improveTalkback by viewModel.improveTalkback.collectChangesWithCurrent()
     val markReadButtonPosition by viewModel.markReadButtonPosition.collectChangesWithCurrent()
-<<<<<<< HEAD
     val replaceFullwidthCharacters by viewModel.replaceFullwidthCharacters.collectChangesWithCurrent()
-||||||| 15777e40
-=======
     val appTheme by viewModel.appPreferences.appTheme.collectChangesWithCurrent()
->>>>>>> main
 
     DisplaySettingsPanelView(
         themeMode = viewModel.themeMode,
