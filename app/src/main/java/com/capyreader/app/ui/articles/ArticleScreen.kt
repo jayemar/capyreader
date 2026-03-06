@@ -786,7 +786,6 @@ fun ArticleScreen(
                                                 }
                                         )
                                     }
-                                }
                             }
                         }
                     }
