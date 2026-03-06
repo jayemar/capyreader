@@ -318,6 +318,7 @@ ul:has(img) {
 
 .table__wrapper {
   width: 100%;
+  overflow-x: var(--table-overflow-x, visible);
 
   table {
     table-layout: fixed;
@@ -326,8 +327,15 @@ ul:has(img) {
   }
 
   table table {
+    table-layout: auto;
     margin-bottom: 0;
     border: none;
+
+    td,
+    th {
+      border: none;
+      padding: 0;
+    }
   }
 
   td,
@@ -385,6 +393,7 @@ ul:has(img) {
 
   img {
     background-color: var(--color-surface-container-highest);
+    border-radius: 0.125rem;
   }
 }
 

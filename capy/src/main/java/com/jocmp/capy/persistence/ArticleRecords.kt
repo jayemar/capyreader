@@ -210,7 +210,7 @@ internal class ArticleRecords internal constructor(
         database.articlesQueries.markStarred(
             articleID = articleID,
             starred = true,
-            lastStarredAt = null,
+            lastUnstarredAt = null,
         )
     }
 
@@ -218,7 +218,7 @@ internal class ArticleRecords internal constructor(
         database.articlesQueries.markStarred(
             articleID = articleID,
             starred = false,
-            lastStarredAt = nowUTC().toEpochSecond(),
+            lastUnstarredAt = nowUTC().toEpochSecond(),
         )
     }
 

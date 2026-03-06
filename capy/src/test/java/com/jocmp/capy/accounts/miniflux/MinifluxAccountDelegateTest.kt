@@ -1,7 +1,9 @@
 package com.jocmp.capy.accounts.miniflux
 
 import com.jocmp.capy.AccountDelegate
+import com.jocmp.capy.AccountPreferences
 import com.jocmp.capy.ArticleFilter
+import com.jocmp.capy.InMemoryDataStore
 import com.jocmp.capy.InMemoryDatabaseProvider
 import com.jocmp.capy.accounts.AddFeedResult
 import com.jocmp.capy.db.Database
@@ -21,9 +23,12 @@ import com.jocmp.minifluxclient.IconData
 import com.jocmp.minifluxclient.Miniflux
 import com.jocmp.minifluxclient.UpdateEntriesRequest
 import com.jocmp.minifluxclient.UpdateFeedRequest
+import com.jocmp.capy.logging.CapyLog
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkObject
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import retrofit2.Response
@@ -160,10 +165,14 @@ class MinifluxAccountDelegateTest {
 
     @BeforeTest
     fun setup() {
+        mockkObject(CapyLog)
+        every { CapyLog.warn(any(), any()) }.returns(Unit)
+        every { CapyLog.info(any(), any()) }.returns(Unit)
+
         database = InMemoryDatabaseProvider.build(accountID)
         feedFixture = FeedFixture(database)
         miniflux = mockk()
-        delegate = MinifluxAccountDelegate(database, miniflux)
+        delegate = MinifluxAccountDelegate(database, miniflux, AccountPreferences(InMemoryDataStore()))
     }
 
     @Test

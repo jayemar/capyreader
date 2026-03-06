@@ -6,6 +6,7 @@ import com.capyreader.app.common.FeedGroup
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.ui.articles.ArticleListFontScale
+import com.capyreader.app.ui.articles.DefaultPaneExpansionIndex
 import com.capyreader.app.ui.articles.MarkReadPosition
 import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.articles.ArticleSortField
@@ -66,6 +67,9 @@ class AppPreferences(context: Context) {
     val pureBlackDarkMode: Preference<Boolean>
         get() = preferenceStore.getBoolean("pure_black_dark_mode", false)
 
+    val accentColors: Preference<Boolean>
+        get() = preferenceStore.getBoolean("accent_colors", false)
+
     val openLinksInternally: Preference<Boolean>
         get() = preferenceStore.getBoolean("open_links_internally", true)
 
@@ -73,7 +77,7 @@ class AppPreferences(context: Context) {
         get() = preferenceStore.getBoolean("enable_sticky_full_content", false)
 
     val paneExpansionIndex: Preference<Int>
-        get() = preferenceStore.getInt("pane_expansion_index", 1)
+        get() = preferenceStore.getInt("pane_expansion_index", DefaultPaneExpansionIndex)
 
     fun pinFeedGroup(type: FeedGroup): Preference<Boolean> {
         return preferenceStore.getBoolean("feed_group_${type.toString().lowercase()}", true)

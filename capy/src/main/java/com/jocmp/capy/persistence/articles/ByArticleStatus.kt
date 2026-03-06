@@ -22,21 +22,35 @@ class ByArticleStatus(private val database: Database) {
         since: OffsetDateTime? = null
     ): Query<Article> {
         val (read, starred) = status.toStatusPair
-        val newestFirst = isNewestFirst(sortOrder)
+        val queries = database.articlesByStatusQueries
 
-        return database.articlesByStatusQueries.all(
-            read = read,
-            starred = starred,
-            limit = limit,
-            offset = offset,
-            lastReadAt = mapLastRead(read, since),
-            lastStarredAt = mapLastStarred(starred, since),
-            publishedSince = null,
-            query = query,
-            newestFirst = newestFirst,
-            sortByPublishedAt = isSortByPublishedAt(sortField),
-            mapper = ::listMapper
-        )
+        return if (isNewestFirst(sortOrder)) {
+            queries.allNewestFirst(
+                read = read,
+                starred = starred,
+                limit = limit,
+                offset = offset,
+                lastReadAt = mapLastRead(read, since),
+                lastUnstarredAt = mapLastUnstarred(starred, since),
+                publishedSince = null,
+                query = query,
+                sortByPublishedAt = isSortByPublishedAt(sortField),
+                mapper = ::listMapper
+            )
+        } else {
+            queries.allOldestFirst(
+                read = read,
+                starred = starred,
+                limit = limit,
+                offset = offset,
+                lastReadAt = mapLastRead(read, since),
+                lastUnstarredAt = mapLastUnstarred(starred, since),
+                publishedSince = null,
+                query = query,
+                sortByPublishedAt = isSortByPublishedAt(sortField),
+                mapper = ::listMapper
+            )
+        }
     }
 
     fun unreadArticleIDs(
@@ -76,7 +90,7 @@ class ByArticleStatus(private val database: Database) {
             starred = starred,
             query = query,
             lastReadAt = mapLastRead(read, since),
-            lastStarredAt = mapLastStarred(starred, since),
+            lastUnstarredAt = mapLastUnstarred(starred, since),
             publishedSince = null
         )
     }

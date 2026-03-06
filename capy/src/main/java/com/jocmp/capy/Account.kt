@@ -4,8 +4,6 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOne
 import com.jocmp.capy.ArticleStatus.UNREAD
 import com.jocmp.capy.accounts.AddFeedResult
-import com.jocmp.feedfinder.DefaultFeedFinder
-import com.jocmp.feedfinder.FeedFinder
 import com.jocmp.capy.accounts.AutoDelete
 import com.jocmp.capy.accounts.FaviconFinder
 import com.jocmp.capy.accounts.FaviconPolicy
@@ -36,9 +34,12 @@ import com.jocmp.capy.persistence.FeedRecords
 import com.jocmp.capy.persistence.FolderRecords
 import com.jocmp.capy.persistence.SavedSearchRecords
 import com.jocmp.capy.persistence.TaggingRecords
+import com.jocmp.capy.preferences.Preference
 import com.jocmp.feedbinclient.Feedbin
-import kotlinx.coroutines.Dispatchers
+import com.jocmp.feedfinder.DefaultFeedFinder
+import com.jocmp.feedfinder.FeedFinder
 import com.jocmp.minifluxclient.Miniflux
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
@@ -73,7 +74,8 @@ data class Account(
             feedbin = Feedbin.forAccount(
                 path = cacheDirectory,
                 preferences = preferences
-            )
+            ),
+            preferences = preferences,
         )
 
         Source.MINIFLUX,
@@ -82,8 +84,10 @@ data class Account(
             miniflux = Miniflux.forAccount(
                 path = cacheDirectory,
                 preferences = preferences,
-                source = source
-            )
+                source = source,
+                clientCertManager = clientCertManager,
+            ),
+            preferences = preferences,
         )
 
         Source.FRESHRSS,
@@ -133,9 +137,14 @@ data class Account(
         }.sortedByTitle()
     }
 
+    val canSaveArticleExternally: Preference<Boolean>
+        get() = preferences.canSaveArticleExternally
+
     suspend fun createPage(url: String) = delegate.createPage(url)
 
     suspend fun deletePage(articleID: String) = delegate.deletePage(articleID)
+
+    suspend fun saveArticleExternally(articleID: String) = delegate.saveArticleExternally(articleID)
 
     suspend fun searchFeed(url: String) = feedFinder.find(url)
 
@@ -342,6 +351,10 @@ data class Account(
         return OPMLFile(this).opmlDocument()
     }
 
+    suspend fun starredBookmarksDocument(): String {
+        return StarredBookmarksFile(this).bookmarksDocument()
+    }
+
     suspend fun createNotifications(since: ZonedDateTime): List<ArticleNotification> {
         return articleRecords.createNotifications(since = since)
     }
@@ -439,7 +452,8 @@ data class Account(
     private suspend fun findFavicon(feed: Feed) {
         withIOContext {
             val siteURL = FaviconFinder.siteURL(feed) ?: return@withIOContext
-            FaviconFinder(localHttpClient, faviconPolicy, userAgent, acceptLanguage).find(siteURL.toString())?.let {
+            
+            faviconFinder.find(siteURL)?.let {
                 feedRecords.updateFavicon(feed.id, it)
             }
         }
@@ -447,6 +461,9 @@ data class Account(
 
     val supportsMultiFolderFeeds: Boolean
         get() = source == Source.FEEDBIN || source == Source.LOCAL
+
+    val faviconFinder
+        get() = FaviconFinder(localHttpClient, faviconPolicy, userAgent, acceptLanguage)
 
     internal suspend fun asOPML(): String {
         var opml = ""

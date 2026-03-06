@@ -13,7 +13,6 @@ class ArticleRenderer(
     private val titleFontSize: Preference<Int>,
     private val textAlignment: Preference<TextAlignment>,
     private val titleFollowsBodyFont: Preference<Boolean>,
-    private val hideTopMargin: Preference<Boolean>,
     private val enableHorizontalScroll: Preference<Boolean>,
     private val audioPlayerLabels: AudioPlayerLabels = AudioPlayerLabels(),
 ) {
@@ -31,6 +30,7 @@ class ArticleRenderer(
     ): String {
         val fontFamily = fontOption.get()
         val showPlaceholderTitle = article.title.isBlank()
+        val enableHorizontalScroll = enableHorizontalScroll.get()
 
         val title = if (showPlaceholderTitle) {
             article.feedName
@@ -60,8 +60,8 @@ class ArticleRenderer(
             "font_size" to "${textSize.get()}px",
             "font_family" to fontFamily.slug,
             "font_preload" to fontPreload(fontFamily),
-            "top_margin" to topMargin(),
-            "pre_white_space" to preWhiteSpace(),
+            "pre_white_space" to preWhiteSpace(enableHorizontalScroll),
+            "table_overflow_x" to tableOverflowX(enableHorizontalScroll),
             "title_font_size" to "${titleFontSize.get()}px",
             "title_text_align" to textAlignment.get().toCSS,
             "title_font_family" to titleFontFamily.slug,
@@ -84,16 +84,16 @@ class ArticleRenderer(
         }
     }
 
-    private fun topMargin(): String {
-        return if (hideTopMargin.get()) {
-            "0px"
+    private fun tableOverflowX(horizontalScroll: Boolean): String {
+        return if (horizontalScroll) {
+            "visible"
         } else {
-            "100px"
+            "auto"
         }
     }
 
-    private fun preWhiteSpace(): String {
-        return if (enableHorizontalScroll.get()) {
+    private fun preWhiteSpace(horizontalScroll: Boolean): String {
+        return if (horizontalScroll) {
             "pre-wrap"
         } else {
             "pre"
