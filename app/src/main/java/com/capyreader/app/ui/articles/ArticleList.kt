@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.capyreader.app.R
@@ -141,15 +142,16 @@ fun MarkReadOnScroll(
         return
     }
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, articles) {
         snapshotFlow { listState.firstVisibleItemIndex }
             .debounce(500)
             .collect { firstVisibleIndex ->
                 val offscreenIndex = firstVisibleIndex - 1
 
                 val markAsRead =
-                    (articles.itemCount == 1 && firstVisibleIndex > 0) ||
-                            (offscreenIndex > 0 && articles.itemCount > 0)
+                    articles.loadState.refresh !is LoadState.Loading &&
+                            ((articles.itemCount == 1 && firstVisibleIndex > 0) ||
+                            (offscreenIndex > 0 && articles.itemCount > 0))
 
                 if (!markAsRead) {
                     return@collect
