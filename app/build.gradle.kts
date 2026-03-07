@@ -32,8 +32,8 @@ android {
         applicationId = "com.capyreader.app"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1198
-        versionName = "2026.02.1198"
+        versionCode = 1199
+        versionName = "2026.03.1199"
 
         val buildTime = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) + " UTC"
         buildConfigField("String", "BUILD_TIME", "\"$buildTime\"")
