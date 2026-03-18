@@ -6,10 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.capyreader.app.common.ImagePreview
 import com.capyreader.app.preferences.AppPreferences
-import com.capyreader.app.preferences.LayoutPreference
 import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
-import com.capyreader.app.preferences.AppTheme
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
 import com.capyreader.app.ui.articles.SummaryMaxLines
@@ -26,6 +24,9 @@ class DisplaySettingsViewModel(
         private set
     
     var pureBlackDarkMode by mutableStateOf(appPreferences.pureBlackDarkMode.get())
+        private set
+
+    var accentColors by mutableStateOf(appPreferences.accentColors.get())
         private set
 
     private val _imagePreview = mutableStateOf(appPreferences.articleListOptions.imagePreview.get())
@@ -45,8 +46,6 @@ class DisplaySettingsViewModel(
 
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
         private set
-
-    var enableBottomBarActions = appPreferences.readerOptions.bottomBarActions
 
     val imagePreview: ImagePreview
         get() = _imagePreview.value
@@ -69,12 +68,9 @@ class DisplaySettingsViewModel(
     val summaryMaxLines: SummaryMaxLines
         get() = _summaryMaxLines.value
 
-    val pinArticleBars = appPreferences.readerOptions.pinTopToolbar
+    val pinArticleBars = appPreferences.readerOptions.pinToolbars
 
     var imageVisibility by mutableStateOf(appPreferences.readerOptions.imageVisibility.get())
-        private set
-
-    var layout by mutableStateOf(appPreferences.layout.get())
         private set
 
     val improveTalkback = appPreferences.readerOptions.improveTalkback
@@ -86,22 +82,18 @@ class DisplaySettingsViewModel(
         this.themeMode = themeMode
     }
 
-    fun updateAppTheme(appTheme: AppTheme) {
-        appPreferences.appTheme.set(appTheme)
-        this.appTheme = appTheme
-    }
-
     fun updatePureBlackDarkMode(enable: Boolean) {
         appPreferences.pureBlackDarkMode.set(enable)
         this.pureBlackDarkMode = enable
     }
 
-    fun updatePinArticleBars(pinBars: Boolean) {
-        appPreferences.readerOptions.pinTopToolbar.set(pinBars)
+    fun updateAccentColors(enable: Boolean) {
+        appPreferences.accentColors.set(enable)
+        this.accentColors = enable
     }
 
-    fun updateBottomBarActions(enable: Boolean) {
-        appPreferences.readerOptions.bottomBarActions.set(enable)
+    fun updatePinArticleBars(pinBars: Boolean) {
+        appPreferences.readerOptions.pinToolbars.set(pinBars)
     }
 
     fun updateFontScale(fontScale: ArticleListFontScale) {
@@ -126,12 +118,6 @@ class DisplaySettingsViewModel(
         appPreferences.readerOptions.imageVisibility.set(option)
 
         this.imageVisibility = option
-    }
-
-    fun updateLayoutPreference(layout: LayoutPreference) {
-        appPreferences.layout.set(layout)
-
-        this.layout = layout
     }
 
     fun updateMarkReadButtonPosition(position: MarkReadPosition) {
