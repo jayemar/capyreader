@@ -60,6 +60,9 @@ class AccompanistWebViewClient(
     lateinit var state: WebViewState
         internal set
 
+    var pageUrl: String? = null
+        internal set
+
     override fun shouldInterceptRequest(
         view: WebView,
         request: WebResourceRequest
@@ -72,105 +75,57 @@ class AccompanistWebViewClient(
             return asset
         }
 
-        val url = request.url.toString()
-        val origin = request.requestHeaders["Origin"]
-        val isCorsRequest = origin == "null" && url.startsWith("http")
-
-        if (isCorsRequest) {
-            return proxyCorsRequest(request)
+        if (!shouldProxyRequest(request)) {
+            return null
         }
 
-        // Intercept image requests to apply authentication
-        if (isImageRequest(request)) {
-            return loadAuthenticatedImage(request)
-        }
-
-        return null
+        return proxyRequest(request)
     }
 
-    private fun isImageRequest(request: WebResourceRequest): Boolean {
-        val url = request.url.toString()
-        val accept = request.requestHeaders["Accept"] ?: ""
+    private fun shouldProxyRequest(request: WebResourceRequest) =
+        WebRequestProxyPolicy.shouldProxy(request.url.toString(), request, pageUrl)
 
-        // Check if Accept header indicates an image request
-        if (accept.contains("image/")) {
-            return true
-        }
-
-        // Check common image extensions
-        val imageExtensions = listOf(".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".bmp", ".ico")
-        return imageExtensions.any { url.lowercase().contains(it) }
-    }
-
-    private fun loadAuthenticatedImage(request: WebResourceRequest): WebResourceResponse? {
+    /**
+     * Proxies requests to add CORS headers for cross-origin
+     * requests (Issue #1616) and Referer headers for media CDNs (Issue #1878)
+     */
+    private fun proxyRequest(request: WebResourceRequest): WebResourceResponse? {
         return try {
-            val okRequest = Request.Builder()
+            val okHttpRequest = Request.Builder()
                 .url(request.url.toString())
                 .apply {
-                    request.requestHeaders.forEach { (key, value) ->
-                        header(key, value)
-                    }
+                    request
+                        .requestHeaders
+                        .filterNot { it.key.equals("Accept-Encoding", ignoreCase = true) }
+                        .forEach { (key, value) ->
+                            header(key, value)
+                        }
+                    pageUrl?.let { header("Referer", it) }
                 }
                 .build()
 
-            val response = httpClient.newCall(okRequest).execute()
-
-            if (!response.isSuccessful) {
-                CapyLog.error("webview_image_load_failed", Exception("HTTP ${response.code} for ${request.url}"))
-                return null
-            }
-
-            val contentType = response.header("Content-Type") ?: "application/octet-stream"
-            val mimeType = contentType.substringBefore(";").trim()
-            val charset = contentType
-                .substringAfter("charset=", "UTF-8")
-                .substringBefore(";")
-                .trim()
-
-            WebResourceResponse(
-                mimeType,
-                charset,
-                response.code,
-                response.message.ifEmpty { "OK" },
-                response.headers.toMultimap().mapValues { it.value.firstOrNull() ?: "" },
-                response.body.byteStream()
-            )
-        } catch (e: Exception) {
-            CapyLog.error("webview_image_intercept", e)
-            null
-        }
-    }
-
-    /** Avoids CORS issues when loading additional pages from Mercury.js */
-    private fun proxyCorsRequest(request: WebResourceRequest): WebResourceResponse? {
-        return try {
-            val okRequest = Request.Builder()
-                .url(request.url.toString())
-                .apply {
-                    request.requestHeaders.forEach { (key, value) ->
-                        header(key, value)
-                    }
-                }
-                .build()
-
-            val response = httpClient.newCall(okRequest).execute()
+            val response = httpClient.newCall(okHttpRequest).execute()
             val contentType = response.header("Content-Type") ?: "text/html"
             val mimeType = contentType.substringBefore(";").trim()
+
             val charset = contentType
                 .substringAfter("charset=", "UTF-8")
                 .substringBefore(";")
                 .trim()
+
+            val corsHeaders = mapOf(
+                "Access-Control-Allow-Origin" to "*",
+                "Access-Control-Allow-Methods" to "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers" to "*"
+            )
+            val responseHeaders = response.headers.toMap() + corsHeaders
 
             WebResourceResponse(
                 mimeType,
                 charset,
                 response.code,
                 response.message.ifEmpty { "OK" },
-                mapOf(
-                    "Access-Control-Allow-Origin" to "*",
-                    "Access-Control-Allow-Methods" to "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers" to "*"
-                ),
+                responseHeaders,
                 response.body.byteStream()
             )
         } catch (e: Exception) {
@@ -218,6 +173,9 @@ class WebViewState(
         htmlId = id
         contentHash = hash
 
+        val client = webView.webViewClient as? AccompanistWebViewClient
+        client?.pageUrl = article.url?.toString()
+
         val html = renderer.render(
             article,
             hideImages = !showImages,
@@ -242,6 +200,9 @@ class WebViewState(
     fun updateAudioPlayState(url: String?, isPlaying: Boolean) {
         currentAudioUrl = url
         isAudioPlaying = isPlaying
+        if (htmlId == null) {
+            return
+        }
         webView.post {
             if (url != null) {
                 val escapedUrl = url.replace("'", "\\'")
@@ -321,7 +282,7 @@ fun rememberWebViewState(
 
             addJavascriptInterface(webViewInterface, WebViewInterface.INTERFACE_NAME)
 
-            setBackgroundColor(context.getColor(android.R.color.transparent))
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
 
             webViewClient = client
         }
