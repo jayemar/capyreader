@@ -101,8 +101,6 @@ fun GeneralSettingsPanel(
             enableStickyFullContent = viewModel.enableStickyFullContent,
             showTodayFilter = viewModel.showTodayFilter,
             updateShowTodayFilter = viewModel::updateShowTodayFilter,
-            enableAudioPlayer = viewModel.enableAudioPlayer,
-            updateEnableAudioPlayer = viewModel::updateEnableAudioPlayer,
         )
     }
 }
@@ -132,8 +130,6 @@ fun GeneralSettingsPanelView(
     markReadOnScroll: Boolean,
     showTodayFilter: Boolean,
     updateShowTodayFilter: (show: Boolean) -> Unit,
-    enableAudioPlayer: Boolean,
-    updateEnableAudioPlayer: (enable: Boolean) -> Unit,
 ) {
     val (isClearArticlesDialogOpen, setClearArticlesDialogOpen) = remember { mutableStateOf(false) }
 
@@ -241,16 +237,6 @@ fun GeneralSettingsPanelView(
                     optionText = {
                         stringResource(id = it.translationKey)
                     }
-                )
-            }
-        }
-
-        FormSection(title = stringResource(R.string.settings_section_experimental)) {
-            RowItem {
-                TextSwitch(
-                    checked = enableAudioPlayer,
-                    onCheckedChange = updateEnableAudioPlayer,
-                    title = stringResource(R.string.settings_option_enable_audio_player)
                 )
             }
         }
@@ -400,8 +386,6 @@ private fun GeneralSettingsPanelPreview() {
                 updateAfterReadAll = {},
                 showTodayFilter = true,
                 updateShowTodayFilter = {},
-                enableAudioPlayer = false,
-                updateEnableAudioPlayer = {}
             )
         }
     }

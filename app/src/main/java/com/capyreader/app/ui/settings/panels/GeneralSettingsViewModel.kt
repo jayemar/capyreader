@@ -53,9 +53,6 @@ class GeneralSettingsViewModel(
     var showTodayFilter by mutableStateOf(appPreferences.showTodayFilter.get())
         private set
 
-    var enableAudioPlayer by mutableStateOf(appPreferences.enableAudioPlayer.get())
-        private set
-
     val keywordBlocklist = account
         .preferences
         .keywordBlocklist
@@ -143,11 +140,5 @@ class GeneralSettingsViewModel(
         appPreferences.showTodayFilter.set(show)
 
         showTodayFilter = show
-    }
-
-    fun updateEnableAudioPlayer(enable: Boolean) {
-        appPreferences.enableAudioPlayer.set(enable)
-
-        enableAudioPlayer = enable
     }
 }
