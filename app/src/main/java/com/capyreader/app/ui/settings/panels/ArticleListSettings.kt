@@ -55,12 +55,14 @@ data class ArticleListOptions(
     val showSummary: Boolean,
     val shortenTitles: Boolean,
     val fontScale: ArticleListFontScale,
+    val showUnreadCount: Boolean,
     val updateFeedIcons: (show: Boolean) -> Unit,
     val updateFeedName: (show: Boolean) -> Unit,
     val updateImagePreview: (preview: ImagePreview) -> Unit,
     val updateSummary: (show: Boolean) -> Unit,
     val updateFontScale: (scale: ArticleListFontScale) -> Unit,
     val updateShortenTitles: (show: Boolean) -> Unit,
+    val updateShowUnreadCount: (show: Boolean) -> Unit,
 )
 
 @Composable
@@ -108,6 +110,11 @@ fun ArticleListSettings(
                 onCheckedChange = options.updateShortenTitles,
                 checked = options.shortenTitles,
                 title = stringResource(R.string.settings_article_list_shorten_titles)
+            )
+            TextSwitch(
+                onCheckedChange = options.updateShowUnreadCount,
+                checked = options.showUnreadCount,
+                title = stringResource(R.string.settings_article_list_show_unread_count)
             )
         }
 
@@ -281,12 +288,14 @@ private fun ArticleListSettingsPreview() {
             fontScale = ArticleListFontScale.LARGE,
             showFeedName = false,
             shortenTitles = true,
+            showUnreadCount = false,
             updateImagePreview = {},
             updateSummary = {},
             updateFeedName = {},
             updateFeedIcons = {},
             updateFontScale = {},
             updateShortenTitles = {},
+            updateShowUnreadCount = {},
         )
     )
 }

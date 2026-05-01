@@ -158,6 +158,10 @@ fun ArticleScreen(
         .articleListOptions
         .markReadButtonPosition
         .collectChangesWithCurrent()
+    val showUnreadCount by appPreferences
+        .articleListOptions
+        .showUnreadCount
+        .collectChangesWithCurrent()
     val badgeStyle by appPreferences.badgeStyle.collectChangesWithDefault()
 
     val articles = viewModel.articles.collectAsLazyPagingItems()
@@ -541,6 +545,8 @@ fun ArticleScreen(
                                 savedSearches = savedSearches,
                                 folders = allFolders,
                                 source = viewModel.source,
+                                unreadCount = unreadCount,
+                                showUnreadCount = showUnreadCount,
                             )
                         },
                         snackbarHost = {
