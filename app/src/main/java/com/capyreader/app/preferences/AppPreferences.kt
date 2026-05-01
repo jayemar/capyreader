@@ -9,6 +9,7 @@ import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.DefaultPaneExpansionIndex
 import com.capyreader.app.ui.articles.MarkReadPosition
 import com.jocmp.capy.ArticleFilter
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.FontOption
 import com.jocmp.capy.articles.FontSize
 import com.jocmp.capy.articles.SortOrder
@@ -149,6 +150,9 @@ class AppPreferences(context: Context) {
                 "article_list_sort_order",
                 SortOrder.default
             )
+
+        val sortField: Preference<ArticleSortField>
+            get() = preferenceStore.getEnum("article_list_sort_field", ArticleSortField.default)
 
         val showFeedName: Preference<Boolean>
             get() = preferenceStore.getBoolean("article_display_feed_name", true)

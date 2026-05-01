@@ -5,7 +5,9 @@ import com.jocmp.capy.ArticleFilter
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.InMemoryDatabaseProvider
+import com.jocmp.capy.MarkRead
 import com.jocmp.capy.RandomUUID
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.TimeHelpers.nowUTC
 import com.jocmp.capy.db.Database
@@ -610,6 +612,326 @@ class ArticleRecordsTest {
         ).firstOrNull()
 
         assertEquals(expected = 2, actual = count)
+    }
+
+    @Test
+    fun allByStatus_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byStatus
+            .all(
+                status = ArticleStatus.ALL,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
+    }
+
+    @Test
+    fun allByStatus_sortByRetrievalDate_oldestFirst() {
+        val now = nowUTC()
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byStatus
+            .all(
+                status = ArticleStatus.ALL,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.OLDEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleC.id, articleB.id, articleA.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleC, articleB, articleA), results),
+        )
+    }
+
+    @Test
+    fun allByFeed_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val since = OffsetDateTime.now().minusDays(7)
+
+        val articleA = articleFixture.create(
+            title = "Article A",
+            feed = feed,
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            feed = feed,
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            feed = feed,
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        val results = articleRecords
+            .byFeed
+            .all(
+                feedIDs = listOf(feed.id),
+                status = ArticleStatus.ALL,
+                since = since,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                priority = FeedPriority.FEED,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
+    }
+
+    @Test
+    fun allBySavedSearch_sortByRetrievalDate_newestFirst() {
+        val now = nowUTC()
+        val savedSearchFixture = SavedSearchFixture(database)
+        val savedSearchRecords = SavedSearchRecords(database)
+        val savedSearch = savedSearchFixture.create()
+        val since = OffsetDateTime.now().minusDays(7)
+
+        val articleA = articleFixture.create(
+            title = "Article A",
+            publishedAt = now.minusDays(3).toEpochSecond(),
+            updatedAt = now.toEpochSecond(),
+        )
+        val articleB = articleFixture.create(
+            title = "Article B",
+            publishedAt = now.minusDays(2).toEpochSecond(),
+            updatedAt = now.minusDays(1).toEpochSecond(),
+        )
+        val articleC = articleFixture.create(
+            title = "Article C",
+            publishedAt = now.minusDays(1).toEpochSecond(),
+            updatedAt = now.minusDays(2).toEpochSecond(),
+        )
+
+        listOf(articleA, articleB, articleC).forEach { article ->
+            savedSearchRecords.upsertArticle(
+                articleID = article.id,
+                savedSearchID = savedSearch.id,
+            )
+        }
+
+        val results = articleRecords
+            .bySavedSearch
+            .all(
+                savedSearchID = savedSearch.id,
+                status = ArticleStatus.ALL,
+                since = since,
+                limit = 10,
+                offset = 0,
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+            )
+            .executeAsList()
+
+        val expected = listOf(articleA.id, articleB.id, articleC.id)
+        val actual = results.map { it.id }
+
+        assertEquals(
+            actual = actual,
+            expected = expected,
+            message = sortedMessage(listOf(articleA, articleB, articleC), results),
+        )
+    }
+
+    @Test
+    fun unreadArticleIDs_retrievedAt_newestFirst_sameBatch_excludesBelowCursor() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val sharedUpdatedAt = now.toEpochSecond()
+
+        // IDs chosen for deterministic lexicographic order: art-a < art-b < art-c < art-d
+        // Newest-first with identical updatedAt => list order: [art-a, art-b, art-c, art-d] (id ASC)
+        val articleA = articleFixture.create(id = "art-a", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleB = articleFixture.create(id = "art-b", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleC = articleFixture.create(id = "art-c", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleD = articleFixture.create(id = "art-d", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+
+        // Cursor at B => mark as read: articles at/above B = [art-a, art-b]
+        val result = articleRecords
+            .byStatus
+            .unreadArticleIDs(
+                status = ArticleStatus.UNREAD,
+                range = MarkRead.After(articleB.id),
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                query = null,
+            )
+            .executeAsList()
+            .toSet()
+
+        assertEquals(
+            expected = setOf(articleA.id, articleB.id),
+            actual = result,
+            message = "Articles below cursor (${articleC.id}, ${articleD.id}) must not be included",
+        )
+    }
+
+    @Test
+    fun unreadArticleIDs_retrievedAt_oldestFirst_sameBatch_excludesBelowCursor() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val sharedUpdatedAt = now.toEpochSecond()
+
+        // Oldest-first with identical updatedAt => list order: [art-a, art-b, art-c, art-d] (id ASC)
+        val articleA = articleFixture.create(id = "art-a", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleB = articleFixture.create(id = "art-b", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleC = articleFixture.create(id = "art-c", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+        val articleD = articleFixture.create(id = "art-d", feed = feed, read = false, updatedAt = sharedUpdatedAt)
+
+        // Cursor at B => mark as read: articles at/above B = [art-a, art-b]
+        val result = articleRecords
+            .byStatus
+            .unreadArticleIDs(
+                status = ArticleStatus.UNREAD,
+                range = MarkRead.After(articleB.id),
+                sortOrder = SortOrder.OLDEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                query = null,
+            )
+            .executeAsList()
+            .toSet()
+
+        assertEquals(
+            expected = setOf(articleA.id, articleB.id),
+            actual = result,
+            message = "Articles below cursor (${articleC.id}, ${articleD.id}) must not be included",
+        )
+    }
+
+    @Test
+    fun unreadArticleIDs_retrievedAt_newestFirst_crossBatch_excludesOlderBatch() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val batchT2 = now.toEpochSecond()
+        val batchT1 = now.minusDays(1).toEpochSecond()
+
+        // T2 batch (newer) appears above T1 batch in newest-first list
+        // List order: [art-a, art-b, art-c (T2), art-e, art-f (T1)]
+        val articleA = articleFixture.create(id = "art-a", feed = feed, read = false, updatedAt = batchT2)
+        val articleB = articleFixture.create(id = "art-b", feed = feed, read = false, updatedAt = batchT2)
+        val articleC = articleFixture.create(id = "art-c", feed = feed, read = false, updatedAt = batchT2)
+        val articleE = articleFixture.create(id = "art-e", feed = feed, read = false, updatedAt = batchT1)
+        val articleF = articleFixture.create(id = "art-f", feed = feed, read = false, updatedAt = batchT1)
+
+        // Cursor at B (in T2) => mark as read: articles at/above B = [art-a, art-b]
+        // art-c is below cursor in T2; art-e, art-f appear below cursor (T1 batch)
+        val result = articleRecords
+            .byStatus
+            .unreadArticleIDs(
+                status = ArticleStatus.UNREAD,
+                range = MarkRead.After(articleB.id),
+                sortOrder = SortOrder.NEWEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                query = null,
+            )
+            .executeAsList()
+            .toSet()
+
+        assertEquals(
+            expected = setOf(articleA.id, articleB.id),
+            actual = result,
+            message = "Older batch articles (${articleE.id}, ${articleF.id}) must not be included when cursor is in newer batch",
+        )
+    }
+
+    @Test
+    fun unreadArticleIDs_retrievedAt_oldestFirst_crossBatch_includesOlderBatch() {
+        val now = nowUTC()
+        val feed = FeedFixture(database).create()
+        val batchT2 = now.toEpochSecond()
+        val batchT1 = now.minusDays(1).toEpochSecond()
+
+        // T1 batch (older) appears above T2 batch in oldest-first list
+        // List order: [art-e, art-f (T1), art-a, art-b, art-c (T2)]
+        val articleA = articleFixture.create(id = "art-a", feed = feed, read = false, updatedAt = batchT2)
+        val articleB = articleFixture.create(id = "art-b", feed = feed, read = false, updatedAt = batchT2)
+        val articleC = articleFixture.create(id = "art-c", feed = feed, read = false, updatedAt = batchT2)
+        val articleE = articleFixture.create(id = "art-e", feed = feed, read = false, updatedAt = batchT1)
+        val articleF = articleFixture.create(id = "art-f", feed = feed, read = false, updatedAt = batchT1)
+
+        // Cursor at B (in T2) => mark as read: art-e, art-f (above, T1), art-a, art-b (above, T2)
+        // art-c is below cursor in T2
+        val result = articleRecords
+            .byStatus
+            .unreadArticleIDs(
+                status = ArticleStatus.UNREAD,
+                range = MarkRead.After(articleB.id),
+                sortOrder = SortOrder.OLDEST_FIRST,
+                sortField = ArticleSortField.RETRIEVED_AT,
+                query = null,
+            )
+            .executeAsList()
+            .toSet()
+
+        assertEquals(
+            expected = setOf(articleE.id, articleF.id, articleA.id, articleB.id),
+            actual = result,
+            message = "Older batch articles (${articleE.id}, ${articleF.id}) must be included when they appear above cursor in oldest-first order",
+        )
     }
 
     @Test
