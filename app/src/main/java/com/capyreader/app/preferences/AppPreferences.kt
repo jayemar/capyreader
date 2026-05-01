@@ -51,6 +51,10 @@ class AppPreferences(context: Context) {
     val refreshInterval: Preference<RefreshInterval>
         get() = preferenceStore.getEnum("refresh_interval", RefreshInterval.default)
 
+    val refreshOnStart: Preference<Boolean>
+        get() = preferenceStore.getBoolean("refresh_on_start", true)
+
+
     val crashReporting: Preference<Boolean>
         get() = preferenceStore.getBoolean("enable_crash_reporting", false)
 
