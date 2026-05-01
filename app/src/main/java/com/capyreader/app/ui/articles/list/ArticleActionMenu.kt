@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.capyreader.app.R
 import com.capyreader.app.common.shareLink
+import com.capyreader.app.preferences.AppPreferences
 import com.capyreader.app.ui.LocalUnreadCount
 import com.capyreader.app.ui.articles.LocalArticleActions
 import com.capyreader.app.ui.components.ArticleAction
@@ -29,6 +30,7 @@ import com.capyreader.app.ui.components.starAction
 import com.capyreader.app.ui.fixtures.ArticleSample
 import com.jocmp.capy.Article
 import com.jocmp.capy.MarkRead
+import org.koin.compose.koinInject
 import com.jocmp.capy.MarkRead.After
 import com.jocmp.capy.MarkRead.Before
 
@@ -133,8 +135,14 @@ private fun SaveForLaterMenuItem(
 @Composable
 private fun CopyLinkMenuItem(onDismissRequest: () -> Unit, article: Article) {
     val url = article.url?.toString() ?: return
+    val appPreferences = koinInject<AppPreferences>()
+    val format = appPreferences.copyLinkFormat.get()
 
-    val copyToClipboard = buildCopyToClipboard(url)
+    val copyToClipboard = buildCopyToClipboard(
+        url = url,
+        title = article.title,
+        format = format
+    )
 
     DropdownMenuItem(
         leadingIcon = {
@@ -154,11 +162,13 @@ private fun CopyLinkMenuItem(onDismissRequest: () -> Unit, article: Article) {
 @Composable
 private fun ShareLinkMenuItem(onDismissRequest: () -> Unit, article: Article) {
     val url = article.url?.toString() ?: return
+    val appPreferences = koinInject<AppPreferences>()
+    val format = appPreferences.copyLinkFormat.get()
 
     val context = LocalContext.current
 
     val shareLink = {
-        context.shareLink(url = url, article.title)
+        context.shareLink(url = url, title = article.title, format = format)
     }
 
     DropdownMenuItem(

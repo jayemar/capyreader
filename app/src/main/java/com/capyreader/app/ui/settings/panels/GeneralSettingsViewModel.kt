@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.capyreader.app.preferences.AfterReadAllBehavior
 import com.capyreader.app.preferences.AppPreferences
+import com.capyreader.app.preferences.CopyLinkFormat
 import com.capyreader.app.refresher.RefreshInterval
 import com.capyreader.app.refresher.RefreshScheduler
 import com.jocmp.capy.Account
@@ -46,6 +47,9 @@ class GeneralSettingsViewModel(
         private set
 
     var markReadOnScroll by mutableStateOf(appPreferences.articleListOptions.markReadOnScroll.get())
+        private set
+
+    var copyLinkFormat by mutableStateOf(appPreferences.copyLinkFormat.get())
         private set
 
     val filterKeywords = account
@@ -125,4 +129,9 @@ class GeneralSettingsViewModel(
         }
     }
 
+    fun updateCopyLinkFormat(format: CopyLinkFormat) {
+        appPreferences.copyLinkFormat.set(format)
+
+        copyLinkFormat = format
+    }
 }
