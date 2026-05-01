@@ -20,7 +20,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -125,6 +128,16 @@ fun ArticleView(
     val scrollState = rememberArticleScrollState()
     val showToolBar = pinToolbars || !scrollState.isScrollingDown
 
+    // Find in page state - needs to be here so ArticleActions can access it
+    var showFindBar by rememberSaveable { mutableStateOf(false) }
+    val findInPageState = remember(showFindBar) {
+        FindInPageState(
+            isVisible = showFindBar,
+            show = { showFindBar = true },
+            hide = { showFindBar = false }
+        )
+    }
+
     LaunchedEffect(article.id) {
         scrollState.reset()
     }
@@ -135,6 +148,7 @@ fun ArticleView(
 
     CompositionLocalProvider(
         LocalSnackbarHost provides snackbarHostState,
+        LocalFindInPage provides findInPageState,
     ) {
         BoxWithConstraints(Modifier
             .fillMaxSize()
@@ -176,36 +190,36 @@ fun ArticleView(
                         }
                     }
                 }
+
+                ArticleTopBar(
+                    show = showToolBar,
+                    isScrolled = scrollState.showTopDivider,
+                    articleId = article.id,
+                    canDeletePage = article.isReadLater,
+                    canSaveExternally = canSaveExternally,
+                    onDeletePage = onDeletePage,
+                    isFullscreen = isFullscreen,
+                    onToggleFullscreen = onToggleFullscreen,
+                    onClose = onBackPressed,
+                )
+
+                ArticleBottomBar(
+                    show = showToolBar,
+                    article = article,
+                    hasNextArticle = hasNext,
+                    onToggleExtractContent = onToggleFullContent,
+                    onToggleRead = onToggleRead,
+                    onToggleStar = onToggleStar,
+                    onSelectNext = { selectNext() },
+                )
+
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 80.dp)
+                )
             }
-
-            ArticleTopBar(
-                show = showToolBar,
-                isScrolled = scrollState.showTopDivider,
-                articleId = article.id,
-                canDeletePage = article.isReadLater,
-                canSaveExternally = canSaveExternally,
-                onDeletePage = onDeletePage,
-                isFullscreen = isFullscreen,
-                onToggleFullscreen = onToggleFullscreen,
-                onClose = onBackPressed,
-            )
-
-            ArticleBottomBar(
-                show = showToolBar,
-                article = article,
-                hasNextArticle = hasNext,
-                onToggleExtractContent = onToggleFullContent,
-                onToggleRead = onToggleRead,
-                onToggleStar = onToggleStar,
-                onSelectNext = { selectNext() },
-            )
-
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 80.dp)
-            )
           }
         }
     }
