@@ -39,6 +39,8 @@ class DisplaySettingsViewModel(
 
     private val _shortenTitles = mutableStateOf(appPreferences.articleListOptions.shortenTitles.get())
 
+    private val _showUnreadCount = mutableStateOf(appPreferences.articleListOptions.showUnreadCount.get())
+
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
         private set
 
@@ -56,6 +58,9 @@ class DisplaySettingsViewModel(
 
     val shortenTitles: Boolean
         get() = _shortenTitles.value
+
+    val showUnreadCount: Boolean
+        get() = _showUnreadCount.value
 
     val pinArticleBars = appPreferences.readerOptions.pinToolbars
 
@@ -129,5 +134,11 @@ class DisplaySettingsViewModel(
         appPreferences.articleListOptions.shortenTitles.set(shortenTitles)
 
         _shortenTitles.value = shortenTitles
+    }
+
+    fun updateShowUnreadCount(show: Boolean) {
+        appPreferences.articleListOptions.showUnreadCount.set(show)
+
+        _showUnreadCount.value = show
     }
 }
