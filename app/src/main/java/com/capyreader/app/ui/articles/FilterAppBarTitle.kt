@@ -48,7 +48,7 @@ fun FilterAppBarTitle(
         is ArticleFilter.Today -> stringResource(R.string.filter_today)
     }.orEmpty()
 
-    val text = if (showUnreadCount && unreadCount > 0) "$title ($unreadCount)" else title
+    val text = if (showUnreadCount) "$title ($unreadCount)" else title
 
     Box(
         contentAlignment = Alignment.CenterStart,
