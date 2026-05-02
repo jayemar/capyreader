@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,6 +36,7 @@ fun FilterActionMenu(
     currentFeed: Feed?,
     onRemoveFolder: (folderTitle: String, completion: (result: Result<Unit>) -> Unit) -> Unit,
     onRequestSearch: () -> Unit,
+    onRequestJumpToBottom: () -> Unit,
     hideSearchIcon: Boolean,
     source: Source,
 ) {
@@ -70,6 +72,15 @@ fun FilterActionMenu(
                 }
             }
 
+            if (!hideSearchIcon) {
+                IconButton(onClick = onRequestJumpToBottom) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowDownward,
+                        contentDescription = stringResource(R.string.filter_action_menu_jump_to_bottom)
+                    )
+                }
+            }
+
             if (currentFeed != null && !currentFeed.isReadLater) {
                 FeedActionMenu(
                     expanded = expanded,
@@ -101,6 +112,7 @@ fun FeedActionsPreview(@PreviewParameter(FeedSample::class) feed: Feed) {
         FilterActionMenu(
             onRemoveFolder = { _, _ -> },
             onRequestSearch = {},
+            onRequestJumpToBottom = {},
             currentFeed = feed,
             filter = ArticleFilter.Feeds(
                 feedID = feed.id,

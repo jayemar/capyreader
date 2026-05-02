@@ -271,6 +271,15 @@ fun ArticleScreen(
             }
         }
 
+        val scrollToBottom = {
+            coroutineScope.launch {
+                val lastIndex = listState.layoutInfo.totalItemsCount - 1
+                if (lastIndex > 0) {
+                    listState.scrollToItem(lastIndex)
+                }
+            }
+        }
+
         val (scrolledFilter, setScrolledFilter) = rememberSaveable(
             saver = ArticleFilter.Saver
         ) { mutableStateOf(null) }
@@ -535,6 +544,7 @@ fun ArticleScreen(
                         topBar = {
                             ArticleListTopBar(
                                 onRequestJumpToTop = { scrollToTop() },
+                                onRequestJumpToBottom = { scrollToBottom() },
                                 onNavigateToDrawer = { openDrawer() },
                                 onRemoveFolder = { folderTitle, completion ->
                                     viewModel.removeFolder(
