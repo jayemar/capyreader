@@ -240,6 +240,7 @@
     <string name="settings_options_reader_pin_top_toolbar">Fixar Barras de Ferramentas</string>
     <string name="settings_gestures_list_back_navigation_navigate_to_parent">Voltar um Nível</string>
     <string name="article_list_swipe_next_feed">Ir para o próximo feed</string>
+    <string name="article_list_swipe_refresh_articles">Atualizar artigos</string>
     <string name="notification_mark_as_read_action">Marcar como lido</string>
     <string name="folder_name_title">Nome</string>
     <string name="media_share_failure">Falha ao compartilhar imagem</string>
