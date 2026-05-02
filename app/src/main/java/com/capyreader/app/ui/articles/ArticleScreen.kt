@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -328,6 +329,10 @@ fun ArticleScreen(
             }
         }
 
+        fun refreshAll() {
+            viewModel.refreshAll()
+        }
+
         fun onSwipeUp() {
             when (swipeBottom) {
                 ArticleListVerticalSwipe.NEXT_FEED -> {
@@ -342,12 +347,12 @@ fun ArticleScreen(
                     markAllRead(MarkRead.All)
                 }
 
+                ArticleListVerticalSwipe.REFRESH_ARTICLES -> {
+                    refreshAll()
+                }
+
                 ArticleListVerticalSwipe.DISABLED -> {}
             }
-        }
-
-        fun refreshAll() {
-            viewModel.refreshAll()
         }
 
         fun refreshFeeds() {
@@ -638,7 +643,6 @@ fun ArticleScreen(
                             }
                         }
                     }
-                )
                 }
             },
             detailPane = {
