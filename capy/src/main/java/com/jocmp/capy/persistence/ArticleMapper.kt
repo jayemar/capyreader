@@ -26,6 +26,7 @@ internal fun articleMapper(
     updatedAt: Long?,
     starred: Boolean,
     read: Boolean,
+    labelCount: Int = 0,
 ): Article {
     return Article(
         id = id,
@@ -43,6 +44,7 @@ internal fun articleMapper(
         publishedAt = publishedAt!!.toDateTimeFromSeconds,
         read = read,
         starred = starred,
+        labelCount = labelCount,
         feedName = feedTitle ?: "",
         enableStickyFullContent = enableStickyContent,
         openInBrowser = openInBrowser,
@@ -66,6 +68,7 @@ internal fun listMapper(
     updatedAt: Long?,
     starred: Boolean?,
     read: Boolean?,
+    labelCount: Long?,
 ): Article {
     return articleMapper(
         id = id,
@@ -94,5 +97,6 @@ internal fun listMapper(
         updatedAt = updatedAt,
         starred = starred ?: false,
         read = read ?: false,
+        labelCount = (labelCount ?: 0L).toInt(),
     )
 }
