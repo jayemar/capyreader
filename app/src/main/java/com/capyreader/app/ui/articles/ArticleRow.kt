@@ -84,6 +84,8 @@ data class ArticleRowOptions(
     val imagePreview: ImagePreview = ImagePreview.default,
     val fontScale: ArticleListFontScale = ArticleListFontScale.MEDIUM,
     val shortenTitles: Boolean = true,
+    val shortenSummaries: Boolean = true,
+    val summaryMaxLines: SummaryMaxLines = SummaryMaxLines.default,
     val accentColors: Boolean = false,
     val dim: Boolean = true,
 )
@@ -211,7 +213,7 @@ fun ArticleRow(
                         if (article.summary.isNotBlank() && options.showSummary) {
                             Text(
                                 text = article.summary,
-                                maxLines = 2,
+                                maxLines = if (options.shortenSummaries) options.summaryMaxLines.lines else Int.MAX_VALUE,
                                 overflow = TextOverflow.Ellipsis,
                                 fontWeight = if (deEmphasizeFontWeight) FontWeight.Light else null,
                             )

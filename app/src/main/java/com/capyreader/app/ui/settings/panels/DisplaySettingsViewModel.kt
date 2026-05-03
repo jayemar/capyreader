@@ -10,6 +10,7 @@ import com.capyreader.app.preferences.ReaderImageVisibility
 import com.capyreader.app.preferences.ThemeMode
 import com.capyreader.app.ui.articles.ArticleListFontScale
 import com.capyreader.app.ui.articles.MarkReadPosition
+import com.capyreader.app.ui.articles.SummaryMaxLines
 import com.jocmp.capy.Account
 
 class DisplaySettingsViewModel(
@@ -41,6 +42,11 @@ class DisplaySettingsViewModel(
 
     private val _showUnreadCount = mutableStateOf(appPreferences.articleListOptions.showUnreadCount.get())
 
+    private val _shortenSummaries = mutableStateOf(appPreferences.articleListOptions.shortenSummaries.get())
+
+    private val _summaryMaxLines = mutableStateOf(appPreferences.articleListOptions.summaryMaxLines.get())
+
+
     var fontScale by mutableStateOf(appPreferences.articleListOptions.fontScale.get())
         private set
 
@@ -61,6 +67,13 @@ class DisplaySettingsViewModel(
 
     val showUnreadCount: Boolean
         get() = _showUnreadCount.value
+
+    val shortenSummaries: Boolean
+        get() = _shortenSummaries.value
+
+    val summaryMaxLines: SummaryMaxLines
+        get() = _summaryMaxLines.value
+
 
     val pinArticleBars = appPreferences.readerOptions.pinToolbars
 
@@ -140,5 +153,17 @@ class DisplaySettingsViewModel(
         appPreferences.articleListOptions.showUnreadCount.set(show)
 
         _showUnreadCount.value = show
+    }
+
+    fun updateShortenSummaries(shortenSummaries: Boolean) {
+        appPreferences.articleListOptions.shortenSummaries.set(shortenSummaries)
+
+        _shortenSummaries.value = shortenSummaries
+    }
+
+    fun updateSummaryMaxLines(maxLines: SummaryMaxLines) {
+        appPreferences.articleListOptions.summaryMaxLines.set(maxLines)
+
+        _summaryMaxLines.value = maxLines
     }
 }
