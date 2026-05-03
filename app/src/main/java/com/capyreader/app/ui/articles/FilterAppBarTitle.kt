@@ -28,9 +28,11 @@ fun FilterAppBarTitle(
     allFeeds: List<Feed>,
     allFolders: List<Folder>,
     allSavedSearches: List<SavedSearch>,
-    onRequestJumpToTop: () -> Unit
+    onRequestJumpToTop: () -> Unit,
+    unreadCount: Long = 0,
+    showUnreadCount: Boolean = false,
 ) {
-    val text = when (filter) {
+    val title = when (filter) {
         is ArticleFilter.Articles -> stringResource(filter.articleStatus.navigationTitle)
         is ArticleFilter.Feeds -> {
             allFeeds.find { it.id == filter.feedID }?.displayTitle()
@@ -45,6 +47,8 @@ fun FilterAppBarTitle(
 
         is ArticleFilter.Today -> stringResource(R.string.filter_today)
     }.orEmpty()
+
+    val text = if (showUnreadCount) "$title ($unreadCount)" else title
 
     Box(
         contentAlignment = Alignment.CenterStart,
