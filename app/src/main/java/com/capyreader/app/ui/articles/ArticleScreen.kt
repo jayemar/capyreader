@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.TopAppBarDefaults.pinnedScrollBehavior
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -25,6 +27,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +43,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -140,6 +144,7 @@ fun ArticleScreen(
         ArticleListVerticalSwipe.DISABLED -> false
         ArticleListVerticalSwipe.NEXT_FEED -> nextFilter != null
         ArticleListVerticalSwipe.MARK_ALL_READ -> true
+        ArticleListVerticalSwipe.REFRESH_ARTICLES -> true
     }
     val context = LocalContext.current
 
@@ -326,6 +331,10 @@ fun ArticleScreen(
 
                 ArticleListVerticalSwipe.MARK_ALL_READ -> {
                     markAllRead(MarkRead.All)
+                }
+
+                ArticleListVerticalSwipe.REFRESH_ARTICLES -> {
+                    refreshAll()
                 }
 
                 ArticleListVerticalSwipe.DISABLED -> {}
@@ -623,6 +632,7 @@ fun ArticleScreen(
                             }
                         }
                     }
+                )
                 }
             },
             detailPane = {

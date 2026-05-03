@@ -6,8 +6,6 @@ import androidx.compose.foundation.MutatorMutex
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.KeyboardArrowUp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -22,7 +20,6 @@ import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -30,6 +27,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import com.capyreader.app.ui.articles.feeds.AngleRefreshState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -119,12 +117,9 @@ private class SwipeRefreshNestedScrollConnection(
         !enabled -> Offset.Zero
         // If we're refreshing, return zero
         state.isRefreshing -> Offset.Zero
-        // If the user is swiping and there's y remaining, handle it
-        scrollFromTop && source == NestedScrollSource.UserInput && available.y < 0f -> onScroll(available)
-        !scrollFromTop && source == NestedScrollSource.UserInput && available.y > 0f -> onScroll(
-            available
-        )
-
+        // For top indicator: handle upward drag (collapsing the indicator)
+        scrollFromTop && source == NestedScrollSource.Drag && available.y < 0f -> onScroll(available)
+        // For bottom indicator: don't intercept in pre-scroll, let the list handle it first
         else -> Offset.Zero
     }
 
@@ -137,9 +132,10 @@ private class SwipeRefreshNestedScrollConnection(
         !enabled -> Offset.Zero
         // If we're refreshing, return zero
         state.isRefreshing -> Offset.Zero
-        // If the user is swiping and there's y remaining, handle it
-        scrollFromTop && source == NestedScrollSource.UserInput && available.y > 0f -> onScroll(available)
-        !scrollFromTop && source == NestedScrollSource.UserInput && available.y < 0f -> onScroll(
+        // For top indicator: handle downward drag when at top (pull-down-to-refresh)
+        scrollFromTop && source == NestedScrollSource.Drag && available.y > 0f -> onScroll(available)
+        // For bottom indicator: handle upward drag when at bottom (pull-up-to-refresh)
+        !scrollFromTop && source == NestedScrollSource.Drag && available.y < 0f -> onScroll(
             available
         )
 
@@ -170,6 +166,7 @@ private class SwipeRefreshNestedScrollConnection(
         // If we're dragging, not currently refreshing and scrolled
         // past the trigger point, refresh!
         if (!state.isRefreshing && state.indicatorOffset >= refreshTrigger) {
+            state.isRefreshing = true  // Set immediately before callback to prevent race condition
             onRefresh()
         }
 
@@ -238,12 +235,11 @@ fun SwipeRefresh(
     refreshTriggerDistance: Dp = 80.dp,
     indicatorAlignment: Alignment = Alignment.TopCenter,
     indicatorPadding: PaddingValues = PaddingValues(0.dp),
-    icon: ImageVector = Icons.Rounded.KeyboardArrowUp,
+    refreshState: AngleRefreshState = AngleRefreshState.STOPPED,
     indicator: @Composable (state: SwipeRefreshState, refreshTrigger: Dp) -> Unit = { s, trigger ->
         SwipeRefreshIndicator(
             state = s,
             refreshTriggerDistance = trigger,
-            icon = icon,
             clockwise = (indicatorAlignment as BiasAlignment).verticalBias != 1f
         )
     },
@@ -253,15 +249,31 @@ fun SwipeRefresh(
     val coroutineScope = rememberCoroutineScope()
     val updatedOnRefresh = rememberUpdatedState(onRefresh)
 
-    // Our LaunchedEffect, which animates the indicator to its resting position
-    LaunchedEffect(state.isSwipeInProgress) {
-        if (!state.isSwipeInProgress) {
-            // If there's not a swipe in progress, rest the indicator at 0f
-            state.animateOffsetTo(0f)
+    val refreshTriggerPx = with(LocalDensity.current) { refreshTriggerDistance.toPx() }
+    val isBottomIndicator = (indicatorAlignment as BiasAlignment).verticalBias == 1f
+
+    LaunchedEffect(refreshState) {
+        when (refreshState) {
+            AngleRefreshState.RUNNING, AngleRefreshState.SETTLING -> {
+                // External state indicates refresh is running
+                state.isRefreshing = true
+                // Always lock indicator at trigger position while refreshing
+                // regardless of where it was when released
+                state.animateOffsetTo(refreshTriggerPx)
+            }
+            AngleRefreshState.STOPPED -> {
+                // External state indicates refresh should stop
+                state.isRefreshing = false
+                // When refresh completes, animate indicator to hidden position
+                if (!state.isSwipeInProgress) {
+                    // For bottom indicators, hide below screen (negative offset)
+                    // For top indicators, hide above screen (0f offset)
+                    val hiddenOffset = if (isBottomIndicator) -refreshTriggerPx else 0f
+                    state.animateOffsetTo(hiddenOffset)
+                }
+            }
         }
     }
-
-    val refreshTriggerPx = with(LocalDensity.current) { refreshTriggerDistance.toPx() }
 
     // Our nested scroll connection, which updates our state.
     val nestedScrollConnection = remember(state, coroutineScope) {
@@ -292,14 +304,9 @@ fun SwipeRefresh(
 
         Box(
             Modifier
-                // If we're not clipping to the padding, we use clipToBounds() before the padding()
-                // modifier.
-                .let { if (!clipIndicatorToPadding) it.clipToBounds() else it }
                 .padding(indicatorPadding)
                 .matchParentSize()
-                // Else, if we're are clipping to the padding, we use clipToBounds() after
-                // the padding() modifier.
-                .let { if (clipIndicatorToPadding) it.clipToBounds() else it }
+                .clipToBounds()
         ) {
             Box(Modifier.align(indicatorAlignment)) {
                 indicator(state, refreshTriggerDistance)
