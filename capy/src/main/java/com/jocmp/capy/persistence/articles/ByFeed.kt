@@ -5,6 +5,7 @@ import com.jocmp.capy.Article
 import com.jocmp.capy.ArticleStatus
 import com.jocmp.capy.FeedPriority
 import com.jocmp.capy.MarkRead
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.db.Database
 import com.jocmp.capy.persistence.listMapper
@@ -19,11 +20,11 @@ class ByFeed(private val database: Database) {
         since: OffsetDateTime,
         limit: Long,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         offset: Long,
         priority: FeedPriority,
     ): Query<Article> {
         val (read, starred) = status.toStatusPair
-
         val queries = database.articlesByFeedQueries
 
         return if (isDescendingOrder(sortOrder)) {
@@ -37,6 +38,7 @@ class ByFeed(private val database: Database) {
                 lastReadAt = mapLastRead(read, since),
                 lastUnstarredAt = mapLastUnstarred(starred, since),
                 publishedSince = null,
+                sortByPublishedAt = isSortByPublishedAt(sortField),
                 priorities = priority.inclusivePriorities,
                 mapper = ::listMapper
             )
@@ -51,6 +53,7 @@ class ByFeed(private val database: Database) {
                 lastReadAt = mapLastRead(read, since),
                 lastUnstarredAt = mapLastUnstarred(starred, since),
                 publishedSince = null,
+                sortByPublishedAt = isSortByPublishedAt(sortField),
                 priorities = priority.inclusivePriorities,
                 mapper = ::listMapper
             )
@@ -62,6 +65,7 @@ class ByFeed(private val database: Database) {
         feedIDs: List<String>,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         priority: FeedPriority,
         query: String?,
     ): Query<String> {
@@ -75,6 +79,7 @@ class ByFeed(private val database: Database) {
             beforeArticleID = beforeArticleID,
             publishedSince = null,
             newestFirst = isNewestFirst(sortOrder),
+            sortByPublishedAt = isSortByPublishedAt(sortField),
             query = query,
             priorities = priority.inclusivePriorities,
         )

@@ -17,6 +17,7 @@ import com.jocmp.capy.accounts.local.LocalAccountDelegate
 import com.jocmp.capy.accounts.miniflux.MinifluxAccountDelegate
 import com.jocmp.capy.accounts.reader.buildReaderDelegate
 import com.jocmp.capy.articles.ArticleContent
+import com.jocmp.capy.articles.ArticleSortField
 import com.jocmp.capy.articles.SortOrder
 import com.jocmp.capy.common.TimeHelpers.nowUTC
 import com.jocmp.capy.common.sortedByName
@@ -343,12 +344,14 @@ data class Account(
         filter: ArticleFilter,
         range: MarkRead,
         sortOrder: SortOrder,
+        sortField: ArticleSortField = ArticleSortField.default,
         query: String?,
     ): List<String> {
         return articleRecords.unreadArticleIDs(
             filter = filter,
             range = range,
             sortOrder = sortOrder,
+            sortField = sortField,
             query = query,
         )
     }
