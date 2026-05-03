@@ -3,12 +3,19 @@ package com.capyreader.app.common
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.capyreader.app.preferences.CopyLinkFormat
+import com.capyreader.app.ui.components.formatLink
 
-fun Context.shareLink(url: String, title: String) {
+fun Context.shareLink(
+    url: String,
+    title: String,
+    format: CopyLinkFormat = CopyLinkFormat.PLAIN_URL
+) {
+    val textToShare = formatLink(url, title, format)
     val share = Intent.createChooser(Intent().apply {
         type = "text/plain"
         action = Intent.ACTION_SEND
-        putExtra(Intent.EXTRA_TEXT, url)
+        putExtra(Intent.EXTRA_TEXT, textToShare)
         putExtra(Intent.EXTRA_TITLE, title)
     }, null)
     startActivity(share)
