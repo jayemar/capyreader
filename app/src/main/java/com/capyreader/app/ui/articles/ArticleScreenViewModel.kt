@@ -292,10 +292,7 @@ class ArticleScreenViewModel(
             }
         }
 
-        val skipInitialRefresh =
-            appPreferences.refreshInterval.get() == RefreshInterval.MANUALLY_ONLY
-
-        if (skipInitialRefresh) {
+        if (!appPreferences.refreshOnStart.get()) {
             refreshInitialized = true
         } else {
             refreshAll()

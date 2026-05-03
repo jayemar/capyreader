@@ -84,6 +84,8 @@ fun GeneralSettingsPanel(
         GeneralSettingsPanelView(
             source = viewModel.source,
             onNavigateToNotifications = onNavigateToNotifications,
+            refreshOnStart = viewModel.refreshOnStart,
+            updateRefreshOnStart = viewModel::updateRefreshOnStart,
             refreshInterval = viewModel.refreshInterval,
             updateRefreshInterval = viewModel::updateRefreshInterval,
             canOpenLinksInternally = viewModel.canOpenLinksInternally,
@@ -112,6 +114,8 @@ fun GeneralSettingsPanelView(
     source: Source,
     onNavigateToNotifications: () -> Unit,
     onClearArticles: () -> Unit,
+    refreshOnStart: Boolean,
+    updateRefreshOnStart: (Boolean) -> Unit,
     refreshInterval: RefreshInterval,
     updateRefreshInterval: (RefreshInterval) -> Unit,
     canOpenLinksInternally: Boolean,
@@ -153,6 +157,13 @@ fun GeneralSettingsPanelView(
 
         FormSection(title = stringResource(R.string.settings_section_refresh)) {
             Column {
+                RowItem {
+                    TextSwitch(
+                        checked = refreshOnStart,
+                        onCheckedChange = updateRefreshOnStart,
+                        title = stringResource(R.string.settings_refresh_on_start)
+                    )
+                }
                 RefreshIntervalMenu(
                     refreshInterval = refreshInterval,
                     updateRefreshInterval = updateRefreshInterval,
@@ -364,6 +375,8 @@ private fun GeneralSettingsPanelPreview() {
         CapyTheme {
             GeneralSettingsPanelView(
                 source = Source.LOCAL,
+                refreshOnStart = true,
+                updateRefreshOnStart = {},
                 refreshInterval = RefreshInterval.EVERY_HOUR,
                 updateRefreshInterval = {},
                 canOpenLinksInternally = false,
