@@ -228,7 +228,7 @@ fun ArticleScreen(
         val paneExpansion = rememberArticlePaneExpansion()
         val isPullToRefreshing = viewModel.isPullToRefreshing
         val addFeedSuccessMessage = stringResource(R.string.add_feed_success)
-        val scrollBehavior = pinnedScrollBehavior()
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         var media by rememberSaveable(saver = Media.Saver) { mutableStateOf(null) }
         val audioController: AudioPlayerController = koinInject()
         val audioEnclosure by audioController.currentAudio.collectAsState()
@@ -319,6 +319,10 @@ fun ArticleScreen(
             }
         }
 
+        fun refreshAll() {
+            viewModel.refreshAll()
+        }
+
         fun onSwipeUp() {
             when (swipeBottom) {
                 ArticleListVerticalSwipe.NEXT_FEED -> {
@@ -339,10 +343,6 @@ fun ArticleScreen(
 
                 ArticleListVerticalSwipe.DISABLED -> {}
             }
-        }
-
-        fun refreshAll() {
-            viewModel.refreshAll()
         }
 
         fun refreshFeeds() {
@@ -632,7 +632,6 @@ fun ArticleScreen(
                             }
                         }
                     }
-                )
                 }
             },
             detailPane = {

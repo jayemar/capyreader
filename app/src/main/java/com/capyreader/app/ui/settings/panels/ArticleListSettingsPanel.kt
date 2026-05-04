@@ -16,6 +16,8 @@ fun ArticleListSettingsPanel(
             showFeedName = viewModel.showFeedName,
             shortenTitles = viewModel.shortenTitles,
             showUnreadCount = viewModel.showUnreadCount,
+            shortenSummaries = viewModel.shortenSummaries,
+            summaryMaxLines = viewModel.summaryMaxLines,
             updateImagePreview = viewModel::updateImagePreview,
             updateSummary = viewModel::updateSummary,
             updateFeedName = viewModel::updateFeedName,
@@ -23,6 +25,8 @@ fun ArticleListSettingsPanel(
             updateFontScale = viewModel::updateFontScale,
             updateShortenTitles = viewModel::updateShortenTitles,
             updateShowUnreadCount = viewModel::updateShowUnreadCount,
+            updateShortenSummaries = viewModel::updateShortenSummaries,
+            updateSummaryMaxLines = viewModel::updateSummaryMaxLines,
         )
     )
 }

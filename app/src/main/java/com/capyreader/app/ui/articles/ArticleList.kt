@@ -21,6 +21,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.Dp
@@ -51,6 +53,8 @@ fun ArticleList(
         dim = dimReadArticles,
     )
     val currentTime = rememberCurrentTime()
+    var listHeight by remember { mutableStateOf(0.dp) }
+    val localDensity = LocalDensity.current
 
     Box(Modifier.fillMaxSize()) {
         key(listState) {
