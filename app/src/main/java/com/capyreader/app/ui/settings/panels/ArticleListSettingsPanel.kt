@@ -15,12 +15,16 @@ fun ArticleListSettingsPanel(
             showFeedIcons = viewModel.showFeedIcons,
             showFeedName = viewModel.showFeedName,
             shortenTitles = viewModel.shortenTitles,
+            shortenSummaries = viewModel.shortenSummaries,
+            summaryMaxLines = viewModel.summaryMaxLines,
             updateImagePreview = viewModel::updateImagePreview,
             updateSummary = viewModel::updateSummary,
             updateFeedName = viewModel::updateFeedName,
             updateFeedIcons = viewModel::updateFeedIcons,
             updateFontScale = viewModel::updateFontScale,
             updateShortenTitles = viewModel::updateShortenTitles,
+            updateShortenSummaries = viewModel::updateShortenSummaries,
+            updateSummaryMaxLines = viewModel::updateSummaryMaxLines,
         )
     )
 }
