@@ -37,6 +37,7 @@ import com.jocmp.readerclient.SubscriptionQuickAddResult
 import com.jocmp.readerclient.Tag
 import com.jocmp.readerclient.ext.editSubscription
 import com.jocmp.readerclient.ext.streamItemsIDs
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
@@ -291,8 +292,10 @@ internal class ReaderAccountDelegate(
 
     private suspend fun refreshTopLevelArticles() {
         refreshFeeds()
-        refreshAllSavedSearches()
-        refreshArticleState()
+        coroutineScope {
+            launch { refreshAllSavedSearches() }
+            refreshArticleState()
+        }
         fetchMissingArticles()
     }
 
@@ -356,9 +359,11 @@ internal class ReaderAccountDelegate(
         )
     }
 
-    private suspend fun refreshArticleState() {
-        refreshStarredItems()
-        refreshUnreadItems()
+    private suspend fun refreshArticleState() = coroutineScope {
+        val starred = async { refreshStarredItems() }
+        val unread = async { refreshUnreadItems() }
+        starred.await()
+        unread.await()
     }
 
     private suspend fun refreshUnreadItems() {
