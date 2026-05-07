@@ -915,7 +915,10 @@ class ArticleScreenViewModel(
         return account.createSavedSearch(name).fold(
             onSuccess = { labelID ->
                 account.addSavedSearch(articleID, labelID).fold(
-                    onSuccess = { Result.success(labelID) },
+                    onSuccess = {
+                        incrementCurrentLabelCount(articleID)
+                        Result.success(labelID)
+                    },
                     onFailure = { Result.failure(it) }
                 )
             },
