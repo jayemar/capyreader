@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -252,6 +253,8 @@ fun ArticleScreen(
             scrollBehavior = scrollBehavior
         )
 
+        val isAtListBottom by remember { derivedStateOf { !listState.canScrollForward } }
+
         val scrollToTop = {
             coroutineScope.launch {
                 listState.scrollToItem(0)
@@ -337,6 +340,8 @@ fun ArticleScreen(
         }
 
         fun refreshFeeds() {
+            if (isRefreshingAll) return
+
             isPullToRefreshing = true
 
             viewModel.refresh(filter) {
@@ -600,7 +605,7 @@ fun ArticleScreen(
                         ) {
                             PullToNextFeedBox(
                                 modifier = Modifier.fillMaxSize(),
-                                enabled = canSwipeUp,
+                                enabled = canSwipeUp && (listSwipeBottom != ArticleListVerticalSwipe.REFRESH_ARTICLES || isAtListBottom),
                                 refreshState = refreshAllState,
                                 onRequestNext = {
                                     when (listSwipeBottom) {
