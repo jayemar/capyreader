@@ -363,4 +363,9 @@
     <string name="article_actions_delete_page_title">Delete</string>
     <string name="article_actions_delete_page_message">Are you sure you want to delete this page?</string>
     <string name="article_actions_delete_page_confirm">Delete</string>
+    <string name="find_in_page">Find in page</string>
+    <string name="find_in_page_hint">Find in page</string>
+    <string name="find_next">Find next</string>
+    <string name="find_previous">Find previous</string>
+    <string name="close">Close</string>
 </resources>
