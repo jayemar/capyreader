@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.capyreader.app.R
 import com.capyreader.app.common.toast
 import com.capyreader.app.notifications.NotificationHelper
@@ -131,6 +132,7 @@ class ArticleScreenViewModel(
                 since = since
             ).flow
         }.flatMapLatest { it }
+         .cachedIn(viewModelScope)
 
     val folders: Flow<List<Folder>> = combine(
         account.folders,
