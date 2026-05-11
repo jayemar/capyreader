@@ -32,6 +32,8 @@ android {
         versionCode = 1209
         versionName = "2026.05.1209"
 
+        buildConfigField("String", "BUILD_DATE", "\"${java.time.LocalDate.now()}\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true

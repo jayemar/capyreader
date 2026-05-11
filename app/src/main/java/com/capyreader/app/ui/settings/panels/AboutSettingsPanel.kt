@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.VolunteerActivism
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.capyreader.app.BuildConfig.BUILD_DATE
 import com.capyreader.app.BuildConfig.VERSION_NAME
 import com.capyreader.app.R
 import com.capyreader.app.ui.LocalLinkOpener
@@ -97,11 +99,14 @@ fun AboutSettingsPanel() {
                         copyVersionToClipboard()
                     }
             ) {
-                Text(
-                    text = VERSION_NAME,
-                    modifier = Modifier
-                        .padding(16.dp)
-                )
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = VERSION_NAME)
+                    Text(
+                        text = BUILD_DATE,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
                 Icon(
                     imageVector = Icons.Filled.ContentCopy,
                     contentDescription = stringResource(
