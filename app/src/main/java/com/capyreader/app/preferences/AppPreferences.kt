@@ -67,7 +67,7 @@ class AppPreferences(context: Context) {
         get() = preferenceStore.getBoolean("accent_colors", false)
 
     val openLinksInternally: Preference<Boolean>
-        get() = preferenceStore.getBoolean("open_links_internally", true)
+        get() = preferenceStore.getBoolean("open_links_internally", false)
 
     val enableStickyFullContent: Preference<Boolean>
         get() = preferenceStore.getBoolean("enable_sticky_full_content", false)
