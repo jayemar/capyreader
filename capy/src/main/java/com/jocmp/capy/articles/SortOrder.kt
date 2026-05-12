@@ -5,6 +5,6 @@ enum class SortOrder  {
     OLDEST_FIRST;
 
     companion object {
-        val default = NEWEST_FIRST
+        val default = OLDEST_FIRST
     }
 }
