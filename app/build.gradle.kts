@@ -1,5 +1,7 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.Properties
 
 plugins {
@@ -33,7 +35,8 @@ android {
         versionCode = 1209
         versionName = "2026.05.1209"
 
-        buildConfigField("String", "BUILD_DATE", "\"${LocalDate.now()}\"")
+        val buildTime = ZonedDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm 'UTC'"))
+        buildConfigField("String", "BUILD_DATE", "\"${buildTime}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
