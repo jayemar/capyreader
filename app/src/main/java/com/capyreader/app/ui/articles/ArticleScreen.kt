@@ -99,16 +99,14 @@ import com.jocmp.capy.MarkRead
 import com.jocmp.capy.SavedSearch
 import com.jocmp.capy.common.launchIO
 import com.jocmp.capy.common.launchUI
-import com.jocmp.capy.logging.CapyLog
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class, FlowPreview::class)
+@OptIn(ExperimentalMaterial3AdaptiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleScreen(
     viewModel: ArticleScreenViewModel = koinViewModel(),
@@ -186,6 +184,7 @@ fun ArticleScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val confirmMarkAllReadEnabled by appPreferences.articleListOptions.confirmMarkAllRead.asState()
+    val markReadOnScrollEnabled by appPreferences.articleListOptions.markReadOnScroll.collectChangesWithCurrent()
     var isMarkAllReadDialogOpen by remember { mutableStateOf(false) }
 
     CompositionLocalProvider(
@@ -279,9 +278,11 @@ fun ArticleScreen(
             listState = listState,
             articles = articles,
             scrollHighWaterMark = viewModel.scrollHighWaterMark,
+            enabled = markReadOnScrollEnabled,
             updateScrollHighWaterMark = viewModel::updateScrollHighWaterMark,
             markReadOnScroll = viewModel::markReadOnScroll,
             resetScrollBehaviorOffset = resetScrollBehaviorOffset,
+            resetScrollHighWaterMark = viewModel::resetScrollHighWaterMark,
         )
 
         suspend fun openNextStatus(action: suspend () -> Unit) {
@@ -881,63 +882,4 @@ fun isFeedActive(
     return media == null &&
             article == null &&
             !search.isActive
-}
-
-@OptIn(FlowPreview::class)
-@Composable
-private fun MarkReadOnScroll(
-    listState: LazyListState,
-    articles: LazyPagingItems<Article>,
-    scrollHighWaterMark: Int,
-    updateScrollHighWaterMark: (Int) -> Unit,
-    markReadOnScroll: (String) -> Unit,
-    resetScrollBehaviorOffset: () -> Unit,
-) {
-    val appPreferences = koinInject<AppPreferences>()
-
-    val enabled by appPreferences
-        .articleListOptions
-        .markReadOnScroll
-        .collectChangesWithCurrent()
-
-    if (enabled) {
-        LaunchedEffect(listState) {
-            snapshotFlow { listState.layoutInfo.totalItemsCount }
-                .distinctUntilChanged()
-                .collect {
-                    listState.scrollToItem(0)
-                    resetScrollBehaviorOffset()
-                }
-        }
-
-        LaunchedEffect(listState) {
-            snapshotFlow {
-                listState.firstVisibleItemIndex - 1
-            }
-                .distinctUntilChanged()
-                .debounce(500)
-                .collect { scrolledPastIndex ->
-                    CapyLog.debug(
-                        "mark_read_on_scroll:collect", mapOf(
-                            "scrolledPastIndex" to scrolledPastIndex,
-                            "highWaterMark" to scrollHighWaterMark,
-                            "itemCount" to articles.itemCount,
-                        )
-                    )
-                    if (scrolledPastIndex > scrollHighWaterMark && scrolledPastIndex < articles.itemCount) {
-                        updateScrollHighWaterMark(scrolledPastIndex)
-                        val boundaryArticle = articles[scrolledPastIndex]
-                        if (boundaryArticle != null) {
-                            CapyLog.debug(
-                                "mark_read_on_scroll:boundary", mapOf(
-                                    "articleID" to boundaryArticle.id,
-                                    "index" to scrolledPastIndex,
-                                )
-                            )
-                            markReadOnScroll(boundaryArticle.id)
-                        }
-                    }
-                }
-        }
-    }
 }
