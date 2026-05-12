@@ -6,6 +6,6 @@ enum class CopyLinkFormat {
     WIKI_LINK;
 
     companion object {
-        val default = PLAIN_URL
+        val default = MARKDOWN
     }
 }
