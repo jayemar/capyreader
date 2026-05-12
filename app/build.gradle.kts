@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import java.time.LocalDate
 import java.util.Properties
 
 plugins {
@@ -32,7 +33,7 @@ android {
         versionCode = 1209
         versionName = "2026.05.1209"
 
-        buildConfigField("String", "BUILD_DATE", "\"${java.time.LocalDate.now()}\"")
+        buildConfigField("String", "BUILD_DATE", "\"${LocalDate.now()}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
