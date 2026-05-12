@@ -15,6 +15,6 @@ enum class ArticleListVerticalSwipe {
         }
 
     companion object {
-        val default = NEXT_FEED
+        val default = DISABLED
     }
 }

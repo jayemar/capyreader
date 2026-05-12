@@ -17,7 +17,7 @@ enum class RowSwipeOption {
         }
 
     companion object {
-        val default = TOGGLE_READ
+        val default = TOGGLE_STARRED
 
         val sorted: List<RowSwipeOption>
             get() = listOf(
